@@ -1,7 +1,8 @@
 // 3. Mapa Torilu: pan/zoom, místa, animovaná trasa družiny po knihách, detail místa.
 import L from 'leaflet';
 import { D } from '../lib/data.js';
-import { $, $$, esc, reduced, ROMAN } from '../lib/util.js';
+import { $, $$, esc, reduced, ROMAN, settleScroll } from '../lib/util.js';
+import { emit } from '../lib/sections.js';
 
 const W = 2576, H = 884;
 const ERA_COL = { I: '#c9a54a', II: '#d0573f', III: '#7fa37a', IV: '#6f9ccf', V: '#d7c49a', epilog: '#eadfc6' };
@@ -143,18 +144,33 @@ export function renderMap() {
     }
     setEra('all');
   }
-  const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); init(); } }, { rootMargin: '300px' });
+  const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); if (!map) init(); } }, { rootMargin: '300px' });
   io.observe($('#leaf', el));
 
   el.addEventListener('click', (e) => {
     const b = e.target.closest('.map-eras button'); if (b) setEra(b.dataset.era);
     const o = e.target.closest('[data-off]'); if (o) panel(D.map.off[+o.dataset.off]);
-    const n = e.target.closest('[data-npc]'); if (n) window.dispatchEvent(new CustomEvent('registry:search', { detail: { q: n.dataset.npc } }));
+    const n = e.target.closest('[data-npc]'); if (n) emit('registry:search', { q: n.dataset.npc });
   });
   $('#mpPlay', el).onclick = play;
   $('#mpPrev', el).onclick = () => { stop(); idx = Math.max(0, idx - 1); draw(true); };
   $('#mpNext', el).onclick = () => { stop(); idx = Math.min(visible().length - 1, idx + 1); draw(true); };
   range.oninput = () => { stop(); idx = +range.value; draw(true); };
+  // odkaz na místo (z vyprávění v Příběhu): mapa se ukáže, přiblíží místo a otevře jeho kartu
+  window.addEventListener('map:place', (e) => {
+    const id = e.detail.id;
+    const p = D.map.places.find((x) => x.id === id) || D.map.off.find((x) => x.id === id);
+    settleScroll($('.map-ui', el));
+    if (!map) { io.disconnect(); init(); }
+    if (!p) return;
+    stop();
+    if (p.x != null) {
+      map.setView(ll(p.x, p.y), 0.25, { animate: !reduced() });
+      const m = markers[p.name]?.getElement();
+      if (m) { m.classList.add('hit'); setTimeout(() => m.classList.remove('hit'), 4000); }
+    }
+    panel(p);
+  });
   window.addEventListener('map:era', (e) => {
     const go = () => { setEra(e.detail.era); idx = 0; draw(); setTimeout(play, 700); };
     if (map) go(); else setTimeout(go, 900);

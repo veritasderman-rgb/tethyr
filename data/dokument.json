@@ -1,9 +1,10 @@
 {
- "popis": "Dramaturgie režimu „Přehrát vše jako dokument“: knihy I–V, střídání spojenců, nepřátel a hlasů z nadhledu; mezi nimi střihy na mapy a malby bitev. Elminster je závěr.",
+ "popis": "Dramaturgie režimu „Přehrát vše jako dokument“: knihy I–V, střídání spojenců, nepřátel a hlasů z nadhledu; mezi nimi střihy na mapu (úsek trasy jedné kapitoly, pole „ch“) a malby bitev. Elminster je závěr.",
  "scenar": [
   {
    "k": "kniha",
-   "key": "I"
+   "key": "I",
+   "ch": "ch-stity-apokalypsy"
   },
   {
    "k": "sv",
@@ -43,7 +44,8 @@
   },
   {
    "k": "kniha",
-   "key": "II"
+   "key": "II",
+   "ch": "ch-draci-let-a-knihovna-arenkae"
   },
   {
    "k": "bitva",
@@ -95,7 +97,8 @@
   },
   {
    "k": "kniha",
-   "key": "III"
+   "key": "III",
+   "ch": "ch-runovladci-a-shoonach"
   },
   {
    "k": "sv",
@@ -123,7 +126,8 @@
   },
   {
    "k": "kniha",
-   "key": "IV"
+   "key": "IV",
+   "ch": "ch-prvni-dungeony-a-arborea"
   },
   {
    "k": "sv",
@@ -143,7 +147,8 @@
   },
   {
    "k": "kniha",
-   "key": "V"
+   "key": "V",
+   "ch": "ch-thultanthar-a-pyramida-casu"
   },
   {
    "k": "sv",

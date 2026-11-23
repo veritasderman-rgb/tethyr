@@ -1,7 +1,7 @@
 // 7. Alaundovo proroctví: tři kapitoly, verše se odhalují při scrollu, u známých dvojverší „komu patří“.
 import { D } from '../lib/data.js';
 import { img, small, largest } from '../lib/img.js';
-import { $, $$, esc } from '../lib/util.js';
+import { $, $$, esc, settleScroll } from '../lib/util.js';
 import { openLightbox } from '../lib/lightbox.js';
 
 const NAMES = ['první', 'druhá', 'třetí'];
@@ -22,7 +22,7 @@ export function renderProphecy() {
           <p class="pr-rom rv">${ROM[i]}</p><h3 class="pr-k rv">Kapitola ${NAMES[i]}</h3>
           <div class="pr-terc rv">${c.tercet.map((l) => `<p>${esc(l)}</p>`).join('')}</div>
           <div class="pr-orn">✦</div>
-          ${c.verses.map((v, j) => `<div class="pr-v rv${v.who ? ' known' : ''}">
+          ${c.verses.map((v, j) => `<div class="pr-v rv${v.who ? ' known' : ''}" id="pv-${i + 1}-${j}">
             <p>${v.t.map(esc).join('<br>')}</p>
             ${v.img ? `<button class="pr-thumb" data-lb="${esc(largest('ilu/' + v.img))}" data-cap="${esc(v.cap || '')}" aria-label="Obraz k verši: ${esc(v.cap || '')}"><img src="${small('ilu/' + v.img)}" alt="" loading="lazy" decoding="async"></button>` : ''}
             ${v.who ? `<button class="pr-who" aria-expanded="false" aria-controls="prw-${i}-${j}">✦ <span>Komu patří</span></button><p class="pr-ans" id="prw-${i}-${j}" hidden><b>${esc(v.who)}</b><small>${esc(v.src)}</small></p>` : ''}
@@ -36,6 +36,14 @@ export function renderProphecy() {
     if (w) { const a = w.nextElementSibling; a.hidden = !a.hidden; w.setAttribute('aria-expanded', !a.hidden); w.classList.toggle('on', !a.hidden); return; }
     const t = e.target.closest('.pr-thumb');
     if (t) openLightbox([{ src: t.dataset.lb, cap: t.dataset.cap }]);
+  });
+  // odkaz na verš (z vyprávění): doskrolovat, zvýraznit, případně otevřít výklad
+  window.addEventListener('prophecy:verse', (e) => {
+    const v = document.getElementById(e.detail.id); if (!v) return;
+    v.classList.add('in', 'hit');
+    const w = $('.pr-who', v); if (w && w.getAttribute('aria-expanded') !== 'true') w.click();
+    if (e.detail.scroll !== false) settleScroll(v);
+    setTimeout(() => v.classList.remove('hit'), 4200);
   });
   // obraz kapitoly vlevo podle toho, kterou kapitolu čtenář právě čte
   const pics = $$('.pr-pic', el);

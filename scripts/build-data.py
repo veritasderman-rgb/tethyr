@@ -9,6 +9,8 @@ Zdroje se jen čtou. Cesty ke zdrojům lze přepsat proměnnými prostředí SRC
 """
 import ast, datetime, glob, json, os, re, sys, unicodedata
 from concurrent.futures import ProcessPoolExecutor
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import vypraveni as VYPR  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WORK = os.environ.get('SRC_WORK', '/home/claude/work')
@@ -121,7 +123,7 @@ GAME = {'hlavni': '', 'lovci': 'Sigilští lovci', 'solo': 'Hra ve dvou', 'pripr
 MINOR = {'s-2007-02-09', 's-2007-06-29', 's-2007-07-25', 's-2014-05-22', 's-2014-07-05', 's-2019-12-30', 's-2020-01-11',
          's-2020-04-26', 's-2020-05-29', 's-2020-12-18', 's-2021-06-19', 's-2026-01-10'}
 CAMP = {c['key']: c for c in WD['campaigns']}
-VYP = clean(load(ROOT + '/data/vypraveni.json')) if os.path.exists(ROOT + '/data/vypraveni.json') else {}
+VYP = clean(VYPR.parse(ROOT + '/data/vypraveni'))  # ručně psané vyprávění ke kapitolám (data/vypraveni/*.md)
 
 # hráči podle postav
 PLAYER = {}
@@ -226,6 +228,7 @@ for s in S:
     o['game_label'] = GAME.get(s['game'], '')
     o['players'] = list(dict.fromkeys(PLAYER.get(norm(c), PLAYER.get(norm(c.split()[0]), '')) for c in s['characters']))
     o['players'] = [p for p in o['players'] if p]
+    o['cast'] = [[c, PLAYER.get(norm(c), PLAYER.get(norm(c.split()[0]), ''))] for c in s['characters']]
     o['ilu'] = [{'f': m['file'][:-4], 'cap': m.get('caption', '')} for m in MAN if m.get('target') == 'kronika' and m.get('session') == s['id']]
     o['gal'] = [{'n': g['n'], 'cap': g.get('caption', ''), 'w': g['w'], 'h': g['h']} for g in GBYS.get(s['id'], [])]
     o['photos'] = photos_for(s)
@@ -235,6 +238,21 @@ for s in S:
     sessions.append({k: v for k, v in o.items() if v not in (None, [], '')} | {'id': s['id']})
 
 # kapitoly v rámci knih
+# úsek trasy družiny (indexy do map.json route) pro mapku u každé kapitoly a pro střih v režimu dokument
+CH_ROUTE = {
+    'ch-z-tethyru-na-vychod': [0, 1, 2, 3, 4, 5, 6], 'ch-shou-lung-a-velke-tazeni': [7, 8, 9, 10, 11, 12, 13, 14, 15],
+    'ch-navrat-tyruv-chram-a-sigil': [21, 17, 22, 16, 18, 19, 20], 'ch-stity-apokalypsy': [23, 24, 25, 26, 27, 28, 29],
+    'ch-feng-asay-a-tempat-larang': [30, 31, 32], 'ch-draci-let-a-knihovna-arenkae': [33, 34, 35, 36],
+    'ch-pod-rudou-pevnosti': [36, 37, 38], 'ch-bitva-o-rudou-pevnost': [38, 39], 'ch-navrat-domu-a-houv-prestup': [40, 41, 44, 45, 43],
+    'ch-kholtar-chult-a-hoova-mala': [43, 46, 47, 48], 'ch-sever-lod-a-zakhara': [49, 42, 50], 'ch-lovci-a-zachrana-ze-zakhary': [40, 51],
+    'ch-nova-krev-a-more-padlych-hvezd': [53, 54, 55], 'ch-namorni-tazeni': [56], 'ch-tethyr-v-novem-slozeni': [41, 57],
+    'ch-runovladci-a-shoonach': [52, 58, 60, 61], 'ch-shoonach-finale': [58, 59], 'ch-severska-druzina': [60, 62], 'ch-halruaa': [59, 63],
+    'ch-anauroch-zaver-druhe-hry': [60, 65, 64], 'ch-spojeni-druzin-a-odlet': [66], 'ch-prvni-dungeony-a-arborea': [66, 67, 68, 69],
+    'ch-cesta-zapadnich-draku': [71], 'ch-lovci-v-turmishi': [70], 'ch-tovarna-temnych-a-deepgate': [70, 73], 'ch-velka-trhlina': [74, 72],
+    'ch-mount-talath-zacatek-konce': [75, 76, 77], 'ch-cham-fau-a-navrat-na-faerun': [78, 79],
+    'ch-morske-veze-draci-a-illithide': [79, 82, 83, 84, 81], 'ch-selunarra-a-vyklad-proroctvi': [80, 85], 'ch-vycvik-a-velka-rada': [86],
+    'ch-anauroch': [86, 88], 'ch-thultanthar-a-pyramida-casu': [88, 89, 90], 'ch-epilog': [91, 92], 'ch-nova-generace': [83],
+}
 books = []
 for k, (kap, tit, real, dr) in ERA.items():
     ss = [s for s in sessions if s['era'] == k]
@@ -254,7 +272,21 @@ for k, (kap, tit, real, dr) in ERA.items():
         ch['real'] = f'{yrs[0]}–{yrs[-1]}' if yrs[0] != yrs[-1] else str(yrs[0])
         ch['drs'] = (f'{drs[0]}–{drs[-1]}' if drs[0] != drs[-1] else str(drs[0])) + ' DR' if drs else ''
         ch['id'] = ch.get('id') or 'ch-' + slug(ch['title'])
-        ch['vypraveni'] = VYP.get(ch['id'], [])
+        v = VYP.get(ch['id'], [])
+        ch['words'] = VYPR.words(v)
+        ch['min'] = max(1, round(ch['words'] / 170))
+        ch['route'] = CH_ROUTE.get(ch['id'], [])
+        cast = {}
+        for s in grp:
+            for c, pl in s.get('cast', []):
+                cast.setdefault(c, pl)
+        ch['cast'] = [[c, pl] for c, pl in cast.items()]
+        gl = []
+        for s in grp:
+            gl += [{'k': 'ilu/' + m['f'], 'cap': m['cap'], 's': s['id']} for m in s.get('ilu', [])]
+            gl += [{'k': 'nove/n%02d' % g['n'], 'cap': g['cap'], 's': s['id']} for g in s.get('gal', [])]
+            gl += [{'k': 'foto/%03d' % n, 'cap': 'U stolu, ' + s['date_label'], 's': s['id']} for n in s.get('photos', [])]
+        ch['gallery'] = gl
         ch['regions'] = list(dict.fromkeys(s.get('region') for s in grp if s.get('region')))
         ch['players'] = list(dict.fromkeys(p for s in grp for p in s.get('players', [])))
     c = CAMP.get(k, {})
@@ -316,6 +348,8 @@ MAP_FIX = {'Castle Tethyr': (365, 568), 'Ithmong': (445, 575), 'Tyrův chrám v 
            'Dračí let': (259, 531), 'Reghedský ledovec': (137, 10), 'Mechový kámen': (256, 523), 'Mořské věže': (116, 628)}
 for p in MP['places']:
     if p['name'] in MAP_FIX: p['x'], p['y'] = MAP_FIX[p['name']]
+for p in MP['places'] + MP['off']:
+    p['id'] = slug(p['name'])
 PL = {p['name']: p for p in MP['places']}
 route = []
 for r in MP['route']:
@@ -445,6 +479,17 @@ for w in SV:
     w.pop('casy', None)
 SV = [clean({k: v for k, v in w.items() if k != 'text'}) | {'text': w['text']} for w in SV]
 
+# ---------------------------------------------------------------- vyprávění: kontrola odkazů a stylu
+C3D = load(ROOT + '/public/mapa3d/data/campaign.json')
+IDS = {'w': {w['id'] for w in SV}, 'm': {p['id'] for p in C3D['places'] + C3D['spheres']}, 'b': {b['id'] for b in BATTLES},
+       'c': {c['id'] for c in chars}, 's': {s['id'] for s in sessions},
+       'p': {f"{ci + 1}-{vi}" for ci, c in enumerate(proph) for vi in range(len(c['verses']))}}
+ALLCH = [c for b in books for c in b['chapters']]
+nbad = VYPR.validate(VYP, ALLCH, IDS)
+print(f'vyprávění: {len(VYP)} kapitol, {sum(c["words"] for c in ALLCH)} slov, {nbad} problémů')
+PLACE_NAME = {p['id']: p['name'] for p in C3D['places'] + C3D['spheres']}
+stats = {'sessions': len(sessions), 'pcs': sum(1 for c in chars if c.get('kind') == 'hrac'), 'battles': len(BATTLES), 'npcs': len(npcs)}
+
 # ---------------------------------------------------------------- zápis
 print('data →', OUT)
 dump('sessions.json', sessions)
@@ -458,6 +503,8 @@ dump('timeline.json', timeline)
 gallery['ilu'] = [x for x in gallery['ilu'] if x['f'] + '.jpg' in ILU_DONE]
 dump('gallery.json', gallery)
 dump('svedectvi.json', SV)
+dump('vypraveni.json', {'chapters': VYP, 'places': PLACE_NAME})
+dump('stats.json', stats)
 
 
 # ---------------------------------------------------------------- obrázky

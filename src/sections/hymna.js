@@ -1,13 +1,14 @@
 // 11. Hymna družiny „Rauko“: vlastní přehrávač, text po slokách se zvýrazněním řádku, vizuál reagující na hlasitost.
 // Zvuk startuje až po kliknutí. Časy řádků jsou v data/hymna.json (skript scripts/build-hymna.py);
-// existuje-li assets/hymna/rauko_klip.mp4, nabídne se i „Videoklip“.
+// existuje-li public/hymna/rauko_klip.mp4, je hlavním přehrávačem videoklip (text písně pod ním se zvýrazňuje podle videa)
+// a vlastní hudební přehrávač zůstává jako záložní možnost.
 import media from 'virtual:media';
 import HY from '../../data/hymna.json';
 import { img } from '../lib/img.js';
 import { $, $$, esc, reduced } from '../lib/util.js';
 
 const PAINT = ['K_026', 'K_032', 'K_034', 'K_031', 'K_027', 'K_033', 'K_028'];
-const HAS_CLIP = media.hymna.includes('rauko_klip.mp4');
+const HAS_CLIP = (media.klip || []).includes('rauko_klip.mp4');
 const mmss = (t) => { t = Math.max(0, t || 0); return `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`; };
 
 export function renderHymna() {
@@ -15,24 +16,25 @@ export function renderHymna() {
   const secs = HY.sekce;
   el.innerHTML = `<header class="sec-head"><p class="kicker">Hymna</p><h2 id="hymna-h">Rauko</h2>
     <p class="lead">Hymna družiny, napsaná ke čtvrtstoletí hry. Poslouchejte nahlas.</p><div class="orn">✦</div></header>
-    <div class="hy wrap">
+    ${HAS_CLIP ? `<figure class="hy-vid wrap"><video id="hyClip" controls playsinline preload="metadata" poster="hymna/rauko_klip.jpg" aria-label="Videoklip k hymně Rauko"><source src="hymna/rauko_klip.mp4" type="video/mp4"></video><figcaption>Videoklip k hymně · text písně se pod videem zvýrazňuje podle zpěvu, klepnutím na řádek video skočí na to místo</figcaption></figure>` : ''}
+    <div class="hy wrap${HAS_CLIP ? ' with-clip' : ''}">
+      ${HAS_CLIP ? '<details class="hy-alt"><summary>Jen hudba · záložní přehrávač</summary>' : ''}
       <div class="hy-left">
         <div class="hy-stage" id="hyStage">
           <div class="hy-paint" aria-hidden="true">${PAINT.map((k, i) => `<div class="hy-p${i === 0 ? ' on' : ''}">${img('ilu/' + k, { alt: '', sizes: '(max-width:900px) 100vw, 60vw', eager: i === 0 })}</div>`).join('')}</div>
           <div class="hy-shade" aria-hidden="true"></div>
           <canvas class="hy-cv" id="hyCv" aria-hidden="true"></canvas>
           <figure class="hy-arch" id="hyArch"><div class="hy-arch-i">${img('port/rauko', { alt: 'Rauko Daerond, portrét', sizes: '(max-width:900px) 60vw, 28vw', pos: '38% 18%' })}</div></figure>
-          <video class="hy-clip" id="hyClip" playsinline preload="none" hidden></video>
           <div class="hy-cur" id="hyCur" aria-live="off"></div>
         </div>
         <div class="hy-ctl" role="group" aria-label="Přehrávač hymny">
           <button class="btn red hy-play" id="hyPlay" aria-label="Přehrát">▶</button>
           <div class="hy-seek"><input type="range" id="hySeek" min="0" max="1000" value="0" step="1" aria-label="Posuv v písni"><span class="hy-time"><b id="hyT">0:00</b> / <i id="hyD">${mmss(HY.delka)}</i></span></div>
           <div class="hy-vol"><button class="btn sm ghost" id="hyMute" aria-pressed="false" aria-label="Ztlumit">♪</button><input type="range" id="hyVol" min="0" max="100" value="85" aria-label="Hlasitost"></div>
-          ${HAS_CLIP ? `<div class="hy-mode" role="group" aria-label="Zobrazení"><button class="btn sm" data-mode="audio" aria-pressed="true">Hudba</button><button class="btn sm" data-mode="clip" aria-pressed="false">Videoklip</button></div>` : ''}
         </div>
         <audio id="hyAudio" preload="none" src="assets/hymna/rauko.mp3"></audio>
       </div>
+      ${HAS_CLIP ? '</details>' : ''}
       <div class="hy-lyr" id="hyLyr" tabindex="0" aria-label="Text hymny">
         ${secs.map((s, i) => `<section class="hy-sec" data-s="${i}"><h4>${esc(s.label)}${s.note ? ` <span>${esc(s.note)}</span>` : ''}</h4>
           ${s.lines.length ? s.lines.map((l, j) => `<p class="hy-l" data-t="${l.t}" data-k="${i}-${j}" tabindex="-1">${esc(l.x)}</p>`).join('') : `<p class="hy-l hy-solo" data-t="${s.start ?? 0}" data-k="${i}-s"><span aria-hidden="true">♪ ♪ ♪</span><b class="sr">instrumentální část</b></p>`}</section>`).join('')}
@@ -40,13 +42,13 @@ export function renderHymna() {
       </div>
     </div>`;
 
-  const audio = $('#hyAudio', el), clip = $('#hyClip', el);
+  const audio = $('#hyAudio', el), clip = $('#hyClip', el) || document.createElement('video');
   const stage = $('#hyStage', el), cv = $('#hyCv', el), ctx = cv.getContext('2d');
   const seek = $('#hySeek', el), tEl = $('#hyT', el), dEl = $('#hyD', el), play = $('#hyPlay', el);
   const lyr = $('#hyLyr', el);
   const lines = $$('.hy-l', el).map((p) => ({ p, t: +p.dataset.t, sec: p.closest('.hy-sec') })).sort((a, b) => a.t - b.t);
-  let m = audio;            // aktuální zdroj (audio / video klip)
-  let mode = 'audio';
+  let m = HAS_CLIP ? clip : audio; // aktuální zdroj (videoklip / záložní hudba)
+  let mode = HAS_CLIP ? 'clip' : 'audio';
   let ac = null, an = null, freq = null, wave = null;
   const srcNodes = new Map();
   let level = 0, avg = 0, rings = [], embers = [], raf = 0, visible = false, curIdx = -2, paintI = 0, paintT = 0, seeking = false;
@@ -73,11 +75,18 @@ export function renderHymna() {
 
   // ---------- přehrávání
   function ui() {
-    const p = playing();
+    const p = !audio.paused && !audio.ended;
     play.textContent = p ? '❚❚' : '▶'; play.setAttribute('aria-label', p ? 'Pozastavit' : 'Přehrát');
     stage.classList.toggle('playing', p);
   }
-  async function toggle() {
+  function use(x) { // přepnout zdroj pro zvýraznění textu; druhý zdroj ztichne
+    if (m === x) return;
+    (x === clip ? audio : clip).pause();
+    m = x; mode = x === clip ? 'clip' : 'audio';
+    dEl.textContent = mmss(dur()); sync(true);
+  }
+  async function toggle() { // vlastní (záložní) přehrávač ovládá jen hudbu
+    if (m !== audio) use(audio);
     if (playing()) { m.pause(); ui(); return; }
     setupAudio(); ac?.state === 'suspended' && ac.resume().catch(() => {}); attach(m);
     if (m === audio && audio.preload !== 'auto') audio.preload = 'auto';
@@ -85,9 +94,9 @@ export function renderHymna() {
     ui(); tick();
   }
   play.addEventListener('click', toggle);
-  [audio, clip].forEach((x) => { x.addEventListener('ended', () => { ui(); }); x.addEventListener('pause', ui); x.addEventListener('play', () => { ui(); tick(); }); x.addEventListener('loadedmetadata', () => { if (x === m) dEl.textContent = mmss(dur()); }); });
+  [audio, clip].forEach((x) => { x.addEventListener('ended', () => { ui(); }); x.addEventListener('pause', ui); x.addEventListener('play', () => { use(x); ui(); tick(); }); x.addEventListener('loadedmetadata', () => { if (x === m) dEl.textContent = mmss(dur()); }); });
   seek.addEventListener('input', () => { seeking = true; tEl.textContent = mmss(seek.value / 1000 * dur()); });
-  seek.addEventListener('change', () => { m.currentTime = seek.value / 1000 * dur(); seeking = false; sync(true); });
+  seek.addEventListener('change', () => { use(audio); m.currentTime = seek.value / 1000 * dur(); seeking = false; sync(true); });
   const vol = $('#hyVol', el), mute = $('#hyMute', el);
   const setVol = () => { audio.volume = clip.volume = vol.value / 100; };
   vol.addEventListener('input', () => { setVol(); audio.muted = clip.muted = false; mute.setAttribute('aria-pressed', 'false'); });
@@ -102,24 +111,10 @@ export function renderHymna() {
   lyr.addEventListener('click', (e) => {
     const p = e.target.closest('.hy-l'); if (!p) return;
     m.currentTime = Math.max(0, +p.dataset.t - 0.2); sync(true);
-    if (!playing()) toggle();
+    if (!playing()) { if (m === clip) clip.play().catch(() => {}); else toggle(); }
   });
 
-  // ---------- videoklip
-  $$('[data-mode]', el).forEach((b) => b.addEventListener('click', async () => {
-    const to = b.dataset.mode; if (to === mode) return;
-    const t = m.currentTime, was = playing();
-    m.pause();
-    mode = to; m = to === 'clip' ? clip : audio;
-    if (to === 'clip') { if (!clip.src) clip.src = 'assets/hymna/rauko_klip.mp4'; clip.hidden = false; clip.preload = 'auto'; }
-    else clip.hidden = true;
-    stage.classList.toggle('klip', to === 'clip');
-    $$('[data-mode]', el).forEach((x) => x.setAttribute('aria-pressed', x.dataset.mode === to));
-    await new Promise((r) => { if (m.readyState >= 1) r(); else { m.addEventListener('loadedmetadata', r, { once: true }); m.load?.(); setTimeout(r, 4000); } });
-    try { m.currentTime = t; } catch { /* nelze přeskočit */ }
-    dEl.textContent = mmss(dur());
-    if (was) toggle(); else sync(true);
-  }));
+  if (HAS_CLIP) clip.addEventListener('timeupdate', () => { if (m === clip && !playing()) sync(true); });
 
   // ---------- text: zvýraznění řádku
   function sync(force) {

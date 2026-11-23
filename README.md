@@ -41,11 +41,15 @@ Zdroje: `SRC_SVEDECTVI`, `SRC_VOICES`, `SRC_VID`, `SRC_HYMNA` (proměnné prost�
 
 ## Hymna a poděkování
 
-Hymna „Rauko“: `assets/hymna/rauko.mp3`, text a časy řádků v `data/hymna.json` (z `/home/claude/hymna/rauko.txt`; časy z `timing.json` ve zdrojové složce (`sekce[].radky[].start`, případně pole 47 čísel), jinak z `data/hymna-timing.json` (odhad z automatického přepisu)). Přehrávač má play/pauzu, posuv, hlasitost, zvýraznění řádku a sloky, klik na řádek skočí na řádek; vizuál reaguje na hlasitost (WebAudio analyser). Když ve složce hymny existuje `rauko_klip.mp4`, po `build-media.py` se nabídne „Videoklip“. Poděkování je `data/podekovani.txt` beze změn.
+Hymna „Rauko“: hlavním přehrávačem je videoklip `public/hymna/rauko_klip.mp4` (1280×720, H.264 crf 31, faststart, ~39 MB) s plakátem `rauko_klip.jpg`; pod ním se zvýrazňuje text podle videa. Záložní hudební přehrávač: `assets/hymna/rauko.mp3`, text a časy řádků v `data/hymna.json` (z `/home/claude/hymna/rauko.txt`; časy z `timing.json` ve zdrojové složce (`sekce[].radky[].start`, případně pole 47 čísel), jinak z `data/hymna-timing.json` (odhad z automatického přepisu)). Přehrávač má play/pauzu, posuv, hlasitost, zvýraznění řádku a sloky, klik na řádek skočí na řádek; vizuál reaguje na hlasitost (WebAudio analyser). Když ve složce hymny existuje `rauko_klip.mp4`, po `build-media.py` se nabídne „Videoklip“. Poděkování je `data/podekovani.txt` beze změn.
 
 ## 3D mapa a kotvy
 
 `public/mapa3d/` je samostatná složka (viz její README). V oddílu Mapa je vstup s odkazem na celou obrazovku a s iframem, který se načte až po kliknutí. Kotvy, které mapa očekává: `#s-…` (sezení), `#b-…` (bitvy), `#svedectvi/<id>` (otevře svědectví), `#mapa`, `#pribeh`; zpracovává je router v `src/main.js` (otevře rozbalené podrobnosti a dorovná polohu, než se dočtou lazy obrázky). Polohy míst v `build-data.py` (`MAP_FIX`) jsou opravené stejně jako v 3D mapě.
+
+## Příběh (vyprávění)
+
+Text kapitol je v `data/vypraveni/1.md`–`4.md`: `## <id kapitoly>`, odstavce oddělené prázdným řádkem, `{s-…}` na konci odstavce = marginálie (datum u stolu a ve hře), citace `> text` + `> — Jméno, zdroj`. Odkazy v textu: `[text](w:svědek)`, `(m:místo z 3D mapy)`, `(b:bitva)`, `(p:kapitola-verš)`, `(c:postava)`, `(s:sezení)`. `build-data.py` texty zkontroluje (platnost odkazů, 4–8 odstavců, zakázaná slova, otazníky, autor citace) a zapíše `public/data/vypraveni.json`. Úsek trasy pro mapku kapitoly je v `CH_ROUTE` v `build-data.py`. Data webu se načítají po oddílech (`src/lib/data.js` `need`, `src/lib/sections.js` `ensure`/`emit`). Kontrola v prohlížeči: `python3 scripts/shots3.py` (snímky a testy odkazů do `/home/claude/webshots/it3/`).
 
 ## Struktura
 
@@ -55,7 +59,7 @@ vite.config.js           base './', plugin pro audio/video svědectví
 scripts/build-data.py    zdroje → public/data/*.json + WebP obrázky
 scripts/shots.py         Playwright snímky desktop/mobil
 data/svedectvi.json      promluvy svědků (ručně psané, fakta z dat)
-data/vypraveni.json      vyprávění ke kapitolám příběhu (ručně psané, fakta z dat)
+data/vypraveni/*.md      převyprávění 36 kapitol (ručně psané, fakta z dat, citace z textů hráčů; formát a kontrola v scripts/vypraveni.py)
 assets/voices, assets/video, assets/hymna   hlasy, videa a hymna (generuje scripts/build-media.py)
 public/mapa3d/           samostatná 3D mapa Faerûnu
 public/data/             generovaná data webu

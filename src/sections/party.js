@@ -2,6 +2,7 @@
 import { D } from '../lib/data.js';
 import { img, small } from '../lib/img.js';
 import { $, esc, nb } from '../lib/util.js';
+import { emit } from '../lib/sections.js';
 import { openDrawer } from '../lib/lightbox.js';
 
 const yrs = (s) => (String(s || '').match(/\d{4}/g) || []).map(Number);
@@ -74,10 +75,12 @@ export function renderParty() {
     openDrawer(detail(c), (panel) => {
       panel.addEventListener('click', (ev) => {
         const w = ev.target.closest('[data-wit]');
-        if (w) { $('.dr-close', panel).click(); window.dispatchEvent(new CustomEvent('witness:open', { detail: { id: w.dataset.wit } })); }
+        if (w) { $('.dr-close', panel).click(); emit('witness:open', { id: w.dataset.wit }); }
         if (ev.target.closest('[data-close]')) $('.dr-close', panel).click();
       });
     });
   });
+  // otevření postavy odjinud (časová osa, příběh)
+  window.addEventListener('party:open', (e) => { const b = $(`[data-c="${e.detail.id}"]`, el); if (b) b.click(); });
   void small;
 }

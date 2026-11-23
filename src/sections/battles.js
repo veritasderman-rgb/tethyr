@@ -2,6 +2,7 @@
 import { D } from '../lib/data.js';
 import { img, largest } from '../lib/img.js';
 import { $, esc, nb } from '../lib/util.js';
+import { emit } from '../lib/sections.js';
 import { openLightbox } from '../lib/lightbox.js';
 
 const real = (v) => v && !['—', '–', '-', '?'].includes(String(v).trim());
@@ -45,7 +46,7 @@ export function renderBattles() {
   el.addEventListener('click', (e) => {
     const a = e.target.closest('.bt-all');
     if (a) { const box = a.previousElementSibling; box.classList.toggle('clip'); a.textContent = box.classList.contains('clip') ? a.textContent.replace('Skrýt', 'Celá soupiska') : a.textContent.replace('Celá soupiska', 'Skrýt'); return; }
-    const w = e.target.closest('[data-wit]'); if (w) { window.dispatchEvent(new CustomEvent('witness:open', { detail: { id: w.dataset.wit } })); return; }
+    const w = e.target.closest('[data-wit]'); if (w) { emit('witness:open', { id: w.dataset.wit }); return; }
     const f = e.target.closest('.bt-img'); if (f) openLightbox([{ src: f.dataset.lb, cap: f.dataset.cap }]);
   });
 }

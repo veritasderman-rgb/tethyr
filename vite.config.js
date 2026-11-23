@@ -20,7 +20,8 @@ function mediaPlugin() {
       const video = ls('assets/video', MEDIA.video);
       const timings = ls('assets/voices', /\.json$/i);
       const hymna = ls('assets/hymna', MEDIA.hymna);
-      return `export default ${JSON.stringify({ voices, video, timings, hymna })};`;
+      const klip = ls('public/hymna', /\.mp4$/i); // videoklip hymny (public/hymna/rauko_klip.mp4)
+      return `export default ${JSON.stringify({ voices, video, timings, hymna, klip })};`;
     },
     configureServer(server) {
       const re = /assets[\\/](voices|video|hymna)[\\/]/;

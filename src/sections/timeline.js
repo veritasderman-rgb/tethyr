@@ -3,6 +3,7 @@ import L from 'leaflet';
 import { D } from '../lib/data.js';
 import { img, largest } from '../lib/img.js';
 import { $, $$, esc, norm } from '../lib/util.js';
+import { emit } from '../lib/sections.js';
 
 const T0 = 2003, T1 = 2027;
 // tmavé barvy linek (z malované osy na pergamenu) zesvětlit pro tmavé pozadí
@@ -19,8 +20,8 @@ function svg(Wpx) {
   const padL = 18, padR = 30;
   const x = (t) => padL + ((t - T0) / (T1 - T0)) * (Wpx - padL - padR);
   const lanes = [...TL.lines].sort((a, b) => b.lane - a.lane);
-  const laneY = {}; lanes.forEach((l, i) => { laneY[l.name] = 150 + i * 19; });
-  const yEnd = 150 + lanes.length * 19 + 10;
+  const laneY = {}; lanes.forEach((l, i) => { laneY[l.name] = 182 + i * 19; });
+  const yEnd = 182 + lanes.length * 19 + 10;
   const sesY = yEnd + 34, drY = sesY + 46, H = drY + 40;
   let s = `<svg class="tl-svg" viewBox="0 0 ${Wpx} ${H}" width="${Wpx}" height="${H}" role="img" aria-label="Časová osa hry 2003–2026">`;
   // knihy
@@ -34,15 +35,31 @@ function svg(Wpx) {
   for (let y = T0; y <= 2026; y++) {
     s += `<line x1="${x(y)}" x2="${x(y)}" y1="46" y2="${H - 30}" class="tl-yr"/><text x="${x(y) + 3}" y="58" class="tl-yt">${y}</text>`;
   }
-  // události
-  let lastX = [-1e9, -1e9];
-  TL.events.forEach((e, i) => {
+  // události: vodorovné popisky rozložené do řádků tak, aby se nepřekrývaly ani s čarami událostí nad nimi
+  const ROWS = [74, 90, 106, 122, 138, 154];
+  const occ = ROWS.map(() => []);
+  const free = (r, a, b) => occ[r].every(([p, q]) => b + 6 < p || a - 6 > q);
+  TL.events.forEach((e) => {
     const xx = x(e.t);
-    const row = xx - lastX[0] > 26 ? 0 : xx - lastX[1] > 26 ? 1 : 0;
-    lastX[row] = xx;
-    const yy = row ? 92 : 118;
+    let label = e.label;
+    const width = (s2) => s2.length * 6.2 + 6;
+    // v každém řádku zkusit popisek vpravo od tečky, pak vlevo; když se nevejde nikam, zkrátit
+    const place = (lab) => {
+      const w = width(lab);
+      for (let r = 0; r < ROWS.length; r++) for (const side of ['start', 'end']) {
+        const a = side === 'start' ? xx + 7 : xx - 7 - w, b = a + w;
+        if (a < 4 || b > Wpx - 4) continue;
+        if (free(r, Math.min(a, xx - 4), Math.max(b, xx + 4))) return { r, a, b, side };
+      }
+      return null;
+    };
+    let pl = place(label);
+    while (!pl && label.length > 6) { label = label.slice(0, -2).trimEnd(); pl = place(label + '…'); if (pl) label += '…'; }
+    if (!pl) return;
+    occ[pl.r].push([Math.min(pl.a, xx - 4), Math.max(pl.b, xx + 4)]);
+    const yy = ROWS[pl.r];
     s += `<line x1="${xx}" x2="${xx}" y1="${yy}" y2="${yEnd}" class="tl-ev"/><circle cx="${xx}" cy="${yy}" r="3.5" class="tl-evd"/>`;
-    s += `<text transform="translate(${xx + 4},${yy - 6}) rotate(-32)" class="tl-evt${row ? ' alt' : ''}">${esc(e.label)}</text>`;
+    s += `<text x="${pl.side === 'start' ? pl.a : pl.b}" y="${yy + 4}" text-anchor="${pl.side}" class="tl-evt"><title>${esc(e.label)}</title>${esc(label)}</text>`;
   });
   // linky postav
   for (const l of lanes) {
@@ -95,12 +112,12 @@ export function renderTimeline() {
     const b = e.target.closest('[data-z]');
     if (b) { const c = box.scrollLeft / Math.max(1, box.scrollWidth); z = Math.min(4, Math.max(1, z + (+b.dataset.z) * 0.75)); draw(); box.scrollLeft = c * box.scrollWidth; }
     const ln = e.target.closest('.tl-line');
-    if (ln?.dataset.c) $(`#druzina [data-c="${ln.dataset.c}"]`)?.click();
+    if (ln?.dataset.c) emit('party:open', { id: ln.dataset.c });
     if (e.target.closest('#tlPaint, #tlPaint2')) paint();
   });
   box.addEventListener('keydown', (e) => {
     const ln = e.target.closest('.tl-line');
-    if (ln && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); $(`#druzina [data-c="${ln.dataset.c}"]`)?.click(); }
+    if (ln && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); emit('party:open', { id: ln.dataset.c }); }
   });
 }
 

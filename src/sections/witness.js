@@ -6,6 +6,7 @@ import media from 'virtual:media';
 import DOC from '../../data/dokument.json';
 import { D } from '../lib/data.js';
 import { img, small } from '../lib/img.js';
+import { routeSvg } from '../lib/minimap.js';
 import { $, $$, esc, reduced, plural, settleScroll } from '../lib/util.js';
 
 const baseOf = (f) => f.replace(/\.[^.]+$/, '');
@@ -330,28 +331,14 @@ export function renderWitness() {
     return `<div class="wi-paint">${img(key, { alt: b.captions?.[0] || b.name, sizes: '100vw', eager: true })}</div>
       <div class="w-inter-t"><p>${esc(b.dr)} DR · ${esc(b.place)}</p><h4>${esc(b.name)}</h4></div>`;
   }
-  function mapHtml(b) {
-    const pts = D.map.route.filter((r) => r.era === b.key && r.x != null);
-    if (pts.length < 2) return null;
-    const xs = pts.map((p) => p.x), ys = pts.map((p) => p.y);
-    const pad = 90;
-    let x0 = Math.max(0, Math.min(...xs) - pad), x1 = Math.min(2576, Math.max(...xs) + pad);
-    let y0 = Math.max(0, Math.min(...ys) - pad), y1 = Math.min(884, Math.max(...ys) + pad);
-    const ar = 16 / 9;
-    let w = x1 - x0, h = y1 - y0;
-    if (w / h < ar) { const nw = h * ar; x0 -= (nw - w) / 2; w = nw; } else { const nh = w / ar; y0 -= (nh - h) / 2; h = nh; }
-    if (w > 2576) { w = 2576; x0 = 0; } if (h > 884) { h = 884; y0 = 0; }
-    x0 = Math.max(0, Math.min(2576 - w, x0)); y0 = Math.max(0, Math.min(884 - h, y0));
-    const d = pts.map((p, i) => `${i ? 'L' : 'M'}${p.x},${p.y}`).join(' ');
-    const names = [...new Set(pts.map((p) => p.place))];
-    const sc = w / 1400;
-    return `<svg class="wi-map" viewBox="${x0.toFixed(0)} ${y0.toFixed(0)} ${w.toFixed(0)} ${h.toFixed(0)}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <image href="img/map/toril-2576.webp" x="0" y="0" width="2576" height="884"/>
-      <rect x="0" y="0" width="2576" height="884" fill="rgba(14,12,9,.5)"/>
-      <path d="${d}" class="wi-route" pathLength="1" style="stroke-width:${(2.2 * sc).toFixed(1)}"/>
-      ${pts.map((p, i) => `<circle cx="${p.x}" cy="${p.y}" r="${((i === 0 || i === pts.length - 1 ? 8 : 5) * sc).toFixed(1)}" class="wi-pt" style="animation-delay:${(0.4 + (i / pts.length) * 3.2).toFixed(2)}s"/>`).join('')}
-    </svg>
-    <div class="w-inter-t"><p>${esc(b.dr)} · u stolu ${esc(b.real)}</p><h4>${esc(b.kap)}: ${esc(b.title)}</h4><span class="wi-places">${esc(names.slice(0, 6).join(' · '))}</span></div>`;
+  // střih na mapu: jen úsek trasy jedné kapitoly (celá kniha I by byla spletenec čar přes půl světa)
+  const DOC_CH = { I: 'ch-stity-apokalypsy', II: 'ch-draci-let-a-knihovna-arenkae', III: 'ch-runovladci-a-shoonach', IV: 'ch-prvni-dungeony-a-arborea', V: 'ch-thultanthar-a-pyramida-casu' };
+  function mapHtml(b, chId) {
+    const ch = b.chapters.find((c) => c.id === (chId || DOC_CH[b.key])) || b.chapters[0];
+    const r = routeSvg(ch.route, { cls: 'wi', aspect: 16 / 9, pad: 90, minW: 700, dim: 0.5 });
+    if (!r) return null;
+    return `${r.svg}
+    <div class="w-inter-t"><p>${esc(b.kap)} · ${esc(ch.drs || b.dr)} · u stolu ${esc(ch.real)}</p><h4>${esc(ch.title)}</h4><span class="wi-places">${esc(r.names.slice(0, 7).join(' · '))}</span></div>`;
   }
   function endCard() {
     return `<div class="wi-card"><p class="wi-k">Konec dokumentu</p><h4>Kronika Tethyrské královské družiny</h4><p class="wi-m"><a href="#hymna">Hymna</a> · <a href="#podekovani">Poděkování</a></p></div>`;
@@ -364,7 +351,7 @@ export function renderWitness() {
       if (it.k === 'kniha') {
         const b = bookOf(it.key); if (!b) continue;
         out.push({ k: 'card', b });
-        if (mapHtml(b)) out.push({ k: 'map', b });
+        if (mapHtml(b, it.ch)) out.push({ k: 'map', b, ch: it.ch });
       } else if (it.k === 'bitva') {
         const b = D.battleById[it.id]; if (b?.images?.length) out.push({ k: 'paint', b });
       } else if (it.k === 'sv') {
@@ -383,7 +370,7 @@ export function renderWitness() {
     const go = () => runSeq(i + 1);
     const skip = reduced();
     if (it.k === 'card') showInter(cardHtml(it.b), skip ? 2500 : 5200, go, 'card');
-    else if (it.k === 'map') showInter(mapHtml(it.b), skip ? 2500 : 6500, go, 'map');
+    else if (it.k === 'map') showInter(mapHtml(it.b, it.ch), skip ? 2500 : 6500, go, 'map');
     else if (it.k === 'paint') showInter(paintHtml(it.b), skip ? 2500 : 5200, go, 'paint');
     else if (it.k === 'konec') showInter(endCard(), 9000, () => stopDoc(), 'card');
     // malba: pomalý nájezd
