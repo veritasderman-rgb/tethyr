@@ -1,6 +1,6 @@
 {
- "zdroj_casu": "data/hymna-timing.json",
- "presne": false,
+ "zdroj_casu": "timing.json",
+ "presne": true,
  "delka": 359.952,
  "sekce": [
   {
@@ -10,14 +10,14 @@
    "lines": [
     {
      "x": "Dvacátý pátý rok...",
-     "t": 4.0
+     "t": 9.2
     },
     {
      "x": "Kruh se uzavírá.",
-     "t": 11.5
+     "t": 50.0
     }
    ],
-   "start": 4.0
+   "start": 9.2
   },
   {
    "tag": "Verse 1",
@@ -26,11 +26,11 @@
    "lines": [
     {
      "x": "Čtvrtstoletí prach už sedá na náš stůl",
-     "t": 72.0
+     "t": 72.7
     },
     {
      "x": "tam, kde Varion stál, zbyl v srdci kůl.",
-     "t": 75.5
+     "t": 75.6
     },
     {
      "x": "Syn draka v černé zbroji, pohlcen tmou",
@@ -38,7 +38,7 @@
     },
     {
      "x": "u Rudé pevnosti prohrál bitvu svou.",
-     "t": 81.1
+     "t": 81.0
     },
     {
      "x": "A Austius, elfí mistr, tanečník ran",
@@ -46,18 +46,18 @@
     },
     {
      "x": "znalec cest Wanu, co chránil náš stan.",
-     "t": 88.9
+     "t": 89.3
     },
     {
      "x": "Teď pluje k Evermeetu, za obzor dní",
-     "t": 96.5
+     "t": 96.4
     },
     {
      "x": "nechal nás v bouři, kde ocel jen zní.",
-     "t": 102.4
+     "t": 102.3
     }
    ],
-   "start": 72.0
+   "start": 72.7
   },
   {
    "tag": "Pre-Chorus",
@@ -90,7 +90,7 @@
    "lines": [
     {
      "x": "Rauko! Ten, který prohlédl závoj všech lží!",
-     "t": 126.7
+     "t": 126.6
     },
     {
      "x": "Stratég, co na bedrech osud nám drží!",
@@ -102,7 +102,7 @@
     },
     {
      "x": "psionik, kněz, co překročil práh!",
-     "t": 141.1
+     "t": 141.0
     },
     {
      "x": "To on spojil krále, on rozptýlil mrak",
@@ -110,7 +110,7 @@
     },
     {
      "x": "Rudá rytířka vede jeho zrak!",
-     "t": 148.2
+     "t": 148.1
     },
     {
      "x": "Architekt vítězství proti všem tmám",
@@ -121,7 +121,7 @@
      "t": 156.7
     }
    ],
-   "start": 126.7
+   "start": 126.6
   },
   {
    "tag": "Verse 2",
@@ -174,7 +174,7 @@
     },
     {
      "x": "To Rauko je svolal jediným dnem!",
-     "t": 191.7
+     "t": 191.6
     },
     {
      "x": "Tethyr a Cormyr, ocel a krev",
@@ -182,7 +182,7 @@
     },
     {
      "x": "Smaragdová enkláva, draků řev!",
-     "t": 197.6
+     "t": 197.5
     },
     {
      "x": "Trpaslíci z hor i Hlubiny zář",
@@ -198,7 +198,7 @@
     },
     {
      "x": "však Raukova vůle je nezlomný proud!",
-     "t": 209.6
+     "t": 209.5
     }
    ],
    "start": 188.7
@@ -208,7 +208,7 @@
    "note": "",
    "label": "Kytarové sólo",
    "lines": [],
-   "start": 213.0
+   "start": 213.4
   },
   {
    "tag": "Final Chorus",
@@ -217,7 +217,7 @@
    "lines": [
     {
      "x": "Rauko! Ten, který prohlédl závoj všech lží!",
-     "t": 294.0
+     "t": 293.9
     },
     {
      "x": "Stratég, co na bedrech osud nám drží!",
@@ -225,11 +225,11 @@
     },
     {
      "x": "Spojené armády čekají na povel",
-     "t": 305.0
+     "t": 305.1
     },
     {
      "x": "aby ze zla sféry zbyl jenom popel!",
-     "t": 308.0
+     "t": 308.4
     },
     {
      "x": "Rudá rytířka žehná, Ho drží stráž",
@@ -237,10 +237,10 @@
     },
     {
      "x": "Tethyrští draci – to je, světe, tvá hráz!",
-     "t": 317.0
+     "t": 314.8
     }
    ],
-   "start": 294.0
+   "start": 293.9
   },
   {
    "tag": "Outro",
@@ -249,18 +249,18 @@
    "lines": [
     {
      "x": "Partie končí.",
-     "t": 333.1
+     "t": 332.5
     },
     {
      "x": "Král je na tahu.",
-     "t": 336.5
+     "t": 336.0
     },
     {
      "x": "Rauko...",
-     "t": 340.2
+     "t": 341.2
     }
    ],
-   "start": 333.1
+   "start": 332.5
   }
  ]
 }

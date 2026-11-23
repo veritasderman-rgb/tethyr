@@ -1,0 +1,304 @@
+{
+ "skladba": "rauko.mp3",
+ "delka": 359.95,
+ "metoda": "časy řádků z ASR (faster-whisper) se ruční korekcí; hranice částí z RMS + ASR; intro odhad",
+ "sekce": [
+  {
+   "nazev": "Intro",
+   "start": 0.0,
+   "end": 72.0,
+   "radky": [
+    {
+     "text": "Dvacátý pátý rok...",
+     "start": 9.2,
+     "end": 13.5
+    },
+    {
+     "text": "Kruh se uzavírá.",
+     "start": 50.0,
+     "end": 54.0
+    }
+   ]
+  },
+  {
+   "nazev": "Verse 1",
+   "start": 72.0,
+   "end": 108.0,
+   "radky": [
+    {
+     "text": "Čtvrtstoletí prach už sedá na náš stůl",
+     "start": 72.7,
+     "end": 75.6
+    },
+    {
+     "text": "tam, kde Varion stál, zbyl v srdci kůl.",
+     "start": 75.6,
+     "end": 78.2
+    },
+    {
+     "text": "Syn draka v černé zbroji, pohlcen tmou",
+     "start": 78.2,
+     "end": 81.0
+    },
+    {
+     "text": "u Rudé pevnosti prohrál bitvu svou.",
+     "start": 81.0,
+     "end": 84.2
+    },
+    {
+     "text": "A Austius, elfí mistr, tanečník ran",
+     "start": 85.3,
+     "end": 89.3
+    },
+    {
+     "text": "znalec cest Wanu, co chránil náš stan.",
+     "start": 89.3,
+     "end": 95.8
+    },
+    {
+     "text": "Teď pluje k Evermeetu, za obzor dní",
+     "start": 96.4,
+     "end": 100.8
+    },
+    {
+     "text": "nechal nás v bouři, kde ocel jen zní.",
+     "start": 102.3,
+     "end": 107.2
+    }
+   ]
+  },
+  {
+   "nazev": "Pre-Chorus",
+   "start": 108.0,
+   "end": 125.8,
+   "radky": [
+    {
+     "text": "Však zrodila se síla v chaosu ztrát",
+     "start": 108.7,
+     "end": 112.1
+    },
+    {
+     "text": "když Nethril ze sfér chtěl náš svět si brát.",
+     "start": 112.1,
+     "end": 115.0
+    },
+    {
+     "text": "Tisíc let kuli svůj zvrácený plán",
+     "start": 115.1,
+     "end": 118.0
+    },
+    {
+     "text": "nečekali však, že povstane Pán...",
+     "start": 118.0,
+     "end": 122.6
+    }
+   ]
+  },
+  {
+   "nazev": "Chorus",
+   "start": 125.8,
+   "end": 161.6,
+   "radky": [
+    {
+     "text": "Rauko! Ten, který prohlédl závoj všech lží!",
+     "start": 126.6,
+     "end": 130.8
+    },
+    {
+     "text": "Stratég, co na bedrech osud nám drží!",
+     "start": 132.6,
+     "end": 136.6
+    },
+    {
+     "text": "Zatímco svět spal, on chystal svůj tah",
+     "start": 137.9,
+     "end": 141.0
+    },
+    {
+     "text": "psionik, kněz, co překročil práh!",
+     "start": 141.0,
+     "end": 144.1
+    },
+    {
+     "text": "To on spojil krále, on rozptýlil mrak",
+     "start": 144.1,
+     "end": 147.9
+    },
+    {
+     "text": "Rudá rytířka vede jeho zrak!",
+     "start": 148.1,
+     "end": 151.4
+    },
+    {
+     "text": "Architekt vítězství proti všem tmám",
+     "start": 151.6,
+     "end": 155.8
+    },
+    {
+     "text": "díky němu dnes nečelím smrti sám!",
+     "start": 156.7,
+     "end": 161.2
+    }
+   ]
+  },
+  {
+   "nazev": "Verse 2",
+   "start": 161.6,
+   "end": 188.2,
+   "radky": [
+    {
+     "text": "Jen Ho zůstal věrný, jak žulový blok",
+     "start": 162.3,
+     "end": 165.5
+    },
+    {
+     "text": "šedý mnich řádu, co drží s ním krok.",
+     "start": 165.7,
+     "end": 168.5
+    },
+    {
+     "text": "Od meče k magii, k vnitřnímu klidu",
+     "start": 168.7,
+     "end": 171.3
+    },
+    {
+     "text": "chrání Raukova záda pro spásu lidu.",
+     "start": 171.3,
+     "end": 174.4
+    },
+    {
+     "text": "Však Rauko je mysl, co spřádá tu síť",
+     "start": 174.4,
+     "end": 177.6
+    },
+    {
+     "text": "všemocný mág, jenž třímá tu niť.",
+     "start": 177.6,
+     "end": 180.2
+    },
+    {
+     "text": "Každý pohyb vojsk, každé kouzlo a stín",
+     "start": 180.3,
+     "end": 183.4
+    },
+    {
+     "text": "je součástí partie proti hradbám vin.",
+     "start": 183.5,
+     "end": 187.4
+    }
+   ]
+  },
+  {
+   "nazev": "Bridge",
+   "start": 188.2,
+   "end": 213.4,
+   "radky": [
+    {
+     "text": "Vidíte prapory? Cítíte zem?",
+     "start": 188.7,
+     "end": 191.6
+    },
+    {
+     "text": "To Rauko je svolal jediným dnem!",
+     "start": 191.6,
+     "end": 194.7
+    },
+    {
+     "text": "Tethyr a Cormyr, ocel a krev",
+     "start": 194.8,
+     "end": 197.5
+    },
+    {
+     "text": "Smaragdová enkláva, draků řev!",
+     "start": 197.5,
+     "end": 200.4
+    },
+    {
+     "text": "Trpaslíci z hor i Hlubiny zář",
+     "start": 200.4,
+     "end": 203.6
+    },
+    {
+     "text": "všem dal naději, všem vrátil tvář!",
+     "start": 203.7,
+     "end": 206.7
+    },
+    {
+     "text": "Ze sfér se blíží poslední soud",
+     "start": 206.7,
+     "end": 209.4
+    },
+    {
+     "text": "však Raukova vůle je nezlomný proud!",
+     "start": 209.5,
+     "end": 213.2
+    }
+   ]
+  },
+  {
+   "nazev": "Guitar Solo",
+   "start": 213.4,
+   "end": 293.4,
+   "radky": []
+  },
+  {
+   "nazev": "Final Chorus",
+   "start": 293.4,
+   "end": 331.6,
+   "radky": [
+    {
+     "text": "Rauko! Ten, který prohlédl závoj všech lží!",
+     "start": 293.9,
+     "end": 298.3
+    },
+    {
+     "text": "Stratég, co na bedrech osud nám drží!",
+     "start": 299.7,
+     "end": 304.2
+    },
+    {
+     "text": "Spojené armády čekají na povel",
+     "start": 305.1,
+     "end": 308.3
+    },
+    {
+     "text": "aby ze zla sféry zbyl jenom popel!",
+     "start": 308.4,
+     "end": 311.0
+    },
+    {
+     "text": "Rudá rytířka žehná, Ho drží stráž",
+     "start": 311.0,
+     "end": 314.8
+    },
+    {
+     "text": "Tethyrští draci – to je, světe, tvá hráz!",
+     "start": 314.8,
+     "end": 327.0
+    }
+   ]
+  },
+  {
+   "nazev": "Outro",
+   "start": 331.6,
+   "end": 359.95,
+   "radky": [
+    {
+     "text": "Partie končí.",
+     "start": 332.5,
+     "end": 335.7
+    },
+    {
+     "text": "Král je na tahu.",
+     "start": 336.0,
+     "end": 340.7
+    },
+    {
+     "text": "Rauko...",
+     "start": 341.2,
+     "end": 344.6
+    }
+   ]
+  }
+ ]
+}

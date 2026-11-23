@@ -4,7 +4,7 @@
   python3 scripts/build-hymna.py
 
 Text:  SRC_HYMNA/rauko.txt (jinak data/hymna.txt). První řádek „RAUKO – hymna …“ se vynechává, text se jinak nemění.
-Časy:  SRC_HYMNA/timing.json (pole čísel = začátky všech řádků textu v pořadí, nebo {"lines": [...], "sekce": {...}}),
+Časy:  SRC_HYMNA/timing.json (sekce[].radky[].start, nebo pole čísel = začátky všech řádků v pořadí, nebo {"lines": [...], "sekce": {...}}),
        jinak data/hymna-timing.json. Nesedí-li počet řádků, časy se rozloží úměrně délce (a skript to ohlásí).
 """
 import json, os, re, subprocess
@@ -29,8 +29,12 @@ n = sum(len(s['lines']) for s in secs)
 tp = SRC + '/timing.json'
 tsrc = tp if os.path.exists(tp) else ROOT + '/data/hymna-timing.json'
 t = json.load(open(tsrc, encoding='utf-8'))
-lines = t if isinstance(t, list) else t.get('lines', [])
-sekce = {} if isinstance(t, list) else t.get('sekce', {})
+if isinstance(t, dict) and isinstance(t.get('sekce'), list):  # formát z /home/claude/hymna/timing.json: sekce[].radky[].start
+    lines = [r['start'] for s_ in t['sekce'] for r in s_.get('radky', [])]
+    sekce = {s_['nazev']: s_['start'] for s_ in t['sekce']}
+else:
+    lines = t if isinstance(t, list) else t.get('lines', [])
+    sekce = {} if isinstance(t, list) else t.get('sekce', {})
 dur = float(subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', SRC + '/rauko.mp3'], capture_output=True, text=True).stdout.strip() or 0) if os.path.exists(SRC + '/rauko.mp3') else 0
 exact = len(lines) == n
 if not exact:
