@@ -1,0 +1,12 @@
+{
+ "poznamka": "Časy začátků řádků (s) odhadnuté z automatického přepisu písně (Whisper); u úvodu nic nebylo slyšet, časy úvodu jsou tipnuté. Přesné časy dodá /home/claude/hymna/timing.json (pole 48 čísel nebo objekt {\"lines\": [...]}) – skript build-hymna.py je pak převezme.",
+ "lines": [4.0, 11.5,
+  72.0, 75.5, 78.2, 81.1, 85.3, 88.9, 96.5, 102.4,
+  108.7, 112.1, 115.1, 118.0,
+  126.7, 132.6, 137.9, 141.1, 144.1, 148.2, 151.6, 156.7,
+  162.3, 165.7, 168.7, 171.3, 174.4, 177.6, 180.3, 183.5,
+  188.7, 191.7, 194.8, 197.6, 200.4, 203.7, 206.7, 209.6,
+  294.0, 299.7, 305.0, 308.0, 311.0, 317.0,
+  333.1, 336.5, 340.2],
+ "sekce": {"Guitar Solo": 213.0}
+}

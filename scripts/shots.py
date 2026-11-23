@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Snímky obrazovky webu (desktop 1440×900 a mobil 390×844) do /home/claude/webshots/.
+"""Snímky obrazovky webu (desktop 1440×900 a mobil 390×844) do /home/claude/webshots/it2/.
 Předpoklad: běží `npx vite preview --port 4173` (nebo URL v proměnné SHOT_URL)."""
 import os, sys, time, json
 from playwright.sync_api import sync_playwright
 
 URL = os.environ.get('SHOT_URL', 'http://localhost:4173/')
-OUT = os.environ.get('SHOT_OUT', '/home/claude/webshots')
+OUT = os.environ.get('SHOT_OUT', '/home/claude/webshots/it2')
 os.makedirs(OUT, exist_ok=True)
-SECTIONS = ['uvod', 'pribeh', 'kniha-II', 'ch-bitva-o-rudou-pevnost', 'mapa', 'svedectvi', 'druzina', 'bitvy', 'proroctvi', 'osa', 'rejstrik', 'stul']
+SECTIONS = ['uvod', 'pribeh', 'kniha-II', 'mapa', 'mapa3d', 'svedectvi', 'druzina', 'bitvy', 'proroctvi', 'osa', 'rejstrik', 'stul', 'hymna', 'podekovani']
 VIEWS = {'desktop': dict(viewport={'width': 1440, 'height': 900}), 'mobile': dict(viewport={'width': 390, 'height': 844}, device_scale_factor=2, is_mobile=True, has_touch=True)}
 only = sys.argv[1:]
 errors = []
@@ -25,8 +25,8 @@ with sync_playwright() as p:
         for sec in SECTIONS:
             if only and sec not in only: continue
             pg.evaluate(f"document.getElementById('{sec}')?.scrollIntoView({{behavior:'instant', block:'start'}})")
-            pg.wait_for_timeout(500)
-            pg.evaluate("window.scrollBy(0, 1)")
+            pg.wait_for_timeout(900)
+            pg.evaluate(f"document.getElementById('{sec}')?.scrollIntoView({{behavior:'instant', block:'start'}})")  # lazy obrázky posunou rozložení
             pg.wait_for_timeout(1400)
             pg.screenshot(path=f'{OUT}/{name}-{sec}.png')
         # svědectví v chodu
@@ -36,7 +36,7 @@ with sync_playwright() as p:
             pg.click('#wStart [data-act="doc"]')
             pg.wait_for_timeout(5200)
             pg.screenshot(path=f'{OUT}/{name}-svedectvi-play.png')
-            pg.evaluate("document.querySelector('.w-card[data-i=\"25\"]').click()")
+            pg.evaluate("document.querySelector('.w-card[data-i=\"12\"]').click()")
             pg.wait_for_timeout(4500)
             pg.screenshot(path=f'{OUT}/{name}-svedectvi-play2.png')
         # detail postavy

@@ -13,7 +13,7 @@ function portraitHtml(c, sizes = '(max-width:760px) 50vw, 25vw') {
 }
 
 function detail(c) {
-  const wit = D.witById[c.id];
+  const wit = c.kind === 'hrac' ? null : D.witById[c.id]; // hráčské postavy žádné svědectví nemají
   const ms = c.milestones || [];
   const ses = (c.sessions || []).map((id) => D.sesById[id]).filter(Boolean);
   return `<div class="pd">
@@ -53,7 +53,7 @@ export function renderParty() {
   const rows = order.filter((p) => players[p]).map((p) => {
     const cs = players[p];
     const bars = cs.map((c) => { const y = yrs(c.active_real); const a = y[0] || Y0, b = y[y.length - 1] || a; return `<i style="left:${((a - Y0) / span * 100).toFixed(2)}%;width:${(((b - a + 1) / span) * 100).toFixed(2)}%" title="${esc(c.name)} ${esc(c.active_real)}"><span>${esc(c.name)}</span></i>`; }).join('');
-    return `<tr><th scope="row">${esc(p)}${p === 'Zdeněk T.' ? '<small>Pán jeskyně</small>' : ''}${p === 'Lukáš' ? '<small>i Pán jeskyně</small>' : ''}</th><td>${cs.map((c) => `<a href="#druzina" data-c="${esc(c.id)}">${esc(c.name)}</a>`).join(', ')}</td><td class="pl-bar"><div>${bars}</div></td></tr>`;
+    return `<tr><th scope="row">${esc(p)}${p === 'Zdeněk T.' ? '<small>Pán jeskyně</small>' : ''}</th><td>${cs.map((c) => `<a href="#druzina" data-c="${esc(c.id)}">${esc(c.name)}</a>`).join(', ')}</td><td class="pl-bar"><div>${bars}</div></td></tr>`;
   }).join('');
 
   el.innerHTML = `<header class="sec-head"><p class="kicker">Družina</p><h2 id="druzina-h">Kdo šel s nimi</h2>
@@ -66,7 +66,7 @@ export function renderParty() {
     <h4>Protivníci</h4><p>${D.characters.filter((c) => c.kind === 'protivnik').map((c) => `<button class="chip red" data-c="${esc(c.id)}">${esc(c.name)}</button>`).join(' ')}</p></div>
     <div class="wrap players rv"><h3>Hráči a léta u stolu</h3>
       <div class="pl-scroll"><table class="pl"><thead><tr><th>Hráč</th><th>Postavy</th><th class="pl-bar"><div class="pl-yrs">${[2003, 2008, 2013, 2018, 2023].map((y) => `<span style="left:${((y - Y0) / span * 100).toFixed(1)}%">${y}</span>`).join('')}</div></th></tr></thead><tbody>${rows}</tbody></table></div>
-      <p class="small">Hru po celou dobu vedl jeden Pán jeskyně, Zdeněk T. Sám si zahrál jen pixie Zaxe v Sigilských lovcích a goliáše Zeka v nové hře. Variona hrál jiný Zdeněk, v tabulce Zdeněk K.</p></div>`;
+      <p class="small">Hru po celou dobu vedl Pán jeskyně Zdeněk T. Sám si zahrál jen pixie Zaxe v Sigilských lovcích a goliáše Zeka v nové hře. Variona hrál jiný Zdeněk, v tabulce Zdeněk K.</p></div>`;
   el.addEventListener('click', (e) => {
     const b = e.target.closest('[data-c]'); if (!b) return;
     e.preventDefault();

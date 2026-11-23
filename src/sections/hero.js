@@ -25,6 +25,7 @@ export function renderHero() {
       <p class="hero-y rv d2"><b>1372–1385</b> letopočtu Údolí <i>·</i> u stolu <b>2003–2026</b></p>
       <p class="hero-p rv d2">Třiadvacet let jedné kampaně ve Forgotten Realms. Od garáže v Lázních Kynžvartě po poslední souboj na vrcholu Pyramidy času. Vyprávějí ti, kdo u toho byli, přátelé i nepřátelé.</p>
       <div class="hero-cta rv d3"><a class="btn red" href="#pribeh">Vstoupit do příběhu</a><a class="btn" href="#svedectvi" data-doc>Svědectví ▸</a></div>
+      <p class="hero-more rv d3"><a href="#mapa3d">3D mapa Faerûnu</a><i>·</i><a href="#hymna">Hymna družiny</a><i>·</i><a href="#podekovani">Poděkování</a></p>
     </div>
     <dl class="hero-stats">${stats.map(([n, l], i) => `<div class="rv d${i % 3}"><dt data-n="${n}">${reduced() ? fmt(n) : '0'}</dt><dd>${l}</dd></div>`).join('')}</dl>
     <a class="hero-down" href="#pribeh" aria-label="Dolů na příběh"><span></span></a>`;

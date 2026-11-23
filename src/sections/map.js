@@ -12,6 +12,20 @@ export function renderMap() {
   const el = $('#mapa');
   el.innerHTML = `<header class="sec-head"><p class="kicker">Mapa</p><h2 id="mapa-h">Cesta po Torilu</h2>
     <p class="lead">Kudy družina šla, kniha po knize. Trasu lze přehrát nebo krokovat, místo na mapě otevře, co se tam stalo a kdo tam žije.</p><div class="orn">✦</div></header>
+    <div class="m3d wrap" id="mapa3d">
+      <div class="m3d-in">
+        <div class="m3d-txt">
+          <p class="m3d-k">Nové</p>
+          <h3>3D mapa Faerûnu</h3>
+          <p>Faerûn a Kara-Tur z výšky: moře, hory a lesy podle mapy, 66 míst kampaně, deset sfér nad Bezstopým mořem, 14 bitev s vojsky a výprava družiny, kterou kamera projde zastávku po zastávce (105 zastávek). Klik na místo otevře sezení, bitvu nebo svědectví v kronice.</p>
+          <div class="m3d-b"><a class="btn red" href="mapa3d/index.html" target="_blank" rel="noopener">⤢ Otevřít 3D mapu na celou obrazovku</a><button class="btn" id="m3dLoad" aria-controls="m3dFrame">Zobrazit náhled zde</button></div>
+          <p class="small">Mapa je těžší na grafiku; na telefonu se přepne na lehčí kvalitu. Zvuk a hlasy se spouštějí až klepnutím.</p>
+        </div>
+        <div class="m3d-view" id="m3dView">
+          <img src="img/misc/mapa3d-poster.webp" alt="Náhled 3D mapy Faerûnu a Kara-Turu s místy kampaně" loading="lazy" decoding="async" width="1400" height="875">
+        </div>
+      </div>
+    </div>
     <div class="map-ui wrap">
       <div class="map-ctl" role="group" aria-label="Ovládání trasy">
         <div class="map-eras" role="group" aria-label="Kniha">
@@ -32,6 +46,15 @@ export function renderMap() {
       </div>
       <div class="map-off"><span>Mimo mapu:</span> ${D.map.off.map((p, i) => `<button class="chip" data-off="${i}">${esc(p.name)}</button>`).join(' ')}</div>
     </div>`;
+
+  // 3D mapa: iframe se načte až po kliknutí
+  $('#m3dLoad', el).addEventListener('click', (e) => {
+    const view = $('#m3dView', el);
+    view.innerHTML = '<iframe id="m3dFrame" src="mapa3d/index.html" title="3D mapa Faerûnu" allow="fullscreen; autoplay" allowfullscreen></iframe>';
+    view.classList.add('live'); view.closest('.m3d-in').classList.add('live');
+    e.currentTarget.hidden = true;
+  });
+  $('#m3dView', el).addEventListener('click', () => { if (!$('#m3dView', el).classList.contains('live')) $('#m3dLoad', el).click(); });
 
   let map, routeLayer, head, markers = {};
   let era = 'all', idx = 0, timer = null;

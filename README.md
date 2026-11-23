@@ -18,40 +18,58 @@ npx vite preview       # náhled buildu, http://localhost:4173
 
 Snímky obrazovky pro kontrolu: spusťte `npx vite preview --port 4173` a pak `npm run shots` (Python Playwright, snímky do `/home/claude/webshots/`, chyby konzole do `console.txt`).
 
-## Jak přidat audio nebo video ke svědectví
+## Svědectví, hlasy a videa (jen vedlejší postavy, nikdy hráčské)
 
-1. Najděte `id` svědka v `data/svedectvi.json` (např. `rauko`, `yamoh-hokhra`).
-2. Audio uložte jako `assets/voices/<id>.mp3` (funguje i `.m4a`, `.ogg`, `.wav`).
-3. Video uložte jako `assets/video/<id>.mp4` (nebo `.webm`). Přehraje se místo statického portrétu.
-4. Volitelně přesné časy titulků: `assets/voices/<id>.json` s polem časů začátku vět v sekundách, např. `[0.4, 3.1, 6.8, …]` (stejný počet jako vět v `text`). Totéž jde zapsat přímo do `data/svedectvi.json` jako pole `casy`.
-5. Restartujte `npm run dev`, případně znovu `npm run build`. Plugin ve `vite.config.js` soubory najde, předá webu jejich seznam a při buildu je zkopíruje do `dist/assets/`.
+Pořadí práce, kdykoli se sada svědectví nebo média změní (vše jde spouštět opakovaně):
 
-Bez souborů web funguje dál: titulky běží podle délky textu a portrét se pohybuje (pomalý nájezd, dýchání, světlo, zrno). Když existuje audio, titulky se rozloží podle jeho délky (nebo podle `casy`). Když existuje jen video, řídí se jeho zvukem; když existuje video i audio, video běží ztlumené ve smyčce a zvuk jde z audia.
+```bash
+python3 scripts/import-svedectvi.py   # /home/claude/voices/svedectvi_v2.json → data/svedectvi.json (text přesně, bez změn)
+python3 scripts/build-media.py        # hlasy + timing.json (/home/claude/voices2), videa (/home/claude/vid, smyčka crf 27), hymna → assets/
+python3 scripts/build-data.py         # data webu a obrázky; portrét svědka = <id>_portret.png nebo poster z /home/claude/vid
+python3 scripts/build-hymna.py        # text a časy hymny → data/hymna.json
+npm run build
+```
 
-Pole v `data/svedectvi.json`: `id`, `jmeno`, `role`, `strana` (`spojenec` / `nepřítel`), `skupina` (`družina` / `spojenci` / `nepřátelé`), `hrac` (u hráčských postav), `portret` (klíč obrázku, např. `port/ho`, `ilu/P_023`, `nove/n79`), `fokus` (bod zájmu obrazu pro ořez a nájezd), `hlas_popis` (pro výběr hlasu), `text` (pole vět), `zdroje` (id sezení `s-…` nebo bitev `b-…`, o které se promluva opírá). `npm run data` kontroluje délku (90–160 slov) a existenci zdrojů.
+Zdroje: `SRC_SVEDECTVI`, `SRC_VOICES`, `SRC_VID`, `SRC_HYMNA` (proměnné prostředí). Do repa se commitují `assets/voices/<id>.mp3`, `assets/voices/timing.json`, `assets/video/<id>.mp4`, `assets/hymna/*` i `public/img/wit/*`, takže Vercel (`npm ci && npm run build`) žádné zdroje nepotřebuje.
+
+- **Titulky** se synchronizují podle `assets/voices/timing.json` (`{"<id>": {"duration": s, "starts": [s…]}}`, počet časů = počet vět). Nesedí-li počet vět, použije se časování podle délky textu (proto po změně textu vždy znovu namluvit a spustit `build-media.py`).
+- **Video** (1280×720, 6 s, bez zvuku) se při převodu upraví na smyčku (konec se prolne do začátku) a hraje ztlumené pod hlasem. Bez videa se použije portrét s pomalým nájezdem, dýcháním, světlem, zrnem a vinětací.
+- **Padlí a zmizelí svědkové** (`stav` ≠ `žije`, `stav_titulek`) mají tlumenější barvy a titulek „hlas z minulosti“.
+- Svědek bez portrétu dostane ztemnělý výřez mapy kolem domovského místa (`HOME_MAP` v `build-data.py`), dokud nedodáme obraz.
+- **Režim dokument** (`data/dokument.json`): knihy I–V, střídání spojenců, nepřátel a hlasů z nadhledu, mezi nimi střihy na mapu s trasou a malby bitev; Elminster je závěr.
+- Pole v `data/svedectvi.json`: `id`, `jmeno`, `role`, `strana`, `skupina` (`spojenci`/`nepřátelé`/`neutrální`/`nadhled`), `vazba`, `portret`, `fokus`, `hlas_popis`, `text` (pole vět), `zdroje` (`s-…` sezení, `b-…` bitva, `txt:…` text hráče, `hymna`), případně `stav`, `stav_titulek`.
+
+## Hymna a poděkování
+
+Hymna „Rauko“: `assets/hymna/rauko.mp3`, text a časy řádků v `data/hymna.json` (z `/home/claude/hymna/rauko.txt`; časy z `timing.json` ve zdrojové složce, jinak z `data/hymna-timing.json`, což jsou časy odhadnuté z automatického přepisu písně a u úvodu tipnuté; stačí dodat `timing.json` s 47 čísly nebo `{"lines":[…]}` a spustit `build-hymna.py`). Přehrávač má play/pauzu, posuv, hlasitost, zvýraznění řádku a sloky, klik na řádek skočí na řádek; vizuál reaguje na hlasitost (WebAudio analyser). Když ve složce hymny existuje `rauko_klip.mp4`, po `build-media.py` se nabídne „Videoklip“. Poděkování je `data/podekovani.txt` beze změn.
+
+## 3D mapa a kotvy
+
+`public/mapa3d/` je samostatná složka (viz její README). V oddílu Mapa je vstup s odkazem na celou obrazovku a s iframem, který se načte až po kliknutí. Kotvy, které mapa očekává: `#s-…` (sezení), `#b-…` (bitvy), `#svedectvi/<id>` (otevře svědectví), `#mapa`, `#pribeh`; zpracovává je router v `src/main.js` (otevře rozbalené podrobnosti a dorovná polohu, než se dočtou lazy obrázky). Polohy míst v `build-data.py` (`MAP_FIX`) jsou opravené stejně jako v 3D mapě.
 
 ## Struktura
 
 ```
-index.html               kostra stránky, 10 oddílů
+index.html               kostra stránky, 12 oddílů
 vite.config.js           base './', plugin pro audio/video svědectví
 scripts/build-data.py    zdroje → public/data/*.json + WebP obrázky
 scripts/shots.py         Playwright snímky desktop/mobil
 data/svedectvi.json      promluvy svědků (ručně psané, fakta z dat)
 data/vypraveni.json      vyprávění ke kapitolám příběhu (ručně psané, fakta z dat)
-assets/voices, assets/video   sem patří audio a video ke svědectvím
+assets/voices, assets/video, assets/hymna   hlasy, videa a hymna (generuje scripts/build-media.py)
+public/mapa3d/           samostatná 3D mapa Faerûnu
 public/data/             generovaná data webu
 public/img/              generované obrázky (ilu = malby, port = portréty, nove = podklady PJ, foto = fotky od stolu, map, osa)
 src/main.js              načtení dat, navigace, spuštění oddílů
 src/lib/                 data, obrázky (srcset), odhalování, částice, lightbox/šuplík
-src/sections/            hero, story, map, witness, party, battles, prophecy, timeline, registry, table
+src/sections/            hero, story, map, witness, party, battles, prophecy, timeline, registry, table, hymna, podekovani
 src/styles/              base.css (barvy, písmo, prvky), sections.css (oddíly)
 ```
 
-Oddíly: Úvod · Příběh (5 knih, kapitoly, sezení, střihy na svědectví a mapu) · Mapa (Leaflet, trasa po knihách) · Svědectví · Družina · Bitvy · Proroctví · Časová osa · Rejstřík · U stolu.
+Oddíly: Úvod · Příběh · Mapa (Leaflet + vstup do 3D mapy) · Svědectví · Družina · Bitvy · Proroctví · Časová osa · Rejstřík · U stolu · Hymna · Poděkování.
 
 ## Obsahová pravidla
 
-Hráči jen křestním jménem (Pepa, Zdeněk K., Zdeněk T., Lukáš, Tomáš, Venca, Vojta, Terka, Jana). `build-data.py` jména ve zdrojích nahrazuje a hlásí zakázaný obsah. Ho je vždy hladce oholený. Fakta (kdo, kde, kdy, jak to dopadlo) se berou jen z dat kroniky.
+Hráči jen křestním jménem (Pepa, Zdeněk K., Zdeněk T., Lukáš, Tomáš, Venca, Vojta, Terka, Jana). Pán jeskyně je Zdeněk T. Hráčské postavy nemají žádné svědectví, hlas ani video. `build-data.py` jména ve zdrojích nahrazuje a hlásí zakázaný obsah. Ho je vždy hladce oholený. Fakta (kdo, kde, kdy, jak to dopadlo) se berou jen z dat kroniky.
 
 Písma jsou lokálně z `@fontsource` (Crimson Text, Cardo, Cinzel, Fira Sans), knihovny (Leaflet) se bundlují, žádné CDN.

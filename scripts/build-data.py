@@ -311,6 +311,11 @@ for i, x in enumerate(N):
     npcs.append({k: v for k, v in o.items() if v not in (None, [], '')})
 
 # ---------------------------------------------------------------- mapa
+# Oprava poloh (shodně s 3D mapou): tethyrský shluk v map.json leží asi o 100 px západněji, Castle Tethyr byl v moři.
+MAP_FIX = {'Castle Tethyr': (365, 568), 'Ithmong': (445, 575), 'Tyrův chrám v Tethyru': (382, 586), 'Port': (1962, 461),
+           'Dračí let': (259, 531), 'Reghedský ledovec': (137, 10), 'Mechový kámen': (256, 523), 'Mořské věže': (116, 628)}
+for p in MP['places']:
+    if p['name'] in MAP_FIX: p['x'], p['y'] = MAP_FIX[p['name']]
 PL = {p['name']: p for p in MP['places']}
 route = []
 for r in MP['route']:
@@ -401,19 +406,44 @@ gallery = {'nove': [{'n': g['n'], 'kind': g['kind'], 'title': g['title'], 'cap':
            'ilu': [{'f': m['file'][:-4], 'target': m.get('target'), 'cap': m.get('caption', ''), 'session': m.get('session'), 'battle': m.get('battle')} for m in MAN]}
 
 # ---------------------------------------------------------------- svědectví
-SV = clean(load(ROOT + '/data/svedectvi.json'))
+SV = load(ROOT + '/data/svedectvi.json')  # text svědectví se NESMÍ měnit (je přesně tak, jak byl namluven)
+VID = os.environ.get('SRC_VID', '/home/claude/vid')
+HOME_MAP = {'khelbenova-dcera': (198, 192)}  # domovské místo na mapě (x, y) pro svědky bez portrétu
 sid = {s['id'] for s in sessions}; bid = {b['id'] for b in BATTLES}
+PCIDS = {c['id'] for c in chars if c.get('kind') == 'hrac'}
 for w in SV:
+    if w['id'] in PCIDS or w.get('hrac'):
+        print('  !! hráčská postava nesmí mít svědectví:', w['id'])
     words = len(' '.join(w['text']).split())
-    miss = [z for z in w.get('zdroje', []) if z not in sid and z not in bid]
-    ok = 'OK' if 90 <= words <= 160 and not miss else '!!'
+    miss = [z for z in w.get('zdroje', []) if re.match(r'(s|b)-', z) and z not in sid and z not in bid]  # txt:…, hymna a poznámky (např. „upřesnění autora“) se nekontrolují
+    ok = 'OK' if 90 <= words <= 170 and not miss else '!!'
     if ok != 'OK' or '-v' in ARGS:
         print(f"  {ok} svědectví {w['id']:16s} {words:4d} slov  {'chybí zdroje: ' + ','.join(miss) if miss else ''}")
-    for k in ('portret', 'pozadi'):
-        if str(w.get(k, '')).startswith('ilu/'): ilu_need(w[k][4:])
-    src = w['portret']
-    if not os.path.exists(IMG + src + '-480.webp') and not any(j[1] == src for j in JOBS):
-        print('  !! portrét nenalezen:', w['id'], src)
+    if clean(w['text']) != w['text']:
+        print('  !! text svědectví by čištění změnil:', w['id'])
+    # portrét: nový portrét z videí (…_portret.png), jinak poster videa, jinak klíč z dat
+    for cand in (f"{VID}/{w['id']}_portret.png", f"{VID}/{w['id']}.jpg"):
+        if os.path.exists(cand):
+            w['portret'] = job(cand, 'wit/' + w['id'], (640, 1280), 80)
+            break
+    else:
+        if not w.get('portret'):
+            # svědek bez tváře: ztemnělý výřez mapy kolem domovského místa (Hlubina pro dceru Khelbena)
+            from PIL import Image, ImageFilter, ImageEnhance
+            cx, cy = HOME_MAP.get(w['id'], (198, 192))
+            os.makedirs('/tmp/wit-cache', exist_ok=True)
+            cp = f"/tmp/wit-cache/{w['id']}.png"
+            mp = Image.open(D + 'toril-east-west.jpg').convert('RGB')
+            cw, ch = 400, 225
+            box = (max(0, min(mp.width - cw, cx - cw // 2)), max(0, min(mp.height - ch, cy - ch // 2)))
+            cr = mp.crop((box[0], box[1], box[0] + cw, box[1] + ch)).resize((1280, 720), Image.LANCZOS).filter(ImageFilter.GaussianBlur(2.2))
+            ImageEnhance.Brightness(ImageEnhance.Color(cr).enhance(.55)).enhance(.62).save(cp)
+            w['portret'] = job(cp, 'wit/' + w['id'], (640, 1280), 76)
+        if str(w.get('portret', '')).startswith('ilu/'): ilu_need(w['portret'][4:])
+        if not w.get('portret') or (not os.path.exists(IMG + w['portret'] + '-480.webp') and not any(j[1] == w['portret'] for j in JOBS)):
+            print('  !! portrét nenalezen:', w['id'], w.get('portret'))
+    w.pop('casy', None)
+SV = [clean({k: v for k, v in w.items() if k != 'text'}) | {'text': w['text']} for w in SV]
 
 # ---------------------------------------------------------------- zápis
 print('data →', OUT)

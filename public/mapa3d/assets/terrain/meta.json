@@ -1,0 +1,15 @@
+{
+ "src": "toril-east-west.jpg",
+ "size": [
+  2576,
+  884
+ ],
+ "grid": [
+  1288,
+  442
+ ],
+ "hmin": -3.654533387232851,
+ "hmax": 17.858352058932677,
+ "milesPerUnit": 2.6,
+ "note": "jednotka světa = 1 pixel podkladu; výšky přehnané"
+}

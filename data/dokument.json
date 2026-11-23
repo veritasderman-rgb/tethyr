@@ -1,0 +1,196 @@
+{
+ "popis": "Dramaturgie režimu „Přehrát vše jako dokument“: knihy I–V, střídání spojenců, nepřátel a hlasů z nadhledu; mezi nimi střihy na mapy a malby bitev. Elminster je závěr.",
+ "scenar": [
+  {
+   "k": "kniha",
+   "key": "I"
+  },
+  {
+   "k": "sv",
+   "id": "thalaxia"
+  },
+  {
+   "k": "sv",
+   "id": "finian"
+  },
+  {
+   "k": "sv",
+   "id": "kung-lao"
+  },
+  {
+   "k": "bitva",
+   "id": "b-valka-s-tuiganskou-hordou"
+  },
+  {
+   "k": "sv",
+   "id": "yamun-ii"
+  },
+  {
+   "k": "sv",
+   "id": "zako"
+  },
+  {
+   "k": "sv",
+   "id": "yamoh-hokhra"
+  },
+  {
+   "k": "sv",
+   "id": "chuang-li"
+  },
+  {
+   "k": "bitva",
+   "id": "b-bitva-o-tvar-vedeni"
+  },
+  {
+   "k": "kniha",
+   "key": "II"
+  },
+  {
+   "k": "bitva",
+   "id": "b-bitva-o-rudou-pevnost"
+  },
+  {
+   "k": "sv",
+   "id": "ruda-rytirka"
+  },
+  {
+   "k": "sv",
+   "id": "khelbenova-dcera"
+  },
+  {
+   "k": "sv",
+   "id": "sar-saratar"
+  },
+  {
+   "k": "sv",
+   "id": "jenova"
+  },
+  {
+   "k": "sv",
+   "id": "gareth"
+  },
+  {
+   "k": "sv",
+   "id": "devrel"
+  },
+  {
+   "k": "bitva",
+   "id": "b-bitva-o-tethyrske-drzavy"
+  },
+  {
+   "k": "sv",
+   "id": "kenshi"
+  },
+  {
+   "k": "sv",
+   "id": "hasagi"
+  },
+  {
+   "k": "sv",
+   "id": "seung-mina"
+  },
+  {
+   "k": "sv",
+   "id": "asaman"
+  },
+  {
+   "k": "kniha",
+   "key": "III"
+  },
+  {
+   "k": "sv",
+   "id": "honda"
+  },
+  {
+   "k": "sv",
+   "id": "isis"
+  },
+  {
+   "k": "sv",
+   "id": "betridal"
+  },
+  {
+   "k": "sv",
+   "id": "turfin"
+  },
+  {
+   "k": "bitva",
+   "id": "b-bitva-u-velke-trhliny"
+  },
+  {
+   "k": "sv",
+   "id": "alusair"
+  },
+  {
+   "k": "kniha",
+   "key": "IV"
+  },
+  {
+   "k": "sv",
+   "id": "gatrya"
+  },
+  {
+   "k": "bitva",
+   "id": "b-pad-sundabaru"
+  },
+  {
+   "k": "sv",
+   "id": "alustriel"
+  },
+  {
+   "k": "sv",
+   "id": "axel-adamantis"
+  },
+  {
+   "k": "kniha",
+   "key": "V"
+  },
+  {
+   "k": "sv",
+   "id": "agathon"
+  },
+  {
+   "k": "sv",
+   "id": "simbul"
+  },
+  {
+   "k": "sv",
+   "id": "arwin"
+  },
+  {
+   "k": "sv",
+   "id": "iryklathagra"
+  },
+  {
+   "k": "sv",
+   "id": "mitsurugy"
+  },
+  {
+   "k": "bitva",
+   "id": "b-bitva-v-anaurochu"
+  },
+  {
+   "k": "sv",
+   "id": "seltar"
+  },
+  {
+   "k": "bitva",
+   "id": "b-utok-na-thultanthar"
+  },
+  {
+   "k": "sv",
+   "id": "rivalen"
+  },
+  {
+   "k": "bitva",
+   "id": "b-posledni-souboj-na-pyramide-casu"
+  },
+  {
+   "k": "sv",
+   "id": "elminster"
+  },
+  {
+   "k": "konec"
+  }
+ ]
+}

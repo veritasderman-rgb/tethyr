@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Faerûn – 3D mapa Západních draků</title>
+<meta name="description" content="Interaktivní 3D mapa Faerûnu a Kara-Turu s trasou Tethyrské královské družiny 2003–2026 (1372–1385 DR).">
+<meta name="theme-color" content="#12100d">
+<link rel="preload" href="assets/terrain/height.bin" as="fetch" crossorigin>
+<link rel="preload" href="data/campaign.json" as="fetch" crossorigin>
+<link rel="stylesheet" href="css/map.css">
+<script type="importmap">
+{ "imports": {
+  "three": "./js/vendor/three/build/three.module.min.js",
+  "three/addons/": "./js/vendor/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<canvas id="c" aria-label="3D mapa Faerûnu"></canvas>
+<div id="labels" aria-hidden="false"></div>
+
+<div id="loading" role="status" aria-live="polite">
+  <div class="ld-in">
+    <p class="ld-k">Kronika Tethyrské královské družiny</p>
+    <h1 class="ld-t">Faerûn</h1>
+    <p class="ld-s">od Moře mečů po Kara-Tur</p>
+    <div class="ld-bar"><i id="ldBar"></i></div>
+    <p class="ld-m" id="ldMsg">Rozvinuji mapu…</p>
+  </div>
+</div>
+<div id="err" hidden><div><h2>Mapu se nepodařilo spustit</h2><p id="errMsg">Prohlížeč nepodporuje WebGL, nebo se nenačetla data.</p><p><a href="../index.html#mapa" target="_top">Zpět na kroniku</a></p></div></div>
+
+<header class="top glass" id="top">
+  <div class="title">
+    <span class="t1">Faerûn <span class="amp">a</span> Kara-Tur</span>
+    <span class="t2" id="sub">3D mapa Západních draků · 2003–2026 · 1372–1385 DR</span>
+  </div>
+  <div class="views" id="views">
+    <button class="btn" data-view="all" title="Celá mapa (Home)">Celek</button>
+    <button class="btn" data-view="tethyr">Tethyr</button>
+    <button class="btn" data-view="north">Sever</button>
+    <button class="btn" data-view="anauroch">Anauroch</button>
+    <button class="btn" data-view="karatur">Kara-Tur</button>
+    <button class="btn" data-view="spheres">Sféry</button>
+  </div>
+  <div class="search" role="search">
+    <input id="q" type="search" placeholder="Hledat místo, bitvu, svědka…" autocomplete="off" aria-label="Hledat na mapě" aria-controls="qList" aria-expanded="false">
+    <ul id="qList" role="listbox" hidden></ul>
+  </div>
+  <div class="tools">
+    <button class="btn ico" id="btnMeasure" title="Měřit vzdálenost (M)" aria-pressed="false"><span aria-hidden="true">⟷</span><em>Měřit</em></button>
+    <button class="btn ico" id="btnSound" title="Zvuk (Z)" aria-pressed="false"><span aria-hidden="true">♪</span><em>Zvuk</em></button>
+    <button class="btn ico" id="btnLegend" title="Legenda a ovládání (?)"><span aria-hidden="true">?</span><em>Legenda</em></button>
+    <button class="btn ico" id="btnFull" title="Celá obrazovka (F)"><span aria-hidden="true">⤢</span><em>Celá obrazovka</em></button>
+    <a class="btn ico back" id="btnBack" href="../index.html#mapa" target="_top" title="Zpět do kroniky"><span aria-hidden="true">←</span><em>Kronika</em></a>
+  </div>
+</header>
+
+<div id="measure" class="glass" hidden>
+  <div class="mrow"><select class="btn" id="mFrom" aria-label="Odkud"><option value="">Odkud…</option></select><span>→</span><select class="btn" id="mTo" aria-label="Kam"><option value="">Kam…</option></select></div>
+  <div class="mrow"><span id="measureTxt">Vyber dvě místa, klepni na popisky, nebo dvakrát do mapy.</span><button class="btn" id="measureClear">Smazat</button></div>
+</div>
+<div id="probe" class="glass" hidden></div>
+
+<section id="info" class="glass card" hidden aria-live="polite">
+  <button class="close" id="infoClose" aria-label="Zavřít kartu">×</button>
+  <div id="infoBody"></div>
+</section>
+
+<section id="tl" class="glass" aria-label="Výprava družiny">
+  <div class="tl-row1">
+    <div class="eras" id="eras" role="group" aria-label="Filtr knih"></div>
+    <div class="tl-ctl">
+      <button class="btn ico" id="tlPrev" title="Předchozí zastávka (,)" aria-label="Předchozí zastávka">‹</button>
+      <button class="btn play" id="tlPlay" title="Přehrát výpravu (mezerník)" aria-label="Přehrát výpravu">▶</button>
+      <button class="btn ico" id="tlNext" title="Další zastávka (.)" aria-label="Další zastávka">›</button>
+      <button class="btn ico" id="tlDiary" title="Deník výpravy" aria-pressed="true" aria-label="Deník výpravy">❦</button>
+      <button class="btn sm" id="tlScale" title="Přepnout měřítko časové osy" aria-label="Přepnout měřítko časové osy">u stolu</button>
+    </div>
+  </div>
+  <div class="tl-slider">
+    <input type="range" id="tlRange" min="0" max="1" step="1" value="0" aria-label="Posuvník času – zastávky výpravy">
+    <div class="tl-ticks" id="tlTicks" aria-hidden="true"></div>
+  </div>
+  <div class="tl-cap" id="tlCap"></div>
+</section>
+
+<div id="hint"><kbd>levé tl.</kbd> posun · <kbd>pravé tl.</kbd> otáčení · <kbd>kolečko</kbd> zoom · <kbd>W A S D</kbd> <kbd>Q E</kbd> <kbd>R F</kbd> · <kbd>klik</kbd> do mapy = výška</div>
+<div id="scale"><span id="scaleTxt"></span><i id="scaleBar"></i></div>
+<div id="mstat" aria-hidden="true"></div>
+<div id="sphereVeil" aria-hidden="true"></div>
+
+<div id="legend" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="legH">
+  <div class="sheet glass">
+    <button class="close" id="legClose" aria-label="Zavřít">×</button>
+    <h3 id="legH">Legenda a ovládání</h3>
+    <div class="leg-grid">
+      <div>
+        <h4>Na mapě</h4>
+        <ul class="leg">
+          <li><i class="lg pl"></i> Místo kampaně – klepnutím otevřeš kartu (sezení, bitvy, kdo tu žije, malby)</li>
+          <li><i class="lg sp"></i> Sféra – ostrovy nad Bezstopým mořem, cesty do nich vedou portálem</li>
+          <li><i class="lg bt"></i> Bitva – zkřížené meče, zblízka šiky a prapory stran</li>
+          <li><i class="lg wt"></i> Svědectví – živý portrét a hlas svědka u jeho domova</li>
+          <li><i class="lg eg"></i> Drobnosti ze hry – lodě, draci, kraken… (jen to, co je v kronice)</li>
+          <li><i class="lg rt"></i> Trasa družiny, barva podle knihy</li>
+        </ul>
+        <h4>Knihy</h4>
+        <ul class="leg" id="legEras"></ul>
+      </div>
+      <div>
+        <h4>Ovládání</h4>
+        <table class="keys">
+          <tr><td>myš</td><td>levé tlačítko posun, pravé otáčení, kolečko přiblížení</td></tr>
+          <tr><td>dotyk</td><td>jeden prst posun, dva prsty zoom a otáčení</td></tr>
+          <tr><td><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / šipky</td><td>posun</td></tr>
+          <tr><td><kbd>Q</kbd> <kbd>E</kbd></td><td>otáčení</td></tr>
+          <tr><td><kbd>R</kbd> <kbd>F</kbd> / <kbd>+</kbd> <kbd>−</kbd></td><td>přiblížit / oddálit</td></tr>
+          <tr><td><kbd>mezerník</kbd></td><td>přehrát / zastavit výpravu</td></tr>
+          <tr><td><kbd>,</kbd> <kbd>.</kbd></td><td>předchozí / další zastávka</td></tr>
+          <tr><td><kbd>/</kbd></td><td>hledat</td></tr>
+          <tr><td><kbd>M</kbd> <kbd>Z</kbd> <kbd>F</kbd> <kbd>Home</kbd></td><td>měření, zvuk, celá obrazovka, celek</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>zavřít kartu</td></tr>
+        </table>
+        <h4>Nastavení</h4>
+        <div class="row">
+          <label class="lbl-s">Nálada <select class="btn" id="mood">
+            <option value="auto">podle knihy</option><option value="day">den</option><option value="dawn">svítání</option><option value="frost">mráz</option><option value="storm">bouře</option><option value="shadow">stín</option><option value="dusk">soumrak</option><option value="night">noc</option></select></label>
+          <label class="lbl-s">Kvalita <select class="btn" id="quality"><option value="auto">automaticky</option><option value="high">plná (PC)</option><option value="low">lehká (telefon)</option></select></label>
+        </div>
+        <div class="row">
+          <label class="tog"><input type="checkbox" id="tLabels" checked><span>Popisky</span></label>
+          <label class="tog"><input type="checkbox" id="tRoute" checked><span>Trasa</span></label>
+          <label class="tog"><input type="checkbox" id="tWit" checked><span>Svědci</span></label>
+          <label class="tog"><input type="checkbox" id="tEggs" checked><span>Drobnosti</span></label>
+        </div>
+      </div>
+    </div>
+    <h4>O mapě</h4>
+    <p class="note">Terén je odvozený z malované mapy Torilu (východ–západ): moře, pobřeží, hory, pouště a lesy se odhadují z barev a kresby podkladu, výšky jsou kvůli čitelnosti mnohonásobně přehnané. Vzdálenosti počítá mapa vzdušnou čarou s měřítkem asi 2,6 míle na dílek podkladu; ber je s rezervou kolem 20 %. Místa označená jako přibližná jsou umístěná podle popisu v kronice. Engine, modely, zvuky a ovládání jsou převzaté z 3D mapy Desetiměstí.</p>
+  </div>
+</div>
+
+<div id="lightbox" class="modal" hidden role="dialog" aria-modal="true" aria-label="Obraz"><figure><img id="lbImg" alt=""><figcaption id="lbCap"></figcaption></figure><button class="close" id="lbClose" aria-label="Zavřít">×</button></div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

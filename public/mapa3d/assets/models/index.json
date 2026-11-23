@@ -1,0 +1,258 @@
+{
+ "bear": {
+  "group": "extra",
+  "bytes": 60068
+ },
+ "cat": {
+  "group": "extra",
+  "bytes": 78584
+ },
+ "griffon": {
+  "group": "extra",
+  "bytes": 138256
+ },
+ "mammoth": {
+  "group": "extra",
+  "bytes": 172808
+ },
+ "mill": {
+  "group": "extra",
+  "bytes": 166220
+ },
+ "reindeer": {
+  "group": "extra",
+  "bytes": 68176
+ },
+ "remorhaz": {
+  "group": "extra",
+  "bytes": 142528
+ },
+ "sled": {
+  "group": "extra",
+  "bytes": 154028
+ },
+ "tent": {
+  "group": "extra",
+  "bytes": 142532
+ },
+ "wolf": {
+  "group": "extra",
+  "bytes": 87392
+ },
+ "yeti": {
+  "group": "extra",
+  "bytes": 99196
+ },
+ "house5_l": {
+  "group": "hlite",
+  "bytes": 103280
+ },
+ "house6_l": {
+  "group": "hlite",
+  "bytes": 91656
+ },
+ "house7_l": {
+  "group": "hlite",
+  "bytes": 115272
+ },
+ "house": {
+  "group": "houses",
+  "bytes": 165948
+ },
+ "inn": {
+  "group": "houses",
+  "bytes": 186344
+ },
+ "long": {
+  "group": "houses",
+  "bytes": 113308
+ },
+ "town": {
+  "group": "houses",
+  "bytes": 226168
+ },
+ "manor": {
+  "group": "houses",
+  "bytes": 305048
+ },
+ "house2": {
+  "group": "houses",
+  "bytes": 153788
+ },
+ "house3": {
+  "group": "houses",
+  "bytes": 209708
+ },
+ "house5": {
+  "group": "houses",
+  "bytes": 103280
+ },
+ "house6": {
+  "group": "houses",
+  "bytes": 91656
+ },
+ "house7": {
+  "group": "houses",
+  "bytes": 115272
+ },
+ "dwarfhouse": {
+  "group": "houses",
+  "bytes": 101832
+ },
+ "elfhouse": {
+  "group": "houses",
+  "bytes": 106872
+ },
+ "elftower": {
+  "group": "houses",
+  "bytes": 121720
+ },
+ "ptower": {
+  "group": "houses",
+  "bytes": 127676
+ },
+ "tavern": {
+  "group": "houses",
+  "bytes": 100064
+ },
+ "smithy": {
+  "group": "houses",
+  "bytes": 91800
+ },
+ "granary": {
+  "group": "houses",
+  "bytes": 97948
+ },
+ "guardhouse": {
+  "group": "houses",
+  "bytes": 105108
+ },
+ "temple": {
+  "group": "houses",
+  "bytes": 117904
+ },
+ "burgher": {
+  "group": "houses",
+  "bytes": 87232
+ },
+ "halftimber": {
+  "group": "houses",
+  "bytes": 93928
+ },
+ "ship": {
+  "group": "lite",
+  "bytes": 335020
+ },
+ "dragon": {
+  "group": "lite",
+  "bytes": 234044
+ },
+ "giant": {
+  "group": "lite",
+  "bytes": 166232
+ },
+ "castle": {
+  "group": "lite",
+  "bytes": 226756
+ },
+ "tower": {
+  "group": "lite",
+  "bytes": 84564
+ },
+ "wizard": {
+  "group": "lite",
+  "bytes": 125120
+ },
+ "kraken": {
+  "group": "lite",
+  "bytes": 115548
+ },
+ "kelvin": {
+  "group": "marks",
+  "bytes": 185956
+ },
+ "crater": {
+  "group": "marks",
+  "bytes": 158416
+ },
+ "tooth": {
+  "group": "marks",
+  "bytes": 142976
+ },
+ "oak": {
+  "group": "marks",
+  "bytes": 131764
+ },
+ "cragmaw": {
+  "group": "marks",
+  "bytes": 177596
+ },
+ "xinlenal": {
+  "group": "marks",
+  "bytes": 193140
+ },
+ "circle": {
+  "group": "marks",
+  "bytes": 98840
+ },
+ "reghed": {
+  "group": "marks",
+  "bytes": 166428
+ },
+ "gobcamp": {
+  "group": "marks",
+  "bytes": 145332
+ },
+ "mine": {
+  "group": "marks",
+  "bytes": 126104
+ },
+ "icecave": {
+  "group": "marks",
+  "bytes": 128000
+ },
+ "fishrack": {
+  "group": "props",
+  "bytes": 71124
+ },
+ "stalls": {
+  "group": "props",
+  "bytes": 85612
+ },
+ "well": {
+  "group": "props",
+  "bytes": 65756
+ },
+ "crane": {
+  "group": "props",
+  "bytes": 89644
+ },
+ "rowboat": {
+  "group": "props",
+  "bytes": 54832
+ },
+ "trawler": {
+  "group": "props",
+  "bytes": 113300
+ },
+ "iceboats": {
+  "group": "props",
+  "bytes": 86344
+ },
+ "citytower": {
+  "group": "props",
+  "bytes": 85800
+ },
+ "citygate": {
+  "group": "props",
+  "bytes": 99596
+ },
+ "lighthouse": {
+  "group": "props",
+  "bytes": 103580
+ },
+ "cathedral": {
+  "group": "props",
+  "bytes": 183484
+ }
+}
