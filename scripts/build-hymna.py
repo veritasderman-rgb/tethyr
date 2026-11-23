@@ -26,11 +26,22 @@ for ln in raw:
         secs[-1]['lines'].append({'x': ln.strip()})
 n = sum(len(s['lines']) for s in secs)
 
-tp = SRC + '/timing.json'
+tp = SRC + '/web/timing.json' if os.path.exists(SRC + '/web/timing.json') else SRC + '/timing.json'  # web/ = verze ke klipu (iterace 10)
 tsrc = tp if os.path.exists(tp) else ROOT + '/data/hymna-timing.json'
 t = json.load(open(tsrc, encoding='utf-8'))
 if isinstance(t, dict) and isinstance(t.get('sekce'), list):  # formát z /home/claude/hymna/timing.json: sekce[].radky[].start
-    lines = [r['start'] for s_ in t['sekce'] for r in s_.get('radky', [])]
+    rad = [r for s_ in t['sekce'] for r in s_.get('radky', [])]
+    lines = [r['start'] for r in rad]
+    # Řádky, které v časování chybějí (vypravěčské řádky intra, které ve skladbě nezazní), se z textu na webu vynechají.
+    if rad and all(r.get('text') for r in rad) and len(rad) < n:
+        key = lambda x: re.sub(r'\W+', '', x.lower())
+        want = {key(r['text']) for r in rad}
+        for s_ in secs:
+            drop = [l['x'] for l in s_['lines'] if key(l['x']) not in want]
+            if drop: print('  vynecháno (ve skladbě nezazní):', ' / '.join(drop))
+            s_['lines'] = [l for l in s_['lines'] if key(l['x']) in want]
+        secs = [s_ for s_ in secs if s_['lines']]
+        n = sum(len(s_['lines']) for s_ in secs)
     sekce = {s_['nazev']: s_['start'] for s_ in t['sekce']}
 else:
     lines = t if isinstance(t, list) else t.get('lines', [])

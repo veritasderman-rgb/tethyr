@@ -167,7 +167,7 @@ for g in GAL:
         job(p, 'nove/n%02d' % g['n'], (480, 1200), 68)
 FOTO = sorted(int(os.path.basename(p)[:-4]) for p in glob.glob(BUILD + '/foto/*.jpg'))
 for n in FOTO:
-    job(BUILD + '/foto/%03d.jpg' % n, 'foto/%03d' % n, (480, 1280), 68)
+    job(BUILD + '/foto/%03d.jpg' % n, 'foto/%03d' % n, (480, 1280), 60)  # iterace 10: q60 kvůli limitu repa
 PORTS = sorted(os.path.basename(p)[:-4] for p in glob.glob(PORT + '/*.png'))
 for k in PORTS:
     job(PORT + '/' + k + '.png', 'port/' + k, (480, 1280), 78)

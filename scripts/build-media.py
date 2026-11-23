@@ -9,7 +9,7 @@ Vezme vše, co ve zdrojových složkách je, a jde spouštět opakovaně (dalš�
   videa:   SRC_VID    (/home/claude/vid)      <id>.mp4 (1280×720, 6 s, bez zvuku)  →  assets/video/<id>.mp4
            Video se při převodu upraví na plynulou smyčku (konec se prolne do začátku) a překóduje (crf 27).
   hymna:   SRC_HYMNA  (/home/claude/hymna)    rauko.mp3, rauko_klip.mp4 (pokud je), timing.json (pokud je) → assets/hymna/
-Hlasy se překódují na mono 96 kb/s (řeč, ~0,7 MB na svědka), hymna na 128 kb/s bez obrázku obalu.
+Hlasy se překódují na mono 64 kb/s (řeč), záložní hudba hymny na 96 kb/s bez obrázku obalu (klip hymny: public/hymna/, z SRC_HYMNA/web/).
 Hlasy a videa se berou jen pro id z data/svedectvi.json (hráčské postavy žádné nemají).
 """
 import json, os, shutil, subprocess, sys
@@ -115,10 +115,12 @@ def main():
     # hymna
     ah = ROOT + '/assets/hymna/'
     os.makedirs(ah, exist_ok=True)
-    for name in ('rauko.mp3', 'rauko_klip.mp4', 'timing.json'):
+    # iterace 10: záložní hudba 96 kb/s (hlavním přehrávačem je klip), časy z web/timing.json (verze ke klipu), pokud je
+    for name in ('rauko.mp3', 'timing.json'):
         s = f'{HYMNA}/{name}'
-        if name == 'rauko.mp3' and os.path.exists(s) and (newer(s, ah + name) or bitrate(ah + name) > 140000):
-            mp3(s, ah + name, 128, mono=False); print('  hymna:', name, '128 kb/s')
+        if name == 'timing.json' and os.path.exists(f'{HYMNA}/web/{name}'): s = f'{HYMNA}/web/{name}'
+        if name == 'rauko.mp3' and os.path.exists(s) and (newer(s, ah + name) or bitrate(ah + name) > 110000):
+            mp3(s, ah + name, 96, mono=False); print('  hymna:', name, '96 kb/s')
         elif os.path.exists(s) and newer(s, ah + name):
             shutil.copy(s, ah + name); print('  hymna:', name)
     tot = sum(os.path.getsize(os.path.join(dp, f)) for dp, _, fs in os.walk(ROOT + '/assets') for f in fs)

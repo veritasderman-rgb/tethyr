@@ -1,24 +1,13 @@
 {
  "skladba": "rauko.mp3",
  "delka": 359.95,
- "metoda": "časy řádků z ASR (faster-whisper) se ruční korekcí; hranice částí z RMS + ASR; intro odhad",
+ "metoda": "časy řádků z ASR (faster-whisper, slovní časy) s ruční korekcí; hranice částí z RMS + ASR; v intru vypravěč nezazní – bez titulků (v2)",
  "sekce": [
   {
    "nazev": "Intro",
    "start": 0.0,
    "end": 72.0,
-   "radky": [
-    {
-     "text": "Dvacátý pátý rok...",
-     "start": 9.2,
-     "end": 13.5
-    },
-    {
-     "text": "Kruh se uzavírá.",
-     "start": 50.0,
-     "end": 54.0
-    }
-   ]
+   "radky": []
   },
   {
    "nazev": "Verse 1",
@@ -37,18 +26,18 @@
     },
     {
      "text": "Syn draka v černé zbroji, pohlcen tmou",
-     "start": 78.2,
-     "end": 81.0
+     "start": 78.6,
+     "end": 81.4
     },
     {
      "text": "u Rudé pevnosti prohrál bitvu svou.",
-     "start": 81.0,
-     "end": 84.2
+     "start": 81.7,
+     "end": 84.4
     },
     {
      "text": "A Austius, elfí mistr, tanečník ran",
-     "start": 85.3,
-     "end": 89.3
+     "start": 84.6,
+     "end": 89.0
     },
     {
      "text": "znalec cest Wanu, co chránil náš stan.",

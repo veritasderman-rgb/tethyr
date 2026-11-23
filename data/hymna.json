@@ -4,22 +4,6 @@
  "delka": 359.952,
  "sekce": [
   {
-   "tag": "Intro",
-   "note": "vypravěč",
-   "label": "Úvod",
-   "lines": [
-    {
-     "x": "Dvacátý pátý rok...",
-     "t": 9.2
-    },
-    {
-     "x": "Kruh se uzavírá.",
-     "t": 50.0
-    }
-   ],
-   "start": 9.2
-  },
-  {
    "tag": "Verse 1",
    "note": "",
    "label": "I. sloka",
@@ -34,15 +18,15 @@
     },
     {
      "x": "Syn draka v černé zbroji, pohlcen tmou",
-     "t": 78.2
+     "t": 78.6
     },
     {
      "x": "u Rudé pevnosti prohrál bitvu svou.",
-     "t": 81.0
+     "t": 81.7
     },
     {
      "x": "A Austius, elfí mistr, tanečník ran",
-     "t": 85.3
+     "t": 84.6
     },
     {
      "x": "znalec cest Wanu, co chránil náš stan.",
@@ -202,13 +186,6 @@
     }
    ],
    "start": 188.7
-  },
-  {
-   "tag": "Guitar Solo",
-   "note": "",
-   "label": "Kytarové sólo",
-   "lines": [],
-   "start": 213.4
   },
   {
    "tag": "Final Chorus",
