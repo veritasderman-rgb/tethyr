@@ -1,6 +1,27 @@
 // Společná „scéna“ svědectví: portrét nebo živý portrét (video ve smyčce), dýchání, světlo, zrno, vinětace,
 // dolní titulek (jmenovka) a titulky po větách. Používá ji přehrávač v oddílu Svědectví i celoobrazovkový film.
 import STAV from '../../data/svedkove-stav.json';
+
+/** Titulky svědectví: samostatné pole `titulky` (např. český překlad anglického dabingu), jinak mluvený `text`.
+ *  Časování (timing.json) se vždy počítá z mluvených vět `text`; `titulky` musí mít stejný počet vět. */
+const SUBKEY = 'zd-titulky';
+let mode = (() => { try { return localStorage.getItem(SUBKEY) || 'cs'; } catch { return 'cs'; } })();
+/** Režim titulků: 'cs' (výchozí, české titulky), 'en' (anglický originál, tj. mluvený text), 'off'. */
+export const subMode = () => mode;
+export function setSubMode(m) {
+  mode = ['cs', 'en', 'off'].includes(m) ? m : 'cs';
+  try { localStorage.setItem(SUBKEY, mode); } catch { /* soukromé okno */ }
+  window.dispatchEvent(new CustomEvent('submode', { detail: mode }));
+}
+export const SUB_LABEL = { cs: 'CZ', en: 'EN', off: 'vyp' };
+/** České titulky (pole `titulky`), pokud sedí počet vět; jinak mluvený text. Pro karty a přepis. */
+export function subsCs(w) {
+  return Array.isArray(w?.titulky) && w.titulky.length === w.text.length ? w.titulky : w.text;
+}
+/** Titulky podle zvoleného režimu (anglicky = mluvený text). Časování se vždy počítá z vět `text`. */
+export function subs(w) {
+  return mode === 'en' ? w.text : subsCs(w);
+}
 import { img, small } from './img.js';
 import { $, esc, reduced } from './util.js';
 
@@ -32,7 +53,7 @@ export function createStage(root) {
   const layers = [...root.querySelectorAll('.w-layer')];
   const lower = $('.w-lower', root);
   const subP = $('.w-sub p', root);
-  let front = 0, kb = null, lastSent = -9, video = null, token = 0;
+  let front = 0, kb = null, lastSent = -9, video = null, token = 0, full = false;
 
   function layerHtml(w, withVideo) {
     const pos = w.fokus || '50% 30%';
@@ -40,16 +61,17 @@ export function createStage(root) {
       <div class="w-img"><div class="w-breath">${img(w.portret, { alt: `Portrét: ${w.jmeno}`, sizes: '100vw', eager: true, pos })}</div></div>${withVideo ? '<div class="w-vwrap"></div>' : ''}`;
   }
   /** Přepne na svědka. Vrací { video, layer, img }. Video se jen připraví (spouští se zvenku). */
-  function setWitness(w, { useVideo = true, video: src = '' } = {}) {
+  function setWitness(w, { useVideo = true, video: src = '', full: isFull = false } = {}) {
     ++token;
     cleanup();
+    full = false;
     const wantVideo = !!src && useVideo && !reduced();
     const next = layers[1 - front];
     next.className = 'w-layer';
     next.innerHTML = layerHtml(w, wantVideo);
     if (wantVideo) {
       video = document.createElement('video');
-      video.className = 'w-video'; video.muted = true; video.defaultMuted = true; video.loop = true; video.playsInline = true; video.preload = 'auto';
+      video.className = 'w-video'; video.muted = true; video.defaultMuted = true; video.loop = !isFull; full = isFull; video.playsInline = true; video.preload = 'auto';
       video.setAttribute('playsinline', ''); video.setAttribute('webkit-playsinline', ''); video.setAttribute('muted', ''); video.setAttribute('aria-hidden', 'true');
       video.disableRemotePlayback = true;
       video.src = src;
@@ -83,19 +105,32 @@ export function createStage(root) {
       { transform: 'scale(1.1) translate(-0.6%, -0.4%)' },
     ], { duration: Math.max(8000, dur * 1000 + 2500), easing: 'cubic-bezier(.33,.0,.3,1)', fill: 'forwards' });
   }
+  let subW = null;
   function setSub(i, w) {
-    if (i === lastSent) return; lastSent = i;
+    if (i === lastSent) return; lastSent = i; subW = w;
     subP.classList.remove('in');
-    setTimeout(() => { if (lastSent !== i) return; subP.textContent = i >= 0 && w ? w.text[i] : ''; if (i >= 0) subP.classList.add('in'); }, i <= 0 ? 0 : 240);
+    setTimeout(() => { if (lastSent !== i) return; const off = mode === 'off'; subP.textContent = i >= 0 && w && !off ? subs(w)[i] : ''; subP.lang = mode === 'en' ? 'en' : 'cs'; if (i >= 0 && !off) subP.classList.add('in'); }, i <= 0 ? 0 : 240);
   }
+  window.addEventListener('submode', () => { const i = lastSent; lastSent = -9; if (i >= 0 && subW) setSub(i, subW); else clearSub(); })
   function clearSub() { lastSent = -9; subP.textContent = ''; subP.classList.remove('in'); }
   function freeze(on) { // pauza vizuálu
     root.classList.toggle('paused', on);
-    if (on) { kb?.pause(); video?.pause(); } else { kb?.play(); video?.play().catch(() => {}); }
+    if (on) { kb?.pause(); video?.pause(); } else { kb?.play(); if (!full) video?.play().catch(() => {}); }
   }
-  function playVideo() { return video?.play().catch(() => {}); }
+  function playVideo() { if (full) return Promise.resolve(); return video?.play().catch(() => {}); }
+  /** Video v celé délce (synchronizovaná ústa, data `video_plne`): čas videa řídí čas zvuku.
+   *  Volá se z hlavní smyčky přehrávače při každém snímku a při play/pause/seek. Drift > 0,15 s se dorovná;
+   *  po konci zvuku zůstane video na posledním snímku. U krátkých smyček nedělá nic. */
+  function sync(t, playing) {
+    if (!full || !video) return;
+    const d = video.duration || Infinity;
+    const want = Math.min(t, d - 0.04);
+    if (video.readyState >= 1 && Math.abs(video.currentTime - want) > 0.15) { try { video.currentTime = Math.max(0, want); } catch { /* ještě bez metadat */ } }
+    if (playing && t < d - 0.05) { if (video.paused) video.play().catch(() => {}); }
+    else if (!video.paused) video.pause();
+  }
   function clear() { cleanup(); layers.forEach((l) => { l.className = 'w-layer'; l.innerHTML = ''; }); lower.classList.remove('in'); clearSub(); }
-  return { setWitness, ken, setSub, clearSub, freeze, playVideo, clear, lower, get video() { return video; }, get token() { return token; } };
+  return { setWitness, ken, setSub, clearSub, freeze, playVideo, sync, clear, lower, get video() { return video; }, get token() { return token; } };
 }
 
 /** Zrno (canvas) v kořenu scény; `active()` říká, jestli se má animovat. Vrací funkci pro zapnutí/vypnutí. */

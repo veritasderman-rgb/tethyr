@@ -1,8 +1,8 @@
 // Jednotný „rám“ oddílů: číslování oddílů (Oddíl I–XI), slavnostní předěly, odhalování nadpisů.
 // Oddíly se vykreslují líně, proto se rám přidává po vykreslení každého z nich (viz sections.js).
-const ORDER = ['pribeh', 'mapa', 'svedectvi', 'druzina', 'bitvy', 'proroctvi', 'osa', 'rejstrik', 'stul', 'hymna', 'podekovani'];
+const ORDER = ['pribeh', 'mapa', 'svedectvi', 'druzina', 'bitvy', 'proroctvi', 'osa', 'lexikon', 'stul', 'hymna', 'podekovani'];
 const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'];
-export const SECTION_LABEL = { uvod: 'Úvod', pribeh: 'Příběh', mapa: 'Mapa', svedectvi: 'Svědectví', druzina: 'Družina', bitvy: 'Bitvy', proroctvi: 'Proroctví', osa: 'Časová osa', rejstrik: 'Rejstřík', stul: 'U stolu', hymna: 'Hymna', podekovani: 'Poděkování' };
+export const SECTION_LABEL = { uvod: 'Úvod', pribeh: 'Příběh', mapa: 'Mapa', svedectvi: 'Svědectví', druzina: 'Družina', bitvy: 'Bitvy', proroctvi: 'Proroctví', osa: 'Časová osa', lexikon: 'Lexikon', stul: 'U stolu', hymna: 'Hymna', podekovani: 'Poděkování' };
 
 export function decorate(id, el) {
   const i = ORDER.indexOf(id);

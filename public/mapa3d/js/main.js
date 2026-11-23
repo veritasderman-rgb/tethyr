@@ -665,16 +665,16 @@ function openWitness(w, fly){ curCard={type:'wit',id:w.id}; if(fly&&w.pl&&BYID[w
     <div class="wit-v">${w.vid?`<video id="wv" muted loop playsinline preload="metadata" ${w.poster?`poster="${esc(w.poster)}"`:''} src="${esc(w.vid)}"></video>`:w.poster?`<img src="${esc(w.poster)}" alt="">`:''}<div class="subt" id="wsub"></div></div>
     <div class="wit-ctl"><button class="btn" id="wplay">▶ Přehrát svědectví</button><div class="prog"><i id="wprog"></i></div></div>
     <p class="note" style="margin-top:8px">${esc(w.bond||'')}</p>
-    <div class="wit-tx" id="wtx">${w.text.map((t,i)=>`<span data-i="${i}">${esc(t)}</span> `).join('')}</div>
+    <div class="wit-tx" id="wtx">${(w.titulky||w.text).map((t,i)=>`<span data-i="${i}">${esc(t)}</span> `).join('')}</div>
     <p class="note" style="margin-top:12px">${webLink('svedectvi/'+w.id,'Svědectví v kronice →')}${w.pl&&BYID[w.pl]?` · <button class="more" data-open="${esc(w.pl)}">${esc(BYID[w.pl].name)}</button>`:''}</p>`);
   const au=new Audio(); au.preload='none'; if(w.audio) au.src=w.audio; const v=$('wv'); wit={au,v,raf:0,w};
   const sub=$('wsub'), pr=$('wprog'), spans=[...$('wtx').querySelectorAll('span')], btn=$('wplay');
   const starts=w.t||w.text.map((_,i)=>i*5.5);
   const tick=()=>{ if(!wit||wit.w!==w) return; const t=au.currentTime, dur=au.duration||w.dur||1; let k=0; for(let i=0;i<starts.length;i++) if(t>=starts[i]) k=i;
-    sub.textContent=w.text[k]||''; spans.forEach((s,i)=>s.classList.toggle('on',i===k&&!au.paused)); pr.style.width=(t/dur*100).toFixed(1)+'%'; wit.raf=requestAnimationFrame(tick); };
+    sub.textContent=(w.titulky||w.text)[k]||''; spans.forEach((s,i)=>s.classList.toggle('on',i===k&&!au.paused)); pr.style.width=(t/dur*100).toFixed(1)+'%'; wit.raf=requestAnimationFrame(tick); };
   btn.onclick=()=>{ if(!w.audio){ sub.textContent='Hlas zatím chybí.'; return; } if(au.paused){ au.volume=SND.on?0.95:0.95; au.play().then(()=>{ v&&v.play().catch(()=>{}); btn.textContent='❚❚ Pozastavit'; tick(); }).catch(()=>{ sub.textContent='Přehrávání zablokoval prohlížeč – klepni znovu.'; }); } else { au.pause(); v&&v.pause(); btn.textContent='▶ Pokračovat'; } };
   au.onended=()=>{ btn.textContent='▶ Přehrát znovu'; v&&v.pause(); sub.textContent=''; };
-  sub.textContent=w.text[0]||''; if(v && !REDUCED) v.play().catch(()=>{});
+  sub.textContent=(w.titulky||w.text)[0]||''; if(v && !REDUCED) v.play().catch(()=>{});
   setHash('w='+w.id); }
 
 function openNote(name){ const n=EGGNOTE[name]; if(!n) return; curCard={type:'note',id:name}; const s=n.sid&&SES[n.sid], b=n.sid&&BATT[n.sid];

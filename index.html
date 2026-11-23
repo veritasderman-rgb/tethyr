@@ -30,28 +30,26 @@
 
   <header class="topbar" id="topbar">
     <a class="brand" href="#uvod" aria-label="Na začátek"><img src="img/misc/znak.svg" alt="" width="34" height="17" /><span>Západní draci</span></a>
-    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="mainNav"><span></span><span></span><span></span><b class="sr">Menu</b></button>
-    <nav id="mainNav" class="mainnav" aria-label="Oddíly">
-      <a href="#pribeh">Příběh</a>
-      <a href="#mapa">Mapa</a>
-      <a href="#svedectvi">Svědectví</a>
-      <a href="#druzina">Družina</a>
-      <a href="#bitvy">Bitvy</a>
-      <a href="#proroctvi">Proroctví</a>
-      <a href="#osa">Časová osa</a>
-      <a href="#rejstrik">Rejstřík</a>
-      <a href="#stul">U stolu</a>
-      <a href="#hymna">Hymna</a>
-      <button class="nav-film" type="button" data-film>▶ Dokument</button>
-    </nav>
+    <div class="tb-r">
+      <button class="nav-film" type="button" data-film>▶ <span>Dokument</span></button>
+      <button class="tb-search" type="button" id="searchBtn" aria-label="Hledat v kronice (klávesa /)" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg><span>Hledat</span><kbd>/</kbd></button>
+      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="navPanel" aria-haspopup="dialog"><span></span><span></span><span></span><b class="sr">Menu</b></button>
+    </div>
   </header>
+
+  <div class="navp" id="navPanel" role="dialog" aria-modal="true" aria-label="Obsah kroniky" hidden>
+    <div class="navp-bg" data-close></div>
+    <nav class="navp-p" aria-label="Oddíly kroniky" tabindex="-1"></nav>
+  </div>
+  <div class="srch" id="searchBox" role="dialog" aria-modal="true" aria-label="Hledat v kronice" hidden></div>
+  <div class="hcard" id="hoverCard" role="tooltip" hidden></div>
 
   <nav class="bottomnav" id="bottomNav" aria-label="Hlavní navigace">
     <a href="#pribeh"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11"/></svg><span>Příběh</span></a>
     <a href="#mapa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/></svg><span>Mapa</span></a>
     <a href="#svedectvi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg><span>Svědectví</span></a>
     <button type="button" data-film><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg><span>Dokument</span></button>
-    <button type="button" id="moreBtn" aria-expanded="false" aria-controls="mainNav"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Další</span></button>
+    <button type="button" id="moreBtn" aria-expanded="false" aria-controls="navPanel" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Menu</span></button>
   </nav>
 
   <main>
@@ -63,7 +61,7 @@
     <section id="bitvy" class="battles dark" aria-labelledby="bitvy-h"></section>
     <section id="proroctvi" class="prophecy" aria-labelledby="proroctvi-h"></section>
     <section id="osa" class="timeline" aria-labelledby="osa-h"></section>
-    <section id="rejstrik" class="registry" aria-labelledby="rejstrik-h"></section>
+    <section id="lexikon" class="lexikon" aria-labelledby="lexikon-h"></section>
     <section id="stul" class="table" aria-labelledby="stul-h"></section>
     <section id="hymna" class="hymna" aria-labelledby="hymna-h"></section>
     <section id="podekovani" class="podekovani" aria-labelledby="podekovani-h"></section>
@@ -71,7 +69,7 @@
 
   <footer class="foot">
     <span class="foot-orn" aria-hidden="true">✦ ✦ ✦</span>
-    <nav aria-label="Oddíly v patičce"><a href="#pribeh">Příběh</a><a href="#mapa">Mapa</a><a href="#svedectvi">Svědectví</a><a href="#druzina">Družina</a><a href="#bitvy">Bitvy</a><a href="#proroctvi">Proroctví</a><a href="#osa">Časová osa</a><a href="#rejstrik">Rejstřík</a><a href="#stul">U stolu</a><a href="#hymna">Hymna</a><a href="#mapa3d">3D mapa</a><a href="#podekovani">Poděkování</a></nav>
+    <nav aria-label="Oddíly v patičce"><a href="#pribeh">Příběh</a><a href="#mapa">Mapa</a><a href="#svedectvi">Svědectví</a><a href="#druzina">Družina</a><a href="#bitvy">Bitvy</a><a href="#proroctvi">Proroctví</a><a href="#osa">Časová osa</a><a href="#lexikon">Lexikon</a><a href="#stul">U stolu</a><a href="#hymna">Hymna</a><a href="#mapa3d">3D mapa</a><a href="#podekovani">Poděkování</a></nav>
     <p>Kronika Tethyrské královské družiny · hraje se od roku 2003 · hru vede Zdeněk T.</p>
     <p class="small">Forgotten Realms a Dungeons &amp; Dragons jsou ochranné známky Wizards of the Coast. Obrazy a portréty vznikly pro tuto kroniku.</p>
   </footer>

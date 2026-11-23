@@ -4,7 +4,7 @@ import os, json
 from playwright.sync_api import sync_playwright
 URL = os.environ.get('SHOT_URL', 'http://127.0.0.1:4173/')
 OUT = os.environ.get('SHOT_OUT', '/home/claude/webshots/it4'); os.makedirs(OUT, exist_ok=True)
-SECS = ['uvod', 'pribeh', 'mapa', 'svedectvi', 'druzina', 'bitvy', 'proroctvi', 'osa', 'rejstrik', 'stul', 'hymna', 'podekovani']
+SECS = ['uvod', 'pribeh', 'mapa', 'svedectvi', 'druzina', 'bitvy', 'proroctvi', 'osa', 'lexikon', 'stul', 'hymna', 'podekovani']
 VIEWS = {'desktop': dict(viewport={'width': 1440, 'height': 900}),
          'mobile': dict(viewport={'width': 390, 'height': 844}, device_scale_factor=2, is_mobile=True, has_touch=True)}
 errs = []

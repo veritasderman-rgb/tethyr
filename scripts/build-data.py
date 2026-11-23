@@ -82,6 +82,8 @@ C = clean(load(D + 'characters.json'))
 N = clean(load(D + 'npcs.json'))
 WD = clean(load(D + 'world.json'))
 MP = clean(load(D + 'map.json'))
+import upresneni  # noqa: E402  upřesnění autora (přednost před daty kroniky)
+S, C, WD, MP, N = upresneni.apply_all(S, C, WD, MP, N)
 GAL = clean(load(BUILD + '/nove/gallery.json'))
 FI = load(BUILD + '/foto/index.json')
 MAN = []
@@ -453,8 +455,8 @@ VYKLAD = [
     ('Ta z bouře zrozená, se zlatým hlasem', 'Storm „Bouře“ Lenlo', 'rejstřík: Storm Lenlo, „ta z bouře zrozená“ z proroctví'),
     ('Ta z bouře zrozená a kněžna černé dýky', 'Storm „Bouře“ Lenlo', 'rejstřík: Storm Lenlo, „ta z bouře zrozená“ z proroctví'),
     ('Za pomstou žene se svatý muž z východu', 'Ho Wu Long proti Yamohu Hokhrovi', 'postavy: Ho, svatý muž z východu; Yamoh Hokhra, šaman z plání'),
-    ('S šamanem z plání střetnout se chce', 'Ho Wu Long proti Yamohu Hokhrovi', 'bitva v Anaurochu a Pyramida času'),
-    ('Boji se vyhýbá velký mág světla', 'kostěj z cizího světa je arcidemilich Sar Saratar', 'postavy: Sar Saratar; Pyramida času'),
+    ('S šamanem z plání střetnout se chce', 'Ho Wu Long proti Yamohu Hokhrovi', 'bitva v Anaurochu'),
+    ('Boji se vyhýbá velký mág světla', 'kostěj z cizího světa je arcidemilich Sar Saratar; velký mág světla Elminster', 'postavy: Sar Saratar; bitva v Anaurochu'),
     ('Odemykač světů, klíče má ke všemu', 'Rauko Daerond', 'píseň „Soukolí věčnosti“: „Za stínem se žene Rauko — Odemykač světů“'),
     ('Lidé jen tuší, moudří to ví', 'Ilthyn, matka země', 'píseň „Soukolí věčnosti“: „Ilthin, matka země… v ní dříme klíč“'),
 ]
@@ -513,7 +515,7 @@ gallery = {'nove': [{'n': g['n'], 'kind': g['kind'], 'title': g['title'], 'cap':
            'ilu': [{'f': m['file'][:-4], 'target': m.get('target'), 'cap': m.get('caption', ''), 'session': m.get('session'), 'battle': m.get('battle')} for m in MAN]}
 
 # ---------------------------------------------------------------- svědectví
-SV = load(ROOT + '/data/svedectvi.json')  # text svědectví se NESMÍ měnit (je přesně tak, jak byl namluven)
+SV = upresneni.fix_witnesses(load(ROOT + '/data/svedectvi.json'))  # text svědectví se NESMÍ měnit (je přesně tak, jak byl namluven)
 VID = os.environ.get('SRC_VID', '/home/claude/vid')
 HOME_MAP = {'khelbenova-dcera': (198, 192)}  # domovské místo na mapě (x, y) pro svědky bez portrétu
 sid = {s['id'] for s in sessions}; bid = {b['id'] for b in BATTLES}
@@ -550,7 +552,8 @@ for w in SV:
         if not w.get('portret') or (not os.path.exists(IMG + w['portret'] + '-480.webp') and not any(j[1] == w['portret'] for j in JOBS)):
             print('  !! portrét nenalezen:', w['id'], w.get('portret'))
     w.pop('casy', None)
-SV = [clean({k: v for k, v in w.items() if k != 'text'}) | {'text': w['text']} for w in SV]
+    if os.path.exists(f"{ROOT}/assets/video/{w['id']}_plne.mp4"): w['video_plne'] = True  # celé video se synchronizovanými ústy
+SV = [clean({k: v for k, v in w.items() if k not in ('text', 'titulky')}) | {k: w[k] for k in ('text', 'titulky') if k in w} for w in SV]
 
 # ---------------------------------------------------------------- vyprávění: kontrola odkazů a stylu
 C3D = load(ROOT + '/public/mapa3d/data/campaign.json')
@@ -621,3 +624,7 @@ if '--no-img' not in ARGS:
     dump('images.json', dims)
     tot = sum(os.path.getsize(p) for p in glob.glob(IMG + '**/*', recursive=True) if os.path.isfile(p))
     print(f'obrázky: {n} nově převedených, celkem {tot / 1e6:.1f} MB')
+
+# ---------------------------------------------------------------- lexikon, hledání a hover odkazy (iterace 7)
+import subprocess  # noqa: E402
+subprocess.run([sys.executable, os.path.join(ROOT, 'scripts', 'build-lexikon.py')], check=True)

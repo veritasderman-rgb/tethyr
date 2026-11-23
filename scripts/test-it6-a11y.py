@@ -4,7 +4,7 @@ import os, sys, json
 from playwright.sync_api import sync_playwright
 URL = os.environ.get('SHOT_URL', 'http://127.0.0.1:4173/')
 AXE = open(os.environ.get('AXE_JS', '/tmp/axe/node_modules/axe-core/axe.min.js')).read()
-SECS = ['uvod', 'pribeh', 'mapa', 'svedectvi', 'druzina', 'bitvy', 'proroctvi', 'osa', 'rejstrik', 'stul', 'hymna', 'podekovani']
+SECS = ['uvod', 'pribeh', 'mapa', 'svedectvi', 'druzina', 'bitvy', 'proroctvi', 'osa', 'lexikon', 'stul', 'hymna', 'podekovani']
 VIEWS = {'desktop': dict(viewport={'width': 1440, 'height': 900}), 'mobile': dict(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True)}
 bad = 0
 with sync_playwright() as p:

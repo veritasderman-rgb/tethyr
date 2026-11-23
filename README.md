@@ -51,7 +51,7 @@ Zdroje: `SRC_SVEDECTVI`, `SRC_VOICES`, `SRC_VID`, `SRC_HYMNA` (proměnné prost�
 
 ## Hymna a poděkování
 
-Hymna „Rauko“: hlavním přehrávačem je videoklip `public/hymna/rauko_klip.mp4` (1280×720, H.264 crf 31, faststart, ~39 MB) s plakátem `rauko_klip.jpg`; pod ním se zvýrazňuje text podle videa. Záložní hudební přehrávač: `assets/hymna/rauko.mp3`, text a časy řádků v `data/hymna.json` (z `/home/claude/hymna/rauko.txt`; časy z `timing.json` ve zdrojové složce (`sekce[].radky[].start`, případně pole 47 čísel), jinak z `data/hymna-timing.json` (odhad z automatického přepisu)). Přehrávač má play/pauzu, posuv, hlasitost, zvýraznění řádku a sloky, klik na řádek skočí na řádek; vizuál reaguje na hlasitost (WebAudio analyser). Když ve složce hymny existuje `rauko_klip.mp4`, po `build-media.py` se nabídne „Videoklip“. Poděkování je `data/podekovani.txt` beze změn.
+Hymna „Rauko“: hlavním přehrávačem je videoklip `public/hymna/rauko_klip.mp4` (1280×720, H.264 crf 32 (od iterace 7 překódováno kvůli váze repa), faststart, ~32 MB) s plakátem `rauko_klip.jpg`; pod ním se zvýrazňuje text podle videa. Záložní hudební přehrávač: `assets/hymna/rauko.mp3`, text a časy řádků v `data/hymna.json` (z `/home/claude/hymna/rauko.txt`; časy z `timing.json` ve zdrojové složce (`sekce[].radky[].start`, případně pole 47 čísel), jinak z `data/hymna-timing.json` (odhad z automatického přepisu)). Přehrávač má play/pauzu, posuv, hlasitost, zvýraznění řádku a sloky, klik na řádek skočí na řádek; vizuál reaguje na hlasitost (WebAudio analyser). Když ve složce hymny existuje `rauko_klip.mp4`, po `build-media.py` se nabídne „Videoklip“. Poděkování je `data/podekovani.txt` beze změn.
 
 ## 2D mapa tažení
 
@@ -78,6 +78,15 @@ Text kapitol je v `data/vypraveni/1.md`–`4.md`: `## <id kapitoly>`, odstavce o
 
 `src/styles/system.css` (typografická škála, číslování oddílů, předěly, scroll-driven animace, fokus, tisk) a `scenes.css` (úvod, Družina, Bitvy, Proroctví, mobilní osa) se načítají po `sections.css`. Rám oddílů přidává `src/lib/chrome.js`. Testy: `scripts/test-it6.py`, `scripts/test-it6-a11y.py` (axe-core, `AXE_JS=<cesta k axe.min.js>`), snímky `scripts/shots6.py <složka>`. Ikony a `og.jpg` se přegenerují `python3 scripts/build-icons.py`. Absolutní adresa náhledu pro sdílení: proměnná `SITE_URL` nebo automaticky Vercel. Tisk kapitoly: tlačítko „Vytisknout kapitolu“.
 
+## Iterace 7: menu, hledání, Lexikon, hover karty, dabing
+
+- **Menu** `src/lib/menu.js` (panel na všech šířkách, na mobilu přes „Menu“ ve spodní liště), **hledání** `src/lib/search.js` (`/`, `Ctrl+K`; index `public/data/search.json`), **hover karty** `src/lib/hovercard.js`, **Lexikon** `src/sections/lexikon.js` (kotva `#lx/<heslo>`), styly `src/styles/it7.css`.
+- `scripts/build-lexikon.py` (spouští ho `build-data.py`): `lexikon.json`, `search.json` a odkazy `x:` u prvního výskytu jména v odstavci vyprávění.
+- `scripts/upresneni.py`: upřesnění autora s předností před daty kroniky (bitva o Anauroch, Broskvová zahrada, Chuang-Li, Kung Lao…); 3D mapu opraví `python3 scripts/upresneni.py`.
+- **Svědectví anglicky s českými titulky:** `scripts/update-svedectvi.sh` (zdroj `/home/claude/voices/svedectvi_v3.json` + `/home/claude/voices3/`). V datech `text` = mluvené anglické věty (časování), `titulky` = české titulky, `jazyk`; přepínač titulků CZ/EN/vyp (`subMode`/`setSubMode` v `src/lib/wstage.js`, uloženo v `localStorage`).
+- **Video v celé délce** (`<id>_lipsync.mp4` ve složce videí → `assets/video/<id>_plne.mp4`, příznak `video_plne`): přehrávač i Dokument ho řídí časem zvuku (`stage.sync`).
+- Test: `scripts/test-it7.py` (snímky `/home/claude/webshots/it7/`).
+
 ## Struktura
 
 ```
@@ -93,11 +102,11 @@ public/data/             generovaná data webu
 public/img/              generované obrázky (ilu = malby, port = portréty, nove = podklady PJ, foto = fotky od stolu, map, osa)
 src/main.js              načtení dat, navigace, spuštění oddílů
 src/lib/                 data, obrázky (srcset), odhalování, částice, lightbox/šuplík
-src/sections/            hero, story, map, witness, party, battles, prophecy, timeline, registry, table, hymna, podekovani
+src/sections/            hero, story, map, witness, party, battles, prophecy, timeline, lexikon, table, hymna, podekovani
 src/styles/              base.css (barvy, písmo, prvky), sections.css (oddíly)
 ```
 
-Oddíly: Úvod · Příběh · Mapa (Leaflet + vstup do 3D mapy) · Svědectví · Družina · Bitvy · Proroctví · Časová osa · Rejstřík · U stolu · Hymna · Poděkování.
+Oddíly: Úvod · Příběh · Mapa (Leaflet + vstup do 3D mapy) · Svědectví · Družina · Bitvy · Proroctví · Časová osa · Lexikon · U stolu · Hymna · Poděkování.
 
 ## Obsahová pravidla
 

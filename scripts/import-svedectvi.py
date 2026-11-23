@@ -13,7 +13,9 @@ Hráčské postavy (kind „hrac“ v characters.json) se do výstupu nikdy nedo
 import json, os, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SRC = sys.argv[1] if len(sys.argv) > 1 else os.environ.get('SRC_SVEDECTVI', '/home/claude/voices/svedectvi_v2.json')
+SRC = sys.argv[1] if len(sys.argv) > 1 else os.environ.get('SRC_SVEDECTVI', '/home/claude/voices/svedectvi_v3.json')
+# Sada v3 (iterace 7): anglický dabing. `text` = mluvené anglické věty (text_en bez audio tagů v [hranatých závorkách]),
+# `titulky` = české titulky (titulky_cs), `jazyk` = 'en'. Časování vět odpovídá větám `text`.
 NADHLED = {'elminster', 'khelben', 'khelbenova-dcera', 'alustriel', 'simbul', 'alusair'}
 # stav (ze zdroje): žije | padl | zmizel; stav_titulek = dovětek pod jménem (např. „† padl ve Feng Asay“).
 # Kdyby zdroj stav neměl, doplní se odsud.
@@ -23,7 +25,7 @@ STAV = {
     'rivalen': ('padl', '† padl na vrcholu Pyramidy času'),
     'sar-saratar': ('padl', '† padl v Anaurochu'),
 }
-KEEP = ('id', 'jmeno', 'role', 'strana', 'vazba', 'portret', 'hlas_popis', 'text', 'zdroje', 'stav', 'stav_titulek')
+KEEP = ('id', 'jmeno', 'role', 'strana', 'vazba', 'portret', 'hlas_popis', 'text', 'titulky', 'jazyk', 'zdroje', 'stav', 'stav_titulek')
 
 src = json.load(open(SRC, encoding='utf-8'))
 try:
@@ -41,6 +43,13 @@ for w in src:
     if w['id'] in pcs:
         print('  přeskočeno (hráčská postava):', w['id']); continue
     o = {k: w[k] for k in KEEP if k in w and w[k] is not None}
+    if w.get('text_en'):
+        import re as _re
+        o['text'] = [_re.sub(r'\s{2,}', ' ', _re.sub(r'\[[^\]]*\]', '', s)).strip() for s in w['text_en']]
+        o['titulky'] = list(w.get('titulky_cs') or [])
+        o['jazyk'] = 'en'
+        if len(o['titulky']) != len(o['text']):
+            print('  !! počet titulků nesedí s větami:', w['id'])
     if 'stav' not in o and w['id'] in STAV:
         o['stav'], o['stav_titulek'] = STAV[w['id']]
     if o.get('stav', 'žije') == 'žije':
@@ -50,5 +59,8 @@ for w in src:
     o['skupina'] = 'nadhled' if w['id'] in NADHLED else {'spojenec': 'spojenci', 'nepřítel': 'nepřátelé'}.get(w['strana'], 'neutrální')
     o['fokus'] = old.get(w['id'], {}).get('fokus', '40% 30%')
     out.append(o)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import upresneni  # noqa: E402  upřesnění autora: vazba a stav (text zůstává beze změny)
+upresneni.fix_witnesses(out)
 json.dump(out, open(ROOT + '/data/svedectvi.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 print(f'data/svedectvi.json: {len(out)} svědectví z {SRC}')

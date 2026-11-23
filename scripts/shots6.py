@@ -5,7 +5,7 @@ from playwright.sync_api import sync_playwright
 URL = os.environ.get('SHOT_URL', 'http://127.0.0.1:4173/')
 OUT = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/webshots/it6/pred'
 os.makedirs(OUT, exist_ok=True)
-SECS = {'uvod': 2, 'pribeh': 3, 'mapa': 1, 'svedectvi': 2, 'druzina': 3, 'bitvy': 3, 'proroctvi': 3, 'osa': 2, 'rejstrik': 1, 'stul': 2, 'hymna': 1, 'podekovani': 1}
+SECS = {'uvod': 2, 'pribeh': 3, 'mapa': 1, 'svedectvi': 2, 'druzina': 3, 'bitvy': 3, 'proroctvi': 3, 'osa': 2, 'lexikon': 1, 'stul': 2, 'hymna': 1, 'podekovani': 1}
 VIEWS = {'desktop': dict(viewport={'width': 1440, 'height': 900}),
          'mobile': dict(viewport={'width': 390, 'height': 844}, device_scale_factor=1, is_mobile=True, has_touch=True)}
 errs = []

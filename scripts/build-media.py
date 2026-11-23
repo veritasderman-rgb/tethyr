@@ -5,7 +5,7 @@ Spuštění:  python3 scripts/build-media.py            (jen chybějící nebo n
            python3 scripts/build-media.py --force    (znovu všechno)
 
 Vezme vše, co ve zdrojových složkách je, a jde spouštět opakovaně (další videa se doplňují).
-  hlasy:   SRC_VOICES (/home/claude/voices2)  <id>.mp3 + timing.json  →  assets/voices/
+  hlasy:   SRC_VOICES (/home/claude/voices3)  <id>.mp3 + timing.json  →  assets/voices/  (anglický dabing, titulky česky)
   videa:   SRC_VID    (/home/claude/vid)      <id>.mp4 (1280×720, 6 s, bez zvuku)  →  assets/video/<id>.mp4
            Video se při převodu upraví na plynulou smyčku (konec se prolne do začátku) a překóduje (crf 27).
   hymna:   SRC_HYMNA  (/home/claude/hymna)    rauko.mp3, rauko_klip.mp4 (pokud je), timing.json (pokud je) → assets/hymna/
@@ -15,7 +15,7 @@ Hlasy a videa se berou jen pro id z data/svedectvi.json (hráčské postavy žá
 import json, os, shutil, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VOICES = os.environ.get('SRC_VOICES', '/home/claude/voices2')
+VOICES = os.environ.get('SRC_VOICES', '/home/claude/voices3')  # od iterace 7 anglický dabing (dřív voices2, česky)
 VID = os.environ.get('SRC_VID', '/home/claude/vid')
 HYMNA = os.environ.get('SRC_HYMNA', '/home/claude/hymna')
 FORCE = '--force' in sys.argv
@@ -79,17 +79,38 @@ def main():
             if newer(s, avid + i + '.mp4'): loopify(s, avid + i + '.mp4'); nvid += 1
         else:
             print('  chybí video:', i)
+        # video v celé délce se synchronizovanými ústy (<id>_lipsync.mp4): bez smyčky, bez zvuku, řídí ho čas hlasu
+        s = f'{VID}/{i}_lipsync.mp4'
+        if os.path.exists(s) and newer(s, avid + i + '_plne.mp4'):
+            # 1280×720, crf 33 (~1,8 MB na minutu), klíčový snímek po 2 s kvůli posuvu a dorovnání podle zvuku
+            r = subprocess.run(['ffmpeg', '-y', '-v', 'error', '-i', s, '-an', '-c:v', 'libx264', '-preset', 'slow', '-crf', '33', '-g', '48',
+                                '-pix_fmt', 'yuv420p', '-movflags', '+faststart', avid + i + '_plne.mp4'])
+            if r.returncode: raise SystemExit('ffmpeg selhal pro ' + s)
+            nvid += 1; print('  video v celé délce:', i)
     # časování vět (jen pro svědky z dat)
     tp = f'{VOICES}/timing.json'
     if os.path.exists(tp):
         t = json.load(open(tp))
-        t = {k: {'duration': v['duration'], 'starts': v['starts']} for k, v in t.items() if k in ids}
+        t = {k: {'duration': v['duration'], 'starts': v['starts']} | ({'ends': [l['end'] for l in v['lines']]} if v.get('lines') else {}) for k, v in t.items() if k in ids}
         json.dump(t, open(av + 'timing.json', 'w'), separators=(',', ':'))
         print(f'  timing.json: {len(t)} svědků')
+        # 3D mapa má vlastní kopii textů svědků: mluvený text, české titulky a časy vět srovnat s webem
+        cp = ROOT + '/public/mapa3d/data/campaign.json'
+        if os.path.exists(cp):
+            camp = json.load(open(cp, encoding='utf-8'))
+            sv = {w['id']: w for w in json.load(open(ROOT + '/data/svedectvi.json', encoding='utf-8'))}
+            for w in camp.get('witnesses', []):
+                s = sv.get(w['id'])
+                if not s: continue
+                w['text'] = s['text']
+                if s.get('titulky'): w['titulky'] = s['titulky']
+                if w['id'] in t: w['t'] = t[w['id']]['starts']; w['dur'] = t[w['id']]['duration']
+            open(cp, 'w', encoding='utf-8').write(json.dumps(camp, ensure_ascii=False, separators=(',', ':')))
+            print('  3D mapa: texty a časy svědků srovnány')
     # odstranit média, která už nepatří do sady
     for d, ext in ((av, '.mp3'), (avid, '.mp4')):
         for f in os.listdir(d):
-            if f.endswith(ext) and f[:-len(ext)] not in ids:
+            if f.endswith(ext) and f[:-len(ext)].removesuffix('_plne') not in ids:
                 os.remove(d + f); print('  odstraněno:', f)
     # hymna
     ah = ROOT + '/assets/hymna/'

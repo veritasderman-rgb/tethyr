@@ -4,20 +4,20 @@
   "jmeno": "Seung Mina",
   "role": "velitelka bojových mnichů Chrámu Západního úsvitu",
   "strana": "spojenec",
-  "vazba": "Hoova milá a v epilogu manželka; s Hoem bojovala od Sid-hou po obranu tethyrských držav.",
+  "vazba": "Hoova žena; Ho ji osvobodil z Feng Asay. S Hoem bojovala od Sid-hou po obranu tethyrských držav.",
   "portret": "ilu/T3_032",
   "hlas_popis": "žena, kolem pětatřiceti (v epilogu stará), živý jasný hlas, rychlá škádlivá řeč, náhle zvážní",
   "text": [
-   "U Sid-hou jsme s Hoem bojovali bok po boku a v Balanzii si mě ten budižkničemu vůbec nepamatoval.",
-   "To mu připomínám dodnes.",
-   "Ve Feng Asay mě drželi za mřížemi a Ho mě odtamtud vysvobodil, měl plán i svitek.",
-   "Na sklonku roku 1380 jsem přijela do jeho chrámu s patnácti sohei a už jsem neodjela.",
-   "Na Nový rok na Dračím letu mu na pláži skočilo po obličeji yugolothí mládě a já ho rozťala vejpůl dřív, než stačil hnout holí.",
-   "Ani se neusmál, on se neusmívá od Šivana.",
-   "Když nepřítel začal útočit na državy družiny, vedli jsme bojové mnichy do pole spolu.",
-   "V jeho mále mám šestý korálek.",
-   "Jsem jeho žena, teď mu u rýžových polí nalévám čaj a on mi na všechno odpovídá vskutku.",
-   "To slovo prý patřilo Varionovi."
+   "We fought side by side at Sid-hou. In Balanzia, that good-for-nothing didn't know me.",
+   "I still remind him. Every winter.",
+   "Then Feng Asay. Cold stone, bars… I'd stopped counting the days.",
+   "And Ho Wu Long walks in with a plan and a scroll, and the walls just… aren't there.",
+   "End of 1380 I came west with fifteen sohei. Not for a visit.",
+   "New Year's, on the beach at Dragonflight, a yugoloth whelp jumps at his face.",
+   "I cut it in half before he can even move his staff.",
+   "He didn't smile. He hasn't smiled since Shivan.",
+   "Now I pour his tea by the rice terraces, and he answers everything with \"indeed\".",
+   "He says that word was Varion's. I let him keep it."
   ],
   "zdroje": [
    "s-2006",
@@ -33,6 +33,19 @@
    "txt:2026-09-04_Budoucnost-Ho",
    "upřesnění autora 23. 11."
   ],
+  "titulky": [
+   "U Sid-hou jsme bojovali bok po boku. V Balanzii mě ten budižkničemu nepoznal.",
+   "Připomínám mu to dodnes. Každou zimu.",
+   "Pak Feng Asay. Studený kámen, mříže… Dny jsem už nepočítala.",
+   "A pak přijde Ho Wu Long s plánem a svitkem a zdi najednou… nejsou.",
+   "Koncem roku 1380 jsem přišla na západ s patnácti sohei. Ne na návštěvu.",
+   "Nový rok, pláž na Dračím letu. Yugolothí mládě mu skočí po obličeji.",
+   "Rozetnu ho vejpůl dřív, než stačí hnout holí.",
+   "Neusmál se. Neusmívá se od Šivana.",
+   "Teď mu u rýžových teras nalévám čaj a on na všechno odpoví „vskutku“.",
+   "Prý to slovo patřilo Varionovi. Nechávám mu ho."
+  ],
+  "jazyk": "en",
   "skupina": "spojenci",
   "fokus": "25% 30%"
  },
@@ -45,16 +58,15 @@
   "portret": "port/kenshi",
   "hlas_popis": "muž kolem čtyřiceti, nízký vyrovnaný hlas bez emocí, velmi úsporný, pomalé tempo, skoro šepot",
   "text": [
-   "Mitsurugy mě porazil, i když těsně, a pak mě poslal na západ k mnichovi, který potřebuje někoho za zády.",
-   "Do Chrámu Západního úsvitu jsem dorazil v prosinci.",
-   "Šedesát sedm lidí a deset studentů, každý z nich došlapuje jinak.",
-   "Mistr Ho došlapuje, jako by nechtěl zem obtěžovat.",
-   "Je to první Šedý mnich na západě a já jsem od té doby jeho strážce a rádce.",
-   "Pár týdnů nato jsem stál za ním v lese u řeky, kde poprvé vedl vlastní lidi do pole.",
-   "Od té doby chodím, kam jde on, na výpravy i do bitev.",
-   "Do své mály mi dal korálek, mezi lidi, kteří mu stojí nejblíž.",
-   "Zůstal jsem v chrámu po jeho boku.",
-   "Ho drží stráž nad ostatními a já nad ním, tak je to v pořádku."
+   "Mitsurugy beat me. Barely. Then he sent me west.",
+   "\"There is a monk,\" he said. \"He needs someone at his back.\"",
+   "I reached the temple in December. Sixty-seven people. Ten students.",
+   "Each one walks differently. Ho Wu Long walks as if he does not want to trouble the ground.",
+   "A few weeks later, a forest by a river. His first time leading his own people.",
+   "I stood behind him. His breath was steady. Mine was not.",
+   "Since then, where he goes, I go. Journeys. Battles.",
+   "He put my bead on his mala. Among the ones closest to him.",
+   "He keeps watch over the others. I keep watch over him. That is right."
   ],
   "zdroje": [
    "s-2013-12-05",
@@ -64,6 +76,18 @@
    "txt:Ho_popisky",
    "hymna"
   ],
+  "titulky": [
+   "Mitsurugy mě porazil. Těsně. Pak mě poslal na západ.",
+   "„Je tam jeden mnich,“ řekl. „Potřebuje někoho za zády.“",
+   "Do chrámu jsem došel v prosinci. Šedesát sedm lidí. Deset studentů.",
+   "Každý došlapuje jinak. Ho Wu Long, jako by nechtěl obtěžovat zem.",
+   "Za pár týdnů les u řeky. Poprvé vedl vlastní lidi.",
+   "Stál jsem za ním. Dýchal klidně. Já ne.",
+   "Od té doby jdu, kam jde on. Na výpravy. Do bitev.",
+   "Můj korálek dal do své mály. Mezi ty, kdo mu stojí nejblíž.",
+   "On drží stráž nad ostatními. Já nad ním. Tak je to správně."
+  ],
+  "jazyk": "en",
   "skupina": "spojenci",
   "fokus": "28% 30%"
  },
@@ -76,15 +100,15 @@
   "portret": "port/hasagi",
   "hlas_popis": "muž kolem čtyřiceti, silný hrubší baryton, bodrý, se smíchem v hlase, v napětí ostrý",
   "text": [
-   "Ten chrám jsem znal dřív než jeho opat.",
-   "Mitsurugy mě poprosil, ať s devíti samuraji dohlédnu na stavbu, a hotovo bylo dřív, než mistr Ho na pět let zmizel.",
-   "Když se vrátil, hlídali jsme mu to s dvojčaty Jin a Jang pořád.",
-   "Pak dorazilo dvacet róninů rodu Kavalan, po nich Honda se Seung Minou, a já měl najednou pod sebou malé vojsko.",
-   "K samurajům přibylo dvanáct žen a patnáct dětí a moje Suami otevřela čajovnu.",
-   "V lese u řeky vedl mistr Ho poprvé vlastní jednotky a já mu do pole přivedl dvaadvacet mečů.",
-   "Bitva byla krátká a vyhráli jsme ji.",
-   "Od té doby s ním chodím na výpravy, a když je pryč, velím doma všem, kdo nosí zbraň.",
-   "S Mitsurugym se pořád přeme, kdo komu víckrát zachránil život, a dodnes nevíme, kdo vede."
+   "I knew that temple before its abbot did. I watched every beam go up.",
+   "Nine of Mitsurugy's samurai, half a year of mud. Done before the master vanished.",
+   "He comes back, then Kavalan ronin, Honda, Seung Mina… suddenly I've got an army!",
+   "Twelve wives, fifteen children, my Suami opens a teahouse. A temple, they said. Ha!",
+   "Forest by the river. Ho Wu Long leads his own men for the first time.",
+   "I bring him twenty-two swords. Short fight. Ours.",
+   "Now when he's away, anyone carrying a blade answers to me.",
+   "Mitsurugy and I still argue who's saved whose life more times.",
+   "I'm ahead. He'll tell you different. He's wrong."
   ],
   "zdroje": [
    "s-2011-12-21",
@@ -92,6 +116,18 @@
    "b-bitva-o-tethyrske-drzavy",
    "txt:Ho_popisky"
   ],
+  "titulky": [
+   "Ten chrám jsem znal dřív než jeho opat. Viděl jsem zvedat každý trám.",
+   "Devět Mitsurugyho samurajů, půl roku bláta. Hotovo, než mistr zmizel.",
+   "Vrátí se, pak rónini Kavalan, Honda, Seung Mina… a já mám vojsko!",
+   "Dvanáct žen, patnáct dětí, moje Suami otevře čajovnu. Prý chrám. Ha!",
+   "Les u řeky. Ho Wu Long poprvé vede vlastní muže.",
+   "Přivedu mu dvaadvacet mečů. Krátká bitva. Naše.",
+   "Když je pryč, každý, kdo nosí zbraň, poslouchá mě.",
+   "S Mitsurugym se pořád hádáme, kdo komu víckrát zachránil život.",
+   "Vedu já. On vám řekne opak. Plete se."
+  ],
+  "jazyk": "en",
   "skupina": "spojenci",
   "fokus": "42% 30%"
  },
@@ -104,15 +140,15 @@
   "portret": "port/honda",
   "hlas_popis": "mohutný muž kolem padesáti, hluboký kulatý bas, pomalý, žoviální, praktický",
   "text": [
-   "Na západ jsem přišel se Seung Minou, rok a půl po róninech, a první, co jsem udělal, byl záhon za klášterem.",
-   "Východní byliny tady rostou neochotně, tak hledám, čím je nahradit.",
-   "Mistr Ho ví, co je lazaret, vedl ho už u Rudé pevnosti, a proto mi do práce nemluví.",
-   "Mluví mi jen do rozpočtu.",
-   "Moji léčitelé chrám živí, chodí po okolí a nekážou, protože to mistr slíbil představeným ostatních chrámů.",
-   "Když nepřítel začal útočit na državy družiny, vytáhl jsem do pole s patnácti léčiteli a polní nemocnicí.",
-   "Bitva u řeky byla krátká a práce po ní dlouhá.",
-   "Na Moři padlých hvězd pak mistr zůstal v zázemí a ošetřovnu vedl sám.",
-   "V jeho mále mám korálek a o víc jsem nikdy nežádal."
+   "I came west with Seung Mina, after the ronin. First thing I did? Dug a garden.",
+   "Eastern herbs grow here like sulking children. I'm still looking for substitutes.",
+   "Ho Wu Long knows what a field hospital is. He ran one at the Red Knight's fortress.",
+   "So he never tells me how to do my work.",
+   "Only how much it costs.",
+   "My healers walk the villages and mend people. They never preach. He promised the other temples.",
+   "When the enemy came for the Company's lands, I took fifteen healers to the river.",
+   "The battle was short. The work after it was long.",
+   "I have a bead on his mala. I never asked for more than that."
   ],
   "zdroje": [
    "s-2011-12-21",
@@ -122,6 +158,18 @@
    "s-2016-03-26",
    "txt:Ho_popisky"
   ],
+  "titulky": [
+   "Na západ jsem přišel se Seung Minou, po róninech. A hned jsem kopal záhon.",
+   "Východní byliny tu rostou jako trucovité děti. Pořád hledám náhražky.",
+   "Ho Wu Long ví, co je lazaret. U Pevnosti Rudé rytířky jeden vedl.",
+   "Takže mi do práce nemluví.",
+   "Jen do toho, kolik stojí.",
+   "Moji léčitelé chodí po vesnicích a léčí. Nekážou. Slíbil to ostatním chrámům.",
+   "Když nepřítel udeřil na državy družiny, vzal jsem k řece patnáct léčitelů.",
+   "Bitva byla krátká. Práce po ní dlouhá.",
+   "V jeho mále mám korálek. O víc jsem nikdy nežádal."
+  ],
+  "jazyk": "en",
   "skupina": "spojenci",
   "fokus": "36% 30%"
  },
@@ -134,17 +182,16 @@
   "portret": "port/turfin",
   "hlas_popis": "muž, elf-veterán neurčitého věku, tvrdý suchý hlas, voják, úsečně, bez emocí",
   "text": [
-   "Sakaar, starší oddíl Seanir, hlásím, jak to bylo.",
-   "Po smrti Nowena přešly oba oddíly na jeho syna a my dostali velitele, který v družině chodil první.",
-   "Rozkaz zněl přesunout se na Dračí let jako samostatná jednotka.",
-   "Než jsme se zabydleli, stáli jsme na hradbách Pevnosti Rudé rytířky.",
-   "Třicet mužů Seaniru se mnou a s Vilthanem, padesát jedna Beogilu pod Ilriendem.",
-   "Horda prorazila severní bránu, bilo se uvnitř a pevnost jsme udrželi.",
-   "Lorda Dračího letu jsme tam ztratili.",
-   "Ještě téhož roku jsme s lordem Austiem vytáhli do lesa u řeky, osmdesát jedna luků, krátká práce.",
-   "Pak se s družinou rozloučil dopisy a odešel na Evermeet.",
-   "Já jsem kdysi přísahal, že kontinent neopustím, a přísahu držím.",
-   "V Anaurochu za něj stříleli jeho lidé pod Vilthanem."
+   "Sakaar. Senior company, Seanir. You want it straight, you get it straight.",
+   "Nowen died. Both companies went to his son. The one who always walked first.",
+   "Orders: Dragonflight, independent unit. We'd barely unpacked.",
+   "Then the walls of the Red Knight's fortress. Thirty of Seanir. Fifty-one of Beogil.",
+   "Horde broke the north gate. Fought inside. Held.",
+   "Lost the lord of Dragonflight there. Leave it.",
+   "Same year, the forest by the river. Eighty-one bows under Lord Austius. Short work.",
+   "Then he wrote his letters and went to Evermeet.",
+   "I swore once I'd never leave this continent. I keep my oaths.",
+   "His men shot for him in Anauroch, under Vilthan. Good shooting, I heard."
   ],
   "zdroje": [
    "s-2012-03-16",
@@ -155,6 +202,19 @@
    "txt:zapisky",
    "txt:Austius_popisky"
   ],
+  "titulky": [
+   "Sakaar, starší oddíl Seanir. Chcete to rovně, máte to mít.",
+   "Nowen umřel. Oba oddíly šly na syna. Na toho, co chodil první.",
+   "Rozkaz: Dračí let, samostatná jednotka. Sotva jsme vybalili.",
+   "Pak hradby Pevnosti Rudé rytířky. Třicet ze Seaniru. Padesát jedna z Beogilu.",
+   "Horda prorazila severní bránu. Bili jsme se uvnitř. Udrželi jsme to.",
+   "Tam jsme ztratili lorda Dračího letu. Nechte to být.",
+   "Téhož roku les u řeky. Osmdesát jedna luků pod lordem Austiem. Krátká práce.",
+   "Pak napsal dopisy a odešel na Evermeet.",
+   "Já kdysi přísahal, že kontinent neopustím. Přísahy držím.",
+   "V Anaurochu za něj stříleli jeho lidé pod Vilthanem. Prý dobře."
+  ],
+  "jazyk": "en",
   "skupina": "spojenci",
   "fokus": "37% 30%"
  },
@@ -167,16 +227,16 @@
   "portret": "port/isis",
   "hlas_popis": "žena, elfka zralého věku, sametový mezzosoprán, klidná, sebejistá, střídmá",
   "text": [
-   "Na Dračí let jsem přijela s Austiem na novoroční oslavu a ráno už jsem se s mistrem Ho dívala, jak odlétá na zlatém orlovi do svítání.",
-   "Na sever táhla horda a družina se balila dřív, než dozněly přípitky.",
-   "Já jsem měla vlastní cestu.",
-   "Na moři napadli loď Tančících čepelí, otce našli v bezvědomí a někdo musel zjistit, kdo za tím je.",
-   "S Austiem jsme se znovu sešli až po roce, když on i jeho přátelé prošli výcvikem, a přivedla jsem mu dceru.",
-   "Mezitím s lordem Daerondem skončil v zakharském zajetí, bez vybavení.",
-   "Mistr Ho je odtamtud vyvedl oba, i s jejich věcmi.",
-   "Pak Austius napsal dopisy a odešel na Evermeet.",
-   "Do Anaurochu už nešel.",
-   "Šel tam můj otec jako maršál elfů a sestra vedla létající loď Zlatý sokol."
+   "I came to Dragonflight with Austius for the New Year feast.",
+   "By morning Ho Wu Long and I were watching him fly off on a golden eagle, into the dawn.",
+   "The horde was marching north. They packed before the toasts had faded.",
+   "I had my own road. Someone attacked the Dancing Blades' ship. My father lay senseless.",
+   "Someone had to find out who.",
+   "A year passed before I saw Austius again. I brought our daughter.",
+   "Later he and Lord Daerond sat in a Zakharan prison with nothing.",
+   "The monk brought them out. Their gear too.",
+   "Then Austius wrote his letters and left for Evermeet. He never went to Anauroch.",
+   "My father did, as marshal of the elves. My sister captained the Golden Falcon."
   ],
   "zdroje": [
    "s-2011-12-26",
@@ -188,6 +248,19 @@
    "b-bitva-v-anaurochu",
    "txt:zapisky"
   ],
+  "titulky": [
+   "Na Dračí let jsem přijela s Austiem na novoroční oslavu.",
+   "Ráno jsme se s Ho Wu Long dívali, jak odlétá na zlatém orlovi do svítání.",
+   "Na sever táhla horda. Balili se dřív, než dozněly přípitky.",
+   "Já měla vlastní cestu. Někdo napadl loď Tančících čepelí. Otec ležel bez sebe.",
+   "Někdo musel zjistit, kdo to byl.",
+   "Austia jsem znovu viděla až po roce. Přivedla jsem mu dceru.",
+   "Pak s lordem Daerondem seděli v zakharském zajetí bez ničeho.",
+   "Mnich je vyvedl. I s výbavou.",
+   "Pak Austius napsal dopisy a odešel na Evermeet. Do Anaurochu nešel.",
+   "Šel tam můj otec jako maršál elfů. Sestra velela Zlatému sokolovi."
+  ],
+  "jazyk": "en",
   "skupina": "spojenci",
   "fokus": "40% 30%"
  },
@@ -200,17 +273,16 @@
   "portret": "port/seltar",
   "hlas_popis": "muž kolem pětačtyřiceti, charismatický rytířský baryton, rozvážný, chvílemi vzplane",
   "text": [
-   "K družině jsme se přidali, až když u Orofinu dohořívalo.",
-   "Polovina Aliance se domů nevracela a Orofin ležel na dně Temného jezera.",
-   "Velekněžka Calla nás tehdy představila mágovi a mnichovi, o kterých jsme do té doby jen slýchali.",
-   "V Thultantharu jsme dostali ulice.",
-   "Jedenáct mých lidí, sedm z Tethyrské jednotky pod Viktorem a Erylthil po mém boku.",
-   "Lord Daerond s mistrem Ho šli nahoru po princích Stínu a my jsme drželi stínové stráže dole.",
-   "Ten den jsem se nemusel krotit a nekrotil jsem se.",
-   "Nahoře jsem nebyl.",
-   "Až pak jsem se dozvěděl, že princové padli na vrcholu Pyramidy času.",
-   "Nemesiáni berou jen ty, kdo zažili pád.",
-   "Ti dva nepadli nikdy, a přesto jsem jim ten den kryl záda rád."
+   "We joined them while Orofin was still burning. Half the Alliance wasn't going home.",
+   "High Priestess Calla brought us to the mage and the monk. Until then, just stories.",
+   "In Thultanthar they gave us the streets. Eleven of mine, Erylthil at my side.",
+   "Lord Daerond and Ho Wu Long went up after the princes of Shade.",
+   "We held the shadow guards below.",
+   "That day I didn't have to hold myself back. And I didn't.",
+   "I wasn't at the top. Only later did I hear the princes had fallen up there.",
+   "On the summit of the Pyramid of Time.",
+   "We Nemesians only take those who have known a fall.",
+   "Those two never fell. And still… I was glad to guard their backs."
   ],
   "zdroje": [
    "s-2026-05-30",
@@ -219,6 +291,19 @@
    "s-2026-08-01",
    "txt:Nemesiani"
   ],
+  "titulky": [
+   "Přidali jsme se, když Orofin ještě hořel. Půlka Aliance se domů nevracela.",
+   "Velekněžka Calla nás přivedla k mágovi a mnichovi. Do té doby jen historky.",
+   "V Thultantharu jsme dostali ulice. Jedenáct mých, vedle mě Erylthil.",
+   "Lord Daerond a Ho Wu Long šli nahoru po princích Stínu.",
+   "My drželi stínové stráže dole.",
+   "Ten den jsem se nemusel krotit. A nekrotil jsem se.",
+   "Nahoře jsem nebyl. Až potom jsem slyšel, že tam princové padli.",
+   "Na vrcholu Pyramidy času.",
+   "My Nemesiáni bereme jen ty, kdo zažili pád.",
+   "Ti dva nepadli nikdy. A přesto… jsem jim kryl záda rád."
+  ],
+  "jazyk": "en",
   "skupina": "spojenci",
   "fokus": "40% 30%"
  },
@@ -231,17 +316,16 @@
   "portret": "port/gareth",
   "hlas_popis": "muž kolem čtyřiceti, chraplavý baryton, drzý, chlubivý, rychlý, smích v hlase",
   "text": [
-   "Na Dračím letu nám ti drowí sourozenci utekli přes hradby, ale svědka zabili šipkou z ničitele duší.",
-   "Tu šipku jsem si zavřel do lahvičky a nosím ji pro někoho, kdo si ji zaslouží.",
-   "Tak jsem se přidal k družině.",
-   "V Rudé pevnosti přede mnou poklekl barbar, prý vypadám jako syn nějakého krále, a já nad tím mávl rukou.",
-   "Chtěl jsem tam naučit lučištníky, aby luky nepoužívali jen na mávání.",
-   "Místo toho jsem letěl s Hyprosem na gryfovi ke knihovně Arenkae jako záloha.",
-   "Tři adamantioví golemové a ten poslední dostal moji střelu do zad.",
-   "Udělal jsem z něj velmi mrtvého golema.",
-   "Pak mě na hlídce někdo přepadl a ven mě vytahovali oni, na to se neptejte.",
-   "O dva roky později jsem s Nemesiány držel ulice Thultantharu.",
-   "A s Vilthanem z Vysokoluní se o to, kdo střílí líp, jednou ještě utkám."
+   "Dragonflight, New Year's. Two drow siblings go over the wall.",
+   "Kill our witness with a soul-destroyer dart. I sealed that dart in a little vial.",
+   "Still carry it. For someone who's earned it. That's how I joined up.",
+   "At the Red Knight's, a barbarian knelt to me. Said I looked like some king's son.",
+   "I waved him off. Next thing I'm on a griffon with Hypros, flying to Arenkae.",
+   "Three adamantine golems. The last one took my arrow in the back.",
+   "Very dead golem.",
+   "Later somebody jumped me on watch and they had to drag me out. Don't ask.",
+   "Two years on, I held the streets of Thultanthar with the Nemesians.",
+   "And Vilthan of Highmoon? One day, him and me. We'll see who shoots straighter."
   ],
   "zdroje": [
    "s-2011-12-26",
@@ -251,6 +335,19 @@
    "txt:zapisky",
    "txt:Nemesiani"
   ],
+  "titulky": [
+   "Dračí let, Nový rok. Dva drowí sourozenci přes hradby.",
+   "Svědka zabijí šipkou z ničitele duší. Tu šipku jsem zavřel do lahvičky.",
+   "Pořád ji nosím. Pro někoho, kdo si ji zaslouží. Tak jsem se přidal.",
+   "U Rudé rytířky přede mnou poklekl barbar. Prý jsem jako syn nějakého krále.",
+   "Mávl jsem rukou. A hned letím s Hyprosem na gryfovi k Arenkae.",
+   "Tři adamantioví golemové. Ten poslední dostal moji střelu do zad.",
+   "Velmi mrtvý golem.",
+   "Pak mě někdo přepadl na hlídce a museli mě vytahovat. Neptejte se.",
+   "O dva roky později jsem s Nemesiány držel ulice Thultantharu.",
+   "A Vilthan z Vysokoluní? Jednou se utkáme. Uvidíme, kdo střílí líp."
+  ],
+  "jazyk": "en",
   "skupina": "spojenci",
   "fokus": "23% 30%"
  },
@@ -259,20 +356,19 @@
   "jmeno": "Kung Lao",
   "role": "Šedý mnich, Hoův učitel",
   "strana": "spojenec",
-  "vazba": "Hoův učitel na východě; zabit ve Feng Asay, jeho duch s Hoem mluvil v Tempat Larangu.",
+  "vazba": "Hoův učitel na východě; padl ve Feng Asay rukou šamana Yamoha Hokhry a přešel do Broskvové zahrady, kde s ním Ho dál mluví.",
   "hlas_popis": "starý muž, suchý přísný hlas mentora, pomalý, krátké věty, ozvěna jako z dálky",
   "text": [
-   "Na východě jsem Hoa učil a zapsal jsem o něm, že jeho síla předčí jen jeho potřebu pořád si něco dokazovat.",
-   "Pokora mu tehdy chyběla.",
-   "Ve Feng Asay mě zabil šaman z plání a Ho z toho žaláře vyvedl ostatní, mě už ne.",
-   "Od té doby nosí můj klobouk a dlouho s ním nosil i nenávist k Yamohu Hokhrovi.",
-   "Klobouk mu sedí dobře.",
-   "Ta nenávist mu neseděla nikdy.",
-   "Do Tempat Larangu za mnou přišel podruhé, už jako Šedý mnich, a ptal se na rozkol mezi Chuang-Li a Ardunou.",
-   "Řekl jsem mu pravdu, že ani já nevím, co se mezi nimi děje.",
-   "Ve svém deníku si pak zapsal, že chce přestat toužit po pomstě a najít vlastní mír.",
-   "V Anaurochu stál proti šamanovi, jak to stálo v proroctví.",
-   "Pokoru se nakonec naučil."
+   "In the East I taught him. I wrote: his strength is outdone only by his need to prove it.",
+   "Humility. He had none.",
+   "In Feng Asay the shaman of the plains killed me.",
+   "Ho Wu Long led the others out of that prison. Not me.",
+   "He wears my hat now. It fits him. For years he also wore hatred for Yamoh Hokhra.",
+   "That never fitted.",
+   "From Tempat Larang he found his way to me, in the Peach Garden. There he rose a rank.",
+   "At the end, in Anauroch, he stood before that shaman. And he did not strike.",
+   "He spoke. And the shaman went away.",
+   "I would have struck. So. The pupil learned what the teacher never did."
   ],
   "zdroje": [
    "s-2006",
@@ -284,29 +380,42 @@
    "txt:pravidla_ho"
   ],
   "stav": "padl",
-  "stav_titulek": "† padl ve Feng Asay",
+  "stav_titulek": "† Feng Asay · Broskvová zahrada",
+  "titulky": [
+   "Na východě jsem ho učil. Zapsal jsem: jeho sílu předčí jen potřeba ji dokazovat.",
+   "Pokoru. Tu neměl.",
+   "Ve Feng Asay mě zabil šaman z plání.",
+   "Ho Wu Long z žaláře vyvedl ostatní. Mě ne.",
+   "Teď nosí můj klobouk. Sluší mu. Léta nosil i nenávist k Yamohu Hokhrovi.",
+   "Ta mu neseděla nikdy.",
+   "Z Tempat Larangu ke mně našel cestu, do Broskvové zahrady. Tam u mě postoupil.",
+   "Na konci, v Anaurochu, stál před tím šamanem. A neudeřil.",
+   "Promluvil. A šaman odešel.",
+   "Já bych udeřil. Tak vidíte. Žák se naučil, co učitel nikdy."
+  ],
+  "jazyk": "en",
   "skupina": "spojenci",
   "fokus": "47% 30%"
  },
  {
   "id": "chuang-li",
   "jmeno": "Chuang-Li",
-  "role": "kronikářka Šedých mnichů ze Zlaté věže",
-  "strana": "spojenec",
-  "vazba": "Tři roky učila Hoa v Tempat Larangu a poslala ho nést Laovo učení na západ.",
+  "role": "kronikářka Šedých mnichů ze Zlaté věže, zrádkyně šedých mnichů",
+  "strana": "nepřítel",
+  "vazba": "Hoova učitelka z Tempat Larangu a zrádkyně: na konci příběhu o Cham Fau se chtěla přidat k Temným a padla ve finálním souboji s Hoem.",
   "portret": "ilu/T1_041",
-  "hlas_popis": "žena středního věku, jemný klidný alt, mentorka, mírně pobavená, pomalá",
+  "hlas_popis": "žena středního věku, chladný kultivovaný alt, pohrdavě klidná, nekajícná, pomalá",
   "text": [
-   "Ho přišel do Zlaté věže s hlavou plnou boje a se jménem, které nesměl vyslovit.",
-   "Psal haiku, ukládal do archivu poznámky o harmonii a přitom myslel na Ling.",
-   "Celý Shou Lung zná legendu o něm a jeho vyvolené z dračího rodu, tak jsem mu to řekla nahlas.",
-   "Skoro tři roky jsme spolu pili čaj, a když odcházel, dostal ode mě šest druhů na cestu.",
-   "Poradila jsem mu, ať zapomene, ke kterému rodu patří.",
-   "Ať nese Laovo učení na západ, kde má přátele a zázemí u Subotamů.",
-   "Poslechl a postavil tam chrám.",
-   "Když se pak vrátil do Tempat Larangu, mezi mnou a Ardunou už nebylo všechno v pořádku.",
-   "O tom mluvit nebudu.",
-   "Z východu nakonec odešel podruhé, tentokrát jako představený šedých laoneyů, a to už jsem mu radit nemusela."
+   "Three years Ho Wu Long drank my tea in Tempat Larang and wrote haiku.",
+   "I sent him west to carry Lao's teaching. He obeyed.",
+   "Wang Fei-Hung was my prisoner. Ho and his friends worked that out. Eventually.",
+   "Lord Ryden was looking into Cham Fau when he died. By my hand.",
+   "At the end of Cham Fau I meant to go over to the Shadovar.",
+   "Why? You will not hear that from me.",
+   "Ho Wu Long stood against me. Three years I had taken his measure. Wrongly.",
+   "He killed me in that duel, with what I taught him.",
+   "Grey Monks go to the Peach Garden when they die. The Garden did not take me.",
+   "If you came for remorse, you came to the wrong teacher."
   ],
   "zdroje": [
    "s-2011-08-15",
@@ -317,7 +426,22 @@
    "txt:Ho_budoucnost_2012",
    "txt:Ho_popisky"
   ],
-  "skupina": "spojenci",
+  "stav": "padl",
+  "stav_titulek": "† Cham Fau, v souboji s Ho Wu Longem",
+  "titulky": [
+   "Tři roky pil Ho Wu Long v Tempat Larangu můj čaj a psal haiku.",
+   "Poslala jsem ho nést Laovo učení na západ. Poslechl.",
+   "Wang Fei-Hung byl můj vězeň. Ho a jeho přátelé na to přišli. Časem.",
+   "Lord Ryden prošetřoval Cham Fau, když zemřel. Mou rukou.",
+   "Na konci Cham Fau jsem chtěla přejít k Temným.",
+   "Proč? To ode mě neuslyšíte.",
+   "Ho Wu Long se mi postavil. Tři roky jsem ho odhadovala. Špatně.",
+   "V tom souboji mě zabil. Tím, co jsem ho naučila.",
+   "Šedí mniši po smrti odcházejí do Broskvové zahrady. Mě zahrada nepřijala.",
+   "Jestli jste přišli pro lítost, přišli jste za špatnou učitelkou."
+  ],
+  "jazyk": "en",
+  "skupina": "nepřátelé",
   "fokus": "55% 30%"
  },
  {
@@ -329,17 +453,16 @@
   "portret": "ilu/K_017",
   "hlas_popis": "muž kolem padesáti, pevný sonorní hlas, obřadný, úsporný, suchý humor",
   "text": [
-   "V Kozakuře jsme stáli spolu proti rodům, které se u císařova dvora praly o moc.",
-   "Varion se vracel domů jako hrdina a mistr Ho jako přemožitel Šivana, s tváří, která se od té doby neusměje.",
-   "Přijali mě za čestného člena družiny a čest se splácí.",
-   "Poslal jsem Hoovi devět samurajů s Hasagim, aby mu dohlédli na stavbu chrámu.",
-   "Róninům rodu Kavalan jsem místo seppuku ukázal cestu na západ.",
-   "Kenshiho jsem musel nejdřív porazit, než šel.",
-   "Do Cham Fau jsem přijel nečekaně a duel s Mujurem jsem ukončil čtvrtým úderem.",
-   "Na Pivoňkovém mostě jsme pak s Hoem a lordem Daerondem udělali věc, o které se v tom městě mluví jako o masakru.",
-   "Přezdívka Řezník mu nesluší.",
-   "Kozakurská jízda šla v Anaurochu do boje už v první třetině bitvy.",
-   "V Pyramidě času jsem stál při nich až do konce."
+   "In Kozakura we stood together against the houses fighting over the Emperor's court.",
+   "Varion went home a hero. Ho Wu Long went home Shivan's slayer.",
+   "With a face that has not smiled since.",
+   "They made me an honorary member of their Company. Honour must be repaid.",
+   "I sent Hasagi and nine samurai to his temple. The Kavalan ronin, west, not to seppuku.",
+   "Kenshi I had to defeat first. It was close.",
+   "On the Peony Bridge, the monk, Lord Daerond and I did what that city calls a massacre.",
+   "They call him the Butcher now. The name does not suit him.",
+   "In Anauroch my riders went in during the first third of the battle.",
+   "On the pyramid, I stood with them to the end."
   ],
   "zdroje": [
    "s-2005-12",
@@ -351,6 +474,19 @@
    "b-bitva-v-anaurochu",
    "b-posledni-souboj-na-pyramide-casu"
   ],
+  "titulky": [
+   "V Kozakuře jsme stáli spolu proti rodům, které se praly o císařův dvůr.",
+   "Varion se vracel jako hrdina. Ho Wu Long jako přemožitel Šivana.",
+   "S tváří, která se od té doby neusmála.",
+   "Přijali mě za čestného člena družiny. Čest se splácí.",
+   "Do chrámu jsem poslal Hasagiho s devíti samuraji. Róniny Kavalan na západ.",
+   "Kenshiho jsem musel nejdřív porazit. Bylo to těsné.",
+   "Na Pivoňkovém mostě jsme s mnichem a Daerondem udělali, čemu tam říkají masakr.",
+   "Od té doby mu říkají Řezník. To jméno mu nesluší.",
+   "V Anaurochu šla moje jízda do boje už v první třetině bitvy.",
+   "Na pyramidě jsem stál při nich až do konce."
+  ],
+  "jazyk": "en",
   "skupina": "spojenci",
   "fokus": "42% 30%"
  },
@@ -362,15 +498,15 @@
   "vazba": "Panovnice, které družina slouží od sesazení barona Althaluse a podle níž nese jméno Tethyrská královská.",
   "hlas_popis": "žena kolem padesáti, zvučný královský alt, klidná autorita, vřelá pod povrchem",
   "text": [
-   "Když mi pomohli sesadit bratrance Althaluse, byli to dobrodruzi s dobrou pověstí a nic víc.",
-   "Nazvala jsem je královskou družinou a to jméno od té doby nosí po celém světě.",
-   "Pak Zesion zmasakroval mé hlavní město a oni se k rozhodující bitvě vrátili až od samotného Chronose.",
-   "Odměnila jsem je půdou a mistr Ho na ní u moře postavil chrám, kde se dnes cvičí moji agenti.",
-   "Když na Rudou pevnost táhla horda, půjčila jsem jim létající loď.",
-   "Na té lodi pak doprovázeli mou delegaci za trpaslíky ke Khôltaru a k Velké trhlině.",
-   "Lord Daerond je arcimág mého království a mistr Ho čtvrtý člen mé družiny.",
-   "Velká rada zasedla v mém paláci a v Anaurochu jsem vedla tethyrský kontingent sama.",
-   "Tethyr pak patnáct let prosperoval a já vím, komu za to vděčí."
+   "When they helped me unseat my cousin Althalus, they were adventurers. Nothing more.",
+   "I called them my Royal Company. Now they carry that name across the world.",
+   "Then Zesion butchered my capital.",
+   "And they came back for the deciding battle… from Chronos himself.",
+   "I gave them land. Ho Wu Long built a temple on it. My agents train there to this day.",
+   "When the horde marched on the Red Knight, I lent them my flying ship.",
+   "Lord Daerond is the archmage of my kingdom. The monk is the fourth of my Company.",
+   "The Grand Council sat in my palace. In Anauroch I led the Tethyrian host myself.",
+   "Fifteen good years followed. I know whom Tethyr owes for them."
   ],
   "zdroje": [
    "s-2003",
@@ -383,6 +519,18 @@
    "s-2025-04-05",
    "b-bitva-v-anaurochu"
   ],
+  "titulky": [
+   "Když mi pomohli sesadit bratrance Althaluse, byli to dobrodruzi. Nic víc.",
+   "Nazvala jsem je královskou družinou. Teď to jméno nosí po celém světě.",
+   "Pak Zesion zmasakroval mé hlavní město.",
+   "A oni se k rozhodující bitvě vrátili… od samotného Chronose.",
+   "Dala jsem jim půdu. Ho Wu Long na ní postavil chrám. Cvičí se tam moji agenti.",
+   "Když horda táhla na Rudou rytířku, půjčila jsem jim létající loď.",
+   "Lord Daerond je arcimág mého království. Mnich je čtvrtý člen mé družiny.",
+   "Velká rada zasedla v mém paláci. V Anaurochu jsem vedla naše vojsko sama.",
+   "Pak přišlo patnáct dobrých let. Vím, komu za ně Tethyr vděčí."
+  ],
+  "jazyk": "en",
   "skupina": "spojenci",
   "fokus": "45% 30%"
  },
@@ -394,16 +542,15 @@
   "vazba": "Varionova žena a kastelánka Dračího letu; hostitelka družiny, po ztrátě Variona vede pevnost sama.",
   "hlas_popis": "žena, drowka neurčitého věku, tmavý sametový alt, klidná, s úsměvem v hlase, pod tím smutek",
   "text": [
-   "Na novoroční oslavě se Varion mračil a já se usmívala, tak to u nás chodilo.",
-   "Mistr Ho tehdy přivedl Seung Minu a my dvě jsme se usmívaly celý večer, zatímco muži probírali Šedé pláně.",
-   "Než noc skončila, ležel u pevnosti kovový vrak, Betridal zkameněl a drowové z Genoaardu nám v chrámu zabili svědka.",
-   "S veleknězem Torma jsem zjistila, jak se přes ochrany dostali: krevní pouto mezi sourozenci.",
-   "Pak odletěli na sever a z Rudé pevnosti se Varion nevrátil.",
-   "Vzala si ho Zesion a Dračí let od té doby vedu sama.",
-   "Hoovi jsem do mály dala obsidián za sebe a kost černého draka za Variona, jako jednadvacátý korálek.",
-   "Moje Temné panny v Anaurochu splnily svůj úděl.",
-   "Na Raukův pohřeb jsem jich přivedla pět.",
-   "Mistr Ho tam za nimi poslal Tamise a já jsem přišla o první důstojnici."
+   "At the New Year feast Varion scowled and I smiled. That's how it was with us.",
+   "Ho Wu Long brought Seung Mina, and we two smiled all evening.",
+   "The men talked of the Grey Wastes. By dawn, Betridal was stone and a witness dead.",
+   "With Torm's high priest I found how the drow slipped our wards. A blood bond.",
+   "They flew north. From the Red Knight's fortress, Varion didn't come back.",
+   "Zesion took him. I've held Dragonflight alone ever since.",
+   "I gave the monk two beads. Obsidian for me. Black dragon bone for Varion.",
+   "At Rauko's funeral I brought five of my Dark Maidens.",
+   "The monk sent Tamis after them. I lost my first officer that night."
   ],
   "zdroje": [
    "s-2011-12-26",
@@ -413,6 +560,18 @@
    "s-2026-09-05-epilog",
    "txt:zapisky"
   ],
+  "titulky": [
+   "Na novoroční oslavě se Varion mračil a já se usmívala. Tak to u nás chodilo.",
+   "Ho Wu Long přivedl Seung Minu a my dvě jsme se celý večer usmívaly.",
+   "Muži probírali Šedé pláně. K ránu byl Betridal kámen a svědek mrtvý.",
+   "S veleknězem Torma jsem zjistila, jak drowové prošli ochranami. Krevní pouto.",
+   "Odletěli na sever. Z Rudé pevnosti se Varion nevrátil.",
+   "Vzala si ho Zesion. Od té doby držím Dračí let sama.",
+   "Mnichovi jsem dala dva korálky. Obsidián za sebe. Kost černého draka za Variona.",
+   "Na Raukův pohřeb jsem přivedla pět Temných panen.",
+   "Mnich za nimi poslal Tamise. Tu noc jsem přišla o první důstojnici."
+  ],
+  "jazyk": "en",
   "skupina": "spojenci",
   "fokus": "44% 30%"
  },
@@ -425,17 +584,16 @@
   "portret": "nove/n16",
   "hlas_popis": "muž, elf neurčitého věku, zvučný divadelní tenor, rád přehrává, rychlé tempo, pak ztiší",
   "text": [
-   "S Raukem se přátelím od prvního tažení, dávno předtím, než se o něm zpívalo.",
-   "Poslal jsem mu do bitevních mágů Calina, mladého barbara, který nevěděl, jestli se modlit k Tempovi, nebo k Erevanovi.",
-   "Rauko si s ním poradil líp než já.",
-   "Když přišlo finále, šel jsem s ním a s mistrem Ho od prvního dne.",
-   "V Hlubině jsem za ně vyjednával s mozkožrouty z Oryndollu o hlavu Alaunda.",
-   "Nejtěžší publikum mého života, nikdo netleskal a všichni mi četli myšlenky.",
-   "Odkud se illithidé vzali, jsme nevěděli ani já, ani Storm.",
-   "Proroctví jsme si nakonec odnesli stejně.",
-   "U kulatého stolu v Castle Tethyr jsem pak seděl mezi králi a draky.",
-   "Král je na tahu, řekl jsem si, a podíval se na Rauka.",
-   "Pro barda z hor je to víc, než mu kdy kdo slíbil."
+   "Rauko and I go back to his first campaign. Before anyone sang about him.",
+   "I sent him Calin, a barbarian torn between Tempus and Erevan. Rauko sorted him out.",
+   "The last road, I walked with him and Ho Wu Long from day one.",
+   "In Waterdeep I bargained with the mind flayers of Oryndoll for the head of Alaundo.",
+   "Hardest audience of my life. Nobody clapped, and everyone read my mind.",
+   "Where those illithids came from, neither Storm nor I could say.",
+   "We got the prophecy anyway.",
+   "Then, at the round table in Castle Tethyr, I sat between kings and dragons.",
+   "\"The king is to move,\" I thought… and I looked at Rauko.",
+   "For a bard from the hills, that's more than anyone ever promised me."
   ],
   "zdroje": [
    "s-2023-04-29",
@@ -446,6 +604,19 @@
    "txt:Rauko_popisky_TBM",
    "hymna"
   ],
+  "titulky": [
+   "S Raukem se znám od jeho prvního tažení. Dávno předtím, než se o něm zpívalo.",
+   "Poslal jsem mu Calina, barbara mezi Tempem a Erevanem. Rauko si s ním poradil.",
+   "Poslední tažení jsme od prvního dne šli spolu: on, Ho Wu Long a já.",
+   "V Hlubině jsem vyjednával s mozkožrouty z Oryndollu o hlavu Alaunda.",
+   "Nejtěžší publikum mého života. Nikdo netleskal a všichni mi četli myšlenky.",
+   "Odkud se ti illithidé vzali, nevěděl jsem já ani Storm.",
+   "Proroctví jsme stejně získali.",
+   "Pak jsem u kulatého stolu v Castle Tethyr seděl mezi králi a draky.",
+   "„Král je na tahu,“ pomyslel jsem si… a podíval se na Rauka.",
+   "Pro barda z hor je to víc, než mi kdy kdo slíbil."
+  ],
+  "jazyk": "en",
   "skupina": "spojenci",
   "fokus": "34% 30%"
  },
@@ -458,16 +629,15 @@
   "portret": "nove/n10",
   "hlas_popis": "mladá žena, jasný pevný hlas, přímá, věcná, lehce technický slovník, svižné tempo",
   "text": [
-   "Vytáhli mě ze základny pod vlnami, kde kromě mě zbyly jen konstrukty.",
-   "Hacken je můj bratr a ten se s nimi znal už ze severu.",
-   "Svoje schopnosti jsem tehdy ovládala tak ze sedmi, osmi desetin a zbytek jsem se učila za pochodu.",
-   "S lordem Raukem a mistrem Ho jsem prošla všechno od jednání o dračici Iryklathagře po Velkou radu.",
-   "V Thultantharu jsem šla s nimi a v Pyramidě času taky.",
-   "Od té doby jsem s Raukem ve zbroji, kterou mu dal Chronos, a on mě vidí jako modrý obraz nad svým prstenem.",
-   "S Osmičkou ladíme chronostroj, aby plul i mezi časovými přímkami.",
-   "Na jeho vlastním pohřbu jsme spolu poprvé skočili do Posvátné přímky.",
-   "Svět ho uložil do křišťálové rakve a on se na to díval z lesa.",
-   "Já jsem mu mezitím hlásila horizont události."
+   "They pulled me out of a base under the waves. Me and a lot of constructs. That was it.",
+   "Hacken's my brother. He knew them from up north.",
+   "Back then I had maybe seven parts in ten of my abilities. The rest I learned marching.",
+   "With Lord Rauko and Ho Wu Long I did everything. The dragon talks. The Grand Council.",
+   "Thultanthar? Yes. The Pyramid of Time? Yes.",
+   "Now I live in the armour Chronos gave him. He sees me as a little blue image over his ring.",
+   "At his own funeral we jumped into the Sacred Line for the first time.",
+   "The world laid him in a crystal coffin, and he watched it from the trees.",
+   "Me? I was calling out the event horizon."
   ],
   "zdroje": [
    "s-2023-12-30",
@@ -478,6 +648,18 @@
    "s-2026-09-05-epilog",
    "txt:zapisky"
   ],
+  "titulky": [
+   "Vytáhli mě ze základny pod vlnami. Mě a spoustu konstruktů. Víc tam nebylo.",
+   "Hacken je můj bratr. Znal je ze severu.",
+   "Svoje schopnosti jsem tehdy měla tak ze sedmi desetin. Zbytek za pochodu.",
+   "Lord Rauko, Ho Wu Long a já jsme prošli všechno. Jednání s draky. Velkou radu.",
+   "Thultanthar? Ano. Pyramida času? Taky.",
+   "Teď žiju ve zbroji od Chronose. Vidí mě jako modrý obraz nad svým prstenem.",
+   "Na jeho vlastním pohřbu jsme poprvé skočili do Posvátné přímky.",
+   "Svět ho uložil do křišťálové rakve a on se na to díval z lesa.",
+   "A já? Já mu hlásila horizont události."
+  ],
+  "jazyk": "en",
   "skupina": "spojenci",
   "fokus": "33% 30%"
  },
@@ -489,16 +671,16 @@
   "vazba": "Hoovo západní zázemí od příchodu do družiny; vedl jeho přestup a dal mu poslání.",
   "hlas_popis": "starší muž, pevný suchý hlas představeného, stručný, přísný, bez okolků",
   "text": [
-   "Veritas u nás prošel výcvikem na démony a v Ithmongu padl.",
-   "Rok nato k nám přišel mnich z východu a od nás vedla jeho cesta k téže družině.",
-   "Na západě mu říkali východňan a nikdo nevěděl, čí je syn.",
-   "Když u nás někdo zaútočil na klášter, málem zemřela císařovna Zako a Ho si šel pro Mulhoranďana, který se tu předtím ukázal.",
-   "Iskalona nám zabili šipkou z ničitele duší a ten fialový kámen Ho potkal znovu na Dračím letu.",
-   "Po Rudé pevnosti u mě strávil tři měsíce výcviku a mezitím vedl chrám.",
-   "Na konci jsem mu dal poslání.",
-   "Splnil ho sám a hned odešel do Zakhary pro lorda Daeronda a Austia.",
-   "Vrátil se s nimi i s jejich vybavením.",
-   "Naposledy u nás cvičil před výpravou do Shoonachu."
+   "Veritas trained here against demons. He fell in Ithmong.",
+   "A year later a monk came to us from the East. From here his road led to the same Company.",
+   "In the West they called him \"the Easterner\". Nobody knew whose son he was.",
+   "Someone attacked our monastery. Empress Zako nearly died. He went after the Mulhorandi.",
+   "Iskalon was killed here with a soul-destroyer. A small violet stone.",
+   "Ho Wu Long met that stone again at Dragonflight.",
+   "After the Red Knight's fortress he trained under me for three months, and ran his temple.",
+   "At the end I gave him a task. He finished it alone.",
+   "Then he went straight to Zakhara for Lord Daerond and Austius.",
+   "He brought them back. With their gear. Good."
   ],
   "zdroje": [
    "s-2003-b",
@@ -511,6 +693,19 @@
    "s-2016-12-05",
    "txt:zapisky"
   ],
+  "titulky": [
+   "Veritas se tu cvičil proti démonům. Padl v Ithmongu.",
+   "Rok nato k nám přišel mnich z východu. Odsud vedla jeho cesta k téže družině.",
+   "Na západě mu říkali „východňan“. Nikdo nevěděl, čí je syn.",
+   "Někdo napadl náš klášter. Císařovna Zako málem zemřela. Šel si pro Mulhoranďana.",
+   "Iskalona tu zabili ničitelem duší. Malým fialovým kamenem.",
+   "Ho Wu Long ho potkal znovu na Dračím letu.",
+   "Po Rudé pevnosti u mě tři měsíce cvičil a přitom vedl chrám.",
+   "Nakonec jsem mu dal úkol. Splnil ho sám.",
+   "Pak šel rovnou do Zakhary pro lorda Daeronda a Austia.",
+   "Přivedl je zpátky. I s výbavou. Dobře."
+  ],
+  "jazyk": "en",
   "skupina": "spojenci",
   "fokus": "31% 30%"
  },
@@ -523,17 +718,16 @@
   "portret": "ilu/K_004",
   "hlas_popis": "žena kolem třiceti, chladně vznešený soprán, pomalá dvorská výslovnost, jemná ironie",
   "text": [
-   "Na dračí trůn mě doprovodila družina ze západu a v ní mnich, o jehož původu se u dvora nahlas nemluví.",
-   "Proti nám tehdy stál upír Joldo a jeho patnáctý dům.",
-   "Rok nato jsem byla u nich na západě a někdo zaútočil na klášter, kde jsem pobývala.",
-   "Málem jsem tam zemřela.",
-   "Ho pak od královny Tethyru dostal půdu a já jsem jeho chrámu darovala část císařské knihovny.",
-   "Ať se tam učí, co je Shou Lung.",
-   "Když sestoupil z Tempat Larangu, zastavil se u mě v hlavním městě a pak odešel na západ.",
-   "Do Anaurochu jsem poslala Hwanga s pěti tisíci muži a létající džunkou.",
-   "Ho odešel z východu jako představený šedých laoneyů a po bitvě se měl vrátit.",
-   "Buď jako můj nejbližší rádce, nebo jako následník trůnu.",
-   "Zatím pěstuje rýži."
+   "A company from the West escorted me to the Dragon Throne.",
+   "With them came a monk whose birth no one at my court mentions aloud.",
+   "Against us stood the vampire Joldo and his Fifteenth House.",
+   "A year later, in the West, someone attacked the monastery where I stayed. I nearly died.",
+   "When Tethyr's queen gave him land, I gave his temple part of the imperial library.",
+   "Let them learn there what Shou Lung is.",
+   "For Anauroch I sent Hwang with five thousand men and a flying junk.",
+   "Ho Wu Long left the East as abbot of the grey laoneys. He was to return.",
+   "As my closest counsellor. Or as heir to the throne.",
+   "For now, he grows rice."
   ],
   "zdroje": [
    "s-2006",
@@ -544,6 +738,19 @@
    "s-2026-09-05-epilog",
    "txt:Ho_popisky"
   ],
+  "titulky": [
+   "Na Dračí trůn mě doprovodila družina ze západu.",
+   "A v ní mnich, o jehož původu se u mého dvora nahlas nemluví.",
+   "Proti nám stál upír Joldo a jeho Patnáctý dům.",
+   "O rok později na západě někdo napadl klášter, kde jsem byla. Málem jsem zemřela.",
+   "Když mu tethyrská královna dala půdu, dala jsem chrámu část císařské knihovny.",
+   "Ať se tam učí, co je Shou Lung.",
+   "Do Anaurochu jsem poslala Hwanga s pěti tisíci muži a létající džunkou.",
+   "Ho Wu Long odešel z východu jako představený šedých laoneyů. Měl se vrátit.",
+   "Jako můj nejbližší rádce. Nebo jako následník trůnu.",
+   "Zatím pěstuje rýži."
+  ],
+  "jazyk": "en",
   "skupina": "spojenci",
   "fokus": "47% 30%"
  },
@@ -555,16 +762,16 @@
   "vazba": "Host družiny na Dračím letu, kde zkameněl; po letech ho Rauko a Theira osvobodili v Halruaa.",
   "hlas_popis": "muž bez věku, uhlazený aristokratický baryton, suchý sarkasmus, pomalé tempo",
   "text": [
-   "Na novoroční oslavě na Dračím letu jsem byl prý nejvýznamnější host.",
-   "Pak se ve strojovně té cizí lodi objevil dospělý yugoloth, vyslovil cosi jako moje jméno a vyslal po mně zelený plamen.",
-   "Proměnil jsem se v kámen, nic lepšího jsem v tu chvíli neměl.",
-   "Rauko a mistr Ho toho démona dorazili beze mě a Rauko mě do pevnosti přenesl jako sochu.",
-   "Pak jsem dlouho nebyl.",
-   "Družina měla letět do Khôltaru, a přiletěla nejdřív do Halruaa, kvůli mně.",
-   "Z kamene mě dostali Rauko a Theira.",
-   "Když jsem procitl, horda u Rudé pevnosti byla odražená a Varion v rukou Zesion.",
-   "Ti lidé přitom kdysi ve Stříbroluní poznali Mortuse a jeho Osmnáctku, kterou jsem zakládal.",
-   "U kulatého stolu Aliance jsem pak seděl jako jejich dlužník a spojenec."
+   "New Year on Dragonflight. I was, apparently, the most important guest.",
+   "Then a full-grown yugoloth turned up in the engine room of that strange ship.",
+   "It said something like my name and threw green fire at me.",
+   "I turned myself to stone. Best idea I had at the time.",
+   "Rauko and Ho Wu Long finished the demon. Rauko carried me inside. As a statue.",
+   "Then, for a long while, I simply wasn't.",
+   "They were meant to fly to Khôltar. They flew to Halruaa first. For me.",
+   "Rauko and Theira brought me out of the stone. By then Varion was in Zesion's hands.",
+   "At the Alliance's round table I sat as their ally. And their debtor.",
+   "I don't enjoy that word. I use it anyway."
   ],
   "zdroje": [
    "s-2008",
@@ -574,6 +781,19 @@
    "s-2025-04-05",
    "txt:zapisky"
   ],
+  "titulky": [
+   "Nový rok na Dračím letu. Byl jsem prý nejvýznamnější host.",
+   "Pak se ve strojovně té cizí lodi objevil dospělý yugoloth.",
+   "Vyslovil cosi jako moje jméno a hodil po mně zelený plamen.",
+   "Proměnil jsem se v kámen. Nic lepšího mě nenapadlo.",
+   "Rauko a Ho Wu Long démona dorazili. Rauko mě odnesl dovnitř. Jako sochu.",
+   "Pak jsem dlouho prostě nebyl.",
+   "Měli letět do Khôltaru. Napřed ale přiletěli do Halruaa. Kvůli mně.",
+   "Z kamene mě dostali Rauko a Theira. To už byl Varion v rukou Zesion.",
+   "U kulatého stolu Aliance jsem seděl jako jejich spojenec. A dlužník.",
+   "To slovo nemám rád. Ale používám ho."
+  ],
+  "jazyk": "en",
   "skupina": "spojenci",
   "fokus": "34% 30%"
  },
@@ -586,17 +806,16 @@
   "portret": "ilu/T3_007",
   "hlas_popis": "žena bez věku, mocný jasný alt, velitelka, rázná, k Raukovi vřelá, ozvěna",
   "text": [
-   "Rauka jsem v pevnosti vítala jako přítele, který přišel v hodině nejvyšší nouze.",
-   "Hned první den se mi na náměstí pobili trolobijec Gark s elfem Aertonem a já to nestihla zastavit.",
-   "Aspoň lidé z Tethyru viděli, s čím se tam potýkám.",
-   "Druhou polovinu Tempových bitevních mágů jsem předtím poslala do Rashemenu a ta se odmlčela.",
-   "Když jsem odlétala obhlédnout hordu, svěřila jsem pevnost Raukovi a všem v ní řekla, že se podřídí jeho velení.",
-   "Barbaři, trpaslíci i elfové přikývli.",
-   "Ve vlastní aréně pak padl vedle šampiona Sungara a válečníci ho uznali.",
-   "Horda prorazila severní bránu a bilo se na hradbách i uvnitř.",
-   "Odrazili jsme ji.",
-   "Já jsem v té bitvě padla a on v ní ztratil Variona.",
-   "Pevnost zůstala stát."
+   "I greeted Rauko at my fortress as a friend come in our hour of greatest need.",
+   "First day, a troll-slayer and an elf killed each other in my square.",
+   "At least the Tethyrians saw what I was dealing with.",
+   "When I flew out to scout the horde, I gave him my fortress.",
+   "Told them all: you answer to him now. Barbarians, dwarves, elves… they nodded.",
+   "In my own arena he fell beside the champion Sungar. The warriors took him as their own.",
+   "The horde broke the north gate. We fought on the walls and inside.",
+   "We threw them back.",
+   "I fell in that battle. He lost Varion.",
+   "The fortress stood."
   ],
   "zdroje": [
    "s-2012-03-16",
@@ -608,6 +827,19 @@
   ],
   "stav": "padl",
   "stav_titulek": "† padla v Bitvě o Rudou pevnost",
+  "titulky": [
+   "Rauka jsem v pevnosti vítala jako přítele v hodině nejvyšší nouze.",
+   "Hned první den se mi na náměstí zabili trolobijec a elf.",
+   "Aspoň Tethyřané viděli, s čím se tam potýkám.",
+   "Když jsem odlétala obhlédnout hordu, svěřila jsem mu pevnost.",
+   "Všem jsem řekla: teď posloucháte jeho. Barbaři, trpaslíci, elfové… přikývli.",
+   "V mé aréně padl vedle šampiona Sungara. Válečníci ho přijali za svého.",
+   "Horda prorazila severní bránu. Bili jsme se na hradbách i uvnitř.",
+   "Odrazili jsme je.",
+   "V té bitvě jsem padla. On ztratil Variona.",
+   "Pevnost zůstala stát."
+  ],
+  "jazyk": "en",
   "skupina": "spojenci",
   "fokus": "38% 30%"
  },
@@ -619,17 +851,16 @@
   "vazba": "Jenovina první důstojnice; na Raukově pohřbu ji Ho svedl dohromady s Tamisem, je matkou Turgena.",
   "hlas_popis": "žena, drowka, tichý nízký hlas, váží slova, dlouhé pauzy, suchý humor",
   "text": [
-   "Dračí let jsem s velekněžkou Jenovou hlídala dlouho předtím, než jsem slyšela jméno Tamis.",
-   "V Anaurochu Temné panny splnily svůj úděl.",
-   "Patnáct let nato byl Raukův pohřeb na Wolfburgu.",
-   "Mistr Ho tam k mým pannám poslal měňavce, který litoval, že po něm nic nezůstane.",
-   "Seděli jsme v altánku, popíjeli a kouřili fajfku.",
-   "Až později jsem se dozvěděla, že s Lovci rozbil Temným v Turmishi továrnu na konstrukty a přehradu.",
-   "Proto Temní u Orofinu své stroje nenasadili.",
-   "Bitvu tak pomohl vyhrát, a nikdo ho přitom neviděl.",
-   "Službu u panen jsem pak opustila.",
-   "Syna jsem vychovala na pomezí Tethyru a Amnu a jeho otec bývá pryč.",
-   "Že po něm nic nezůstane, to se Tamis spletl."
+   "I guarded Dragonflight with the High Priestess long before I heard the name Tamis.",
+   "In Anauroch, my Dark Maidens did what they were for.",
+   "Fifteen years later. Rauko's funeral, at Wolfburg.",
+   "Ho Wu Long sent a changeling to my maidens. Sorry that nothing of him would remain.",
+   "We sat in the gazebo. Drank. Smoked a pipe.",
+   "Later I learned: in Turmish, with the Hunters, he'd smashed the construct factory.",
+   "And the dam. So the Shadovar machines never came to Orofin.",
+   "He helped win that battle, and nobody saw him do it.",
+   "I left the Maidens. Raised our son between Tethyr and Amn. His father is often away.",
+   "Nothing of him would remain, he said. Tamis was wrong."
   ],
   "zdroje": [
    "b-bitva-v-anaurochu",
@@ -638,6 +869,19 @@
    "s-2026-09-05-epilog",
    "s-2025-12-21"
   ],
+  "titulky": [
+   "Dračí let jsem hlídala dlouho předtím, než jsem slyšela jméno Tamis.",
+   "V Anaurochu splnily moje Temné panny svůj úděl.",
+   "O patnáct let později. Raukův pohřeb na Wolfburgu.",
+   "Ho Wu Long k nám poslal měňavce. Litoval, že po něm nic nezůstane.",
+   "Seděli jsme v altánku. Popíjeli. Kouřili fajfku.",
+   "Později jsem se dozvěděla, že s Lovci v Turmishi rozbil továrnu na konstrukty.",
+   "I přehradu. Proto stroje Temných k Orofinu nepřišly.",
+   "Pomohl tu bitvu vyhrát a nikdo ho přitom neviděl.",
+   "Panny jsem opustila. Syna jsem vychovala mezi Tethyrem a Amnem. Otec bývá pryč.",
+   "Prý po něm nic nezůstane. Tamis se spletl."
+  ],
+  "jazyk": "en",
   "skupina": "spojenci",
   "fokus": "31% 30%"
  },
@@ -649,17 +893,16 @@
   "vazba": "Rauko a Ho si ji vybrali k jednání místo rudého Charvekannatora; přidala se k drakům Aliance.",
   "hlas_popis": "žena-drak, hluboký hrdelní hlas s praskáním, povýšená, pomalá, chladně pobavená",
   "text": [
-   "Mohli si vybrat Charvekannatora, rudého, vůdce klanu.",
-   "Vybrali si mě, a to byla první moudrá věc, kterou jsem od lidí z Tethyru slyšela.",
-   "Přišli za mnou mág a mnich z královské družiny Tethyru.",
-   "První rozhovor jsme nedokončili.",
-   "Ten druhý skončil u Oltáře vzduchu v Dashadjenu a rozhovor to nebyl.",
-   "Bojovalo se tam o mě a vyhráli.",
-   "Ve Velké radě mě zapsali mezi jedenáct draků Aliance.",
-   "Sedm stříbrných, dva mědění, jeden zlatý a já, jediná modrá.",
-   "Do Anaurochu jsem letěla s nimi.",
-   "Draci si spojence nevybírají snadno.",
-   "Tak se mezi stříbrné dostala modrá, ať si to v Tethyru zapíšou."
+   "They could have chosen Charvekannator. Red. Head of his clan.",
+   "They chose me. The first wise thing I ever heard out of Tethyr.",
+   "A mage and a monk of the royal Company. Small. Polite. Brief, as mortals are.",
+   "Our first conversation was never finished.",
+   "The second ended at the Altar of Air in Dashadjen. It was no conversation.",
+   "They fought for me. They won.",
+   "At the Grand Council they wrote me among the eleven dragons of the Alliance.",
+   "Seven silver, two copper, one gold.",
+   "And me. The only blue. I flew with them to Anauroch.",
+   "Dragons do not choose allies lightly. Let Tethyr write that down."
   ],
   "zdroje": [
    "s-2023-04-29",
@@ -669,6 +912,19 @@
    "s-2025-04-05",
    "b-bitva-v-anaurochu"
   ],
+  "titulky": [
+   "Mohli si vybrat Charvekannatora. Rudého. Vůdce klanu.",
+   "Vybrali si mě. První moudrá věc, kterou jsem z Tethyru slyšela.",
+   "Mág a mnich z královské družiny. Malí. Zdvořilí. Pomíjiví jako smrtelníci.",
+   "Náš první rozhovor jsme nedokončili.",
+   "Druhý skončil u Oltáře vzduchu v Dashadjenu. Rozhovor to nebyl.",
+   "Bojovali o mě. Vyhráli.",
+   "Ve Velké radě mě zapsali mezi jedenáct draků Aliance.",
+   "Sedm stříbrných, dva mědění, jeden zlatý.",
+   "A já. Jediná modrá. Do Anaurochu jsem letěla s nimi.",
+   "Draci si spojence nevybírají snadno. Ať si to v Tethyru zapíšou."
+  ],
+  "jazyk": "en",
   "skupina": "neutrální",
   "fokus": "45% 30%"
  },
@@ -681,22 +937,33 @@
   "portret": "ilu/K_001",
   "hlas_popis": "muž kolem šedesáti, vysoký nosový hlas, povýšený, sarkastický, akademicky přesný",
   "text": [
-   "Bratr Alwarin si vždycky vybíral žáky se srdcem na dlani a mladý Rauko Daerond byl jeden z nich.",
-   "Baron Althalus byl můj pán a ta parta mu vzala Castle Tethyr ve jménu jeho sestřenice.",
-   "Královna jim za to dala jméno.",
-   "Já jsem jim dal Ithmong.",
-   "Nagwanaya je napřed přivítal na stromě a mnicha s lampami sevřely kořeny.",
-   "Ten mnich byl vycvičený na démony, ne na mě.",
-   "Stačil jeden jeho nepovedený pokus ubránit se a už nevstal.",
-   "Žádné kouzlo ho pak nevrátilo.",
-   "Bratrův žák potom prošel celý svět.",
-   "A já mu v paměti zůstal jako první, kdo mu vzal přítele."
+   "My brother Alwarin always chose pupils with soft hearts. Young Rauko Daerond was one.",
+   "Baron Althalus was my lord. That little band took Castle Tethyr from him.",
+   "The queen gave them a name. I gave them Ithmong.",
+   "Nagwanaya welcomed them up in his tree, and the roots closed around their lamp-seller.",
+   "Trained for demons, he was. Not for me.",
+   "One clumsy attempt to save himself, and he never got up. No spell brought him back.",
+   "My brother's pupil went on to walk the whole world.",
+   "And in his memory I remain the first man who took a friend from him.",
+   "I find I don't mind that."
   ],
   "zdroje": [
    "s-2003",
    "s-2003-b",
    "txt:NPC_doplnene"
   ],
+  "titulky": [
+   "Bratr Alwarin si vybíral žáky s měkkým srdcem. Mladý Rauko Daerond byl jeden.",
+   "Baron Althalus byl můj pán. Ta parta mu vzala Castle Tethyr.",
+   "Královna jim dala jméno. Já jim dal Ithmong.",
+   "Nagwanaya je přivítal na svém stromě a kořeny sevřely jejich prodavače lamp.",
+   "Byl vycvičený na démony. Na mě ne.",
+   "Jeden nepovedený pokus ubránit se a už nevstal. Žádné kouzlo ho nevrátilo.",
+   "Bratrův žák pak prošel celý svět.",
+   "A v jeho paměti zůstávám prvním, kdo mu vzal přítele.",
+   "Zjišťuji, že mi to nevadí."
+  ],
+  "jazyk": "en",
   "skupina": "nepřátelé",
   "fokus": "58% 30%"
  },
@@ -709,17 +976,16 @@
   "portret": "ilu/T1_040",
   "hlas_popis": "muž kolem čtyřiceti, drsný hluboký hlas stepního bojovníka, chvástavý, pyšný, neochotně uznalý",
   "text": [
-   "Moji lidé tu dívku odvlekli do stepi, protože linie chánů musí mít krev dračí bohyně Taigy Tio.",
-   "Jmenovala se Ling Xayou.",
-   "Mnich si pro ni přijel se svými západními přáteli až do našeho hlavního města.",
-   "Neskončilo to pro něj dobře a step se smála.",
-   "Pak jsem se ocitl ve Feng Asay, v Žaláři bohů, odkud se neutíká.",
-   "A kdo tam proti mně stál, ten mnich.",
-   "Bili jsme se a já prohrál, to řeknu jednou a víc ne.",
-   "On pak z toho žaláře vyvedl každého, kdo přežil.",
-   "Chánovi dědicové se vrátili s Temnými do Anaurochu.",
-   "Tuiganská horda odtáhla z té pouště ještě před koncem bitvy.",
-   "Tuiganci prohrávat neuměli, ten mnich nás to naučil."
+   "My people dragged that girl into the steppe. Ling Xayou.",
+   "The khan's line needs the blood of the dragon goddess Taiga Tio.",
+   "The monk came for her with his western friends, all the way to our capital.",
+   "It did not end well for him. The steppe laughed.",
+   "Then I find myself in Feng Asay. Prison of the Gods. Nobody leaves it.",
+   "And who stands against me there? That monk.",
+   "We fought. I lost. I say it once, and never again.",
+   "Then Ho Wu Long led out everyone still breathing.",
+   "The khan's heirs went to Anauroch with the Shadovar. Our horde rode off before the end.",
+   "Tuigan never knew how to lose. That monk taught us."
   ],
   "zdroje": [
    "s-2005-11-18",
@@ -729,6 +995,19 @@
    "b-valka-s-tuiganskou-hordou",
    "b-bitva-v-anaurochu"
   ],
+  "titulky": [
+   "Moji lidé tu dívku odvlekli do stepi. Ling Xayou.",
+   "Linie chánů potřebuje krev dračí bohyně Taigy Tio.",
+   "Mnich si pro ni přijel se západními přáteli až do našeho hlavního města.",
+   "Neskončilo to pro něj dobře. Step se smála.",
+   "Pak se ocitnu ve Feng Asay. V Žaláři bohů. Odtud se neodchází.",
+   "A kdo tam proti mně stojí? Ten mnich.",
+   "Bili jsme se. Prohrál jsem. Řeknu to jednou a nikdy víc.",
+   "Pak Ho Wu Long vyvedl každého, kdo ještě dýchal.",
+   "Chánovi dědicové šli s Temnými do Anaurochu. Naše horda odtáhla před koncem.",
+   "Tuiganci prohrávat neuměli. Ten mnich nás to naučil."
+  ],
+  "jazyk": "en",
   "skupina": "nepřátelé",
   "fokus": "44% 30%"
  },
@@ -737,22 +1016,20 @@
   "jmeno": "Yamoh Hokhra",
   "role": "tuiganský hierofant, „šaman z plání“",
   "strana": "nepřítel",
-  "vazba": "Zabil Hoova učitele Kung Laa; proroctví ho postavilo proti Hoovi jako svatému muži z východu.",
+  "vazba": "Zabil Hoova učitele Kung Laa; v bitvě o Anauroch po Hoově domluvě ustoupil a v dračí podobě zmizel i se svými lidmi.",
   "portret": "ilu/P_023",
   "hlas_popis": "starý muž, hluboký drsný hlas, pomalý, zpěvavý rytmus, pohrdavý a tajemný",
   "text": [
-   "Vítr z plání nemá paměť.",
-   "Já ano.",
-   "Ten mnich přišel se západními přáteli do chánova města hledat dívku a neskončilo to pro něj dobře.",
-   "Ve Feng Asay jsem zabil jeho starého učitele Kung Laa.",
-   "Od té doby mě nosil v sobě jako trn a moje jméno měl zapsané pod slovem pomsta.",
-   "U Orofinu jsem vedl tuiganské jezdce, bandity z plání a šamany.",
-   "Staré proroctví mě nazvalo šamanem z plání a postavilo proti mně svatého muže z východu.",
-   "Na konci bitvy šel po mně a já čekal jeho hůl, jenže on promluvil.",
-   "Řekl mi, že ta bitva je ztracená, a měl pravdu.",
-   "Vzal jsem na sebe dračí podobu, zmizel a své lidi jsem odvedl s sebou.",
-   "Holí mě ten mnich nepřemohl, přemohl mě slovem.",
-   "Vítr by na to zapomněl, já nezapomenu."
+   "The wind of the plains has no memory. I do.",
+   "That monk came to the khan's city for a girl. It ended badly for him.",
+   "In Feng Asay I killed his old teacher. Kung Lao.",
+   "After that he carried my name like a thorn.",
+   "At Orofin I led Tuigan riders, plains bandits, shamans.",
+   "A prophecy called me the shaman of the plains, and set the holy man of the east against me.",
+   "At the end Ho Wu Long came for me. I waited for his staff.",
+   "He talked. He said the battle was lost. He was right.",
+   "I took dragon shape and was gone. My people with me.",
+   "His staff never beat me. His words did. The wind would forget. I will not."
   ],
   "zdroje": [
    "s-2006",
@@ -763,7 +1040,20 @@
    "txt:Ho_popisky (deník mistra Ho)"
   ],
   "stav": "zmizel",
-  "stav_titulek": "zmizel v podobě draka",
+  "stav_titulek": "zmizel v dračí podobě v bitvě o Anauroch",
+  "titulky": [
+   "Vítr z plání nemá paměť. Já ano.",
+   "Ten mnich přišel do chánova města pro dívku. Skončilo to pro něj zle.",
+   "Ve Feng Asay jsem zabil jeho starého učitele. Kung Laa.",
+   "Od té doby nosil moje jméno jako trn.",
+   "U Orofinu jsem vedl tuiganské jezdce, bandity z plání a šamany.",
+   "Proroctví mi říkalo šaman z plání. Proti mně postavilo svatého muže z východu.",
+   "Na konci si pro mě přišel Ho Wu Long. Čekal jsem jeho hůl.",
+   "On mluvil. Řekl, že ta bitva je ztracená. Měl pravdu.",
+   "Vzal jsem na sebe dračí podobu a zmizel. I s mými lidmi.",
+   "Holí mě nepřemohl. Slovy ano. Vítr by zapomněl. Já nezapomenu."
+  ],
+  "jazyk": "en",
   "skupina": "nepřátelé",
   "fokus": "40% 30%"
  },
@@ -776,17 +1066,16 @@
   "portret": "ilu/K_040",
   "hlas_popis": "muž kolem pětačtyřiceti, chladný kultivovaný baryton, věcný, úřednický, klidné pohrdání",
   "text": [
-   "Počítám lidi, lodě a dny, a družinu z Tethyru jsem počítal od začátku.",
-   "Když Zesion vyčistil jejich hlavní město, měla to být čistá operace.",
-   "Skončila Bitvou o Tvář vědění a moje skupina tam prohrála.",
-   "Do knihovny Arenkae jsem s Devrel došel o několik desítek hodin dřív než oni a golemy jsem jim nechal u vchodu.",
-   "Paladin si všiml našich stop, ale knihovnici jsme stejně odvedli v antimagických poutech.",
-   "Oni se na to dívali z okénka nad hangárem.",
-   "U Rudé pevnosti horda neuspěla, zato jejich lord Dračího letu skončil u nás.",
-   "Pak mi měňavec a jeho Lovci v Turmishi rozbili továrnu a přehradu.",
-   "V Anaurochu jsem koordinoval armády Temných a půlka jejich Aliance skončila v nekropoli u Temného jezera.",
-   "Prohrál jsem i tak.",
-   "Tahle položka se do výkazu píše špatně."
+   "I count men, ships and days. I counted the Tethyrians from the start.",
+   "Zesion cleared their capital. Meant to be clean. It ended at the Face of Knowledge.",
+   "At Arenkae, Devrel and I were hours ahead of them. I left them golems at the door.",
+   "Their paladin read our tracks. We took the librarian anyway. Antimagic chains.",
+   "They watched from a little window over the hangar. Satisfying.",
+   "At the Red Knight's the horde failed. Their lord of Dragonflight was ours.",
+   "Then a changeling and his Hunters wrecked my factory and my dam in Turmish.",
+   "In Anauroch I coordinated the Shadovar armies.",
+   "Half their Alliance lies in a necropolis by the Dark Lake. I lost anyway.",
+   "That is a hard line to enter in a ledger."
   ],
   "zdroje": [
    "s-2010",
@@ -800,6 +1089,19 @@
    "s-2026-09-05-epilog",
    "txt:zapisky"
   ],
+  "titulky": [
+   "Počítám lidi, lodě a dny. Družinu z Tethyru jsem počítal od začátku.",
+   "Zesion vyčistil jejich metropoli. Mělo to být čisté. Skončilo u Tváře vědění.",
+   "V Arenkae jsme byli s Devrel hodiny před nimi. Golemy jsem jim nechal u vchodu.",
+   "Paladin četl naše stopy. Knihovnici jsme stejně odvedli v antimagických poutech.",
+   "Dívali se z okénka nad hangárem. Uspokojivé.",
+   "U Rudé pevnosti horda neuspěla. Jejich lord Dračího letu ale skončil u nás.",
+   "Pak mi měňavec a jeho Lovci v Turmishi rozbili továrnu a přehradu.",
+   "V Anaurochu jsem koordinoval armády Temných.",
+   "Půlka jejich Aliance leží v nekropoli u Temného jezera. Stejně jsem prohrál.",
+   "Tahle položka se do výkazu píše špatně."
+  ],
+  "jazyk": "en",
   "skupina": "nepřátelé",
   "fokus": "38% 30%"
  },
@@ -812,16 +1114,15 @@
   "portret": "ilu/K_012",
   "hlas_popis": "žena bez věku, tichý zvonivý hlas s ozvěnou, chladná, hořká, jakoby z dálky",
   "text": [
-   "Mluvím k vám ze škapulíře a pro bytost, která kdysi patřila nebi, je to dost malá místnost.",
-   "V knihovně Arenkae jsem šla s Axelem před nimi a jejich paladin poznal moje jméno ze stop.",
-   "Knihovnici jsme odvedli, zatímco se dívali.",
-   "V Zakhaře pak seděli mág a elf v zajetí bez vybavení a já jsem na ně čekala v podobě malého chlapíka.",
-   "Mnich přišel sám.",
-   "Dostal je ven i s jejich věcmi a já jsem byla poslední, kdo mu stál v cestě.",
-   "Moje duše skončila v tomhle škapulíři a mnich ho nosil u sebe.",
-   "Zapsal si ho do soupisu vedle krabičky a svitků, jako by šlo o další věc z kořisti.",
-   "Nakonec mě předal Elminsterovi.",
-   "Tak jsem skončila v rukou starého mudrce ze Stinného údolí."
+   "I speak to you from a scapular. For a creature of the heavens, a small room.",
+   "At Arenkae I walked ahead of them with Axel. Their paladin read my name in the tracks.",
+   "We led the librarian away while they watched.",
+   "In Zakhara the mage and the elf sat in chains, stripped of everything.",
+   "I waited for them in the shape of a little man. The monk came alone.",
+   "He got them out, things and all. I was the last in his way.",
+   "My soul ended up in this scapular, and Ho Wu Long wore it.",
+   "He listed it among his things. Next to a little box.",
+   "In the end he gave me to Elminster. The sage of Shadowdale holds what's left of me."
   ],
   "zdroje": [
    "s-2012-04-07",
@@ -833,6 +1134,18 @@
   ],
   "stav": "padl",
   "stav_titulek": "† poražena v Zakhaře, duše uvězněna ve škapulíři",
+  "titulky": [
+   "Mluvím k vám ze škapulíře. Na bytost z nebes je to malá místnost.",
+   "V Arenkae jsem šla s Axelem před nimi. Paladin četl moje jméno ve stopách.",
+   "Knihovnici jsme odvedli a oni se dívali.",
+   "V Zakhaře seděli mág a elf v okovech, bez všeho.",
+   "Čekala jsem na ně v podobě malého chlapíka. Mnich přišel sám.",
+   "Dostal je ven i s věcmi. Byla jsem poslední, kdo mu stál v cestě.",
+   "Moje duše skončila v tomhle škapulíři a Ho Wu Long ho nosil.",
+   "Zapsal si ho do soupisu. Vedle krabičky.",
+   "Nakonec mě dal Elminsterovi. Mudrc ze Stinného údolí drží, co ze mě zbylo."
+  ],
+  "jazyk": "en",
   "skupina": "nepřátelé",
   "fokus": "28% 30%"
  },
@@ -845,18 +1158,16 @@
   "portret": "ilu/T3_050",
   "hlas_popis": "muž bez věku, hluboký tichý hlas, aristokratický, pomalý, studené pohrdání",
   "text": [
-   "Naše město viselo na jejich nebi jako nová hvězda v souhvězdí Rytíře a roky nevěděli, na co se dívají.",
-   "Moji lidé už tehdy drželi třináct zemských čaker a jejich portály ztichly.",
-   "Přadeno mělo patřit nám.",
-   "V cestě mi stál jeden muž, Rauko Daerond, mág z Tethyru, kterému jeho lidé říkají lord.",
-   "U Orofinu jsme prohráli, ale polovina jeho Aliance zůstala v poušti.",
-   "Pak vtrhl s mnichem do Thultantharu a Nemesiáni mu drželi moje ulice.",
-   "Ustoupil jsem do Chronosovy pyramidy, kde bůh času seděl v okovech a já na trůnu z hodin.",
-   "Rauko došel až na vrchol a tam jsme to spolu dohráli.",
-   "Rozhodl to on.",
-   "Padl jsem tam s bratrem Clariburnem a s námi padli Temní.",
-   "Byl lepší.",
-   "Pohrdám jím o to víc."
+   "Our city hung in their sky like a new star in the Knight.",
+   "For years they didn't know what they were seeing. Their portals went silent.",
+   "The Weave was to be ours.",
+   "One man stood in my way. Rauko Daerond. A Tethyrian mage they call lord.",
+   "At Orofin we lost. But half his Alliance stayed in the sand.",
+   "Then he broke into Thultanthar with his monk. I withdrew into the pyramid of Chronos.",
+   "The god of time in chains. And I, on a throne of clocks.",
+   "He climbed to the summit. There we finished it, he and I.",
+   "He decided it. I fell there with my brother Clariburnus, and the Shadovar with us.",
+   "He was better. I despise him all the more for it."
   ],
   "zdroje": [
    "s-2012-03-16",
@@ -871,6 +1182,19 @@
   ],
   "stav": "padl",
   "stav_titulek": "† padl na vrcholu Pyramidy času",
+  "titulky": [
+   "Naše město viselo na jejich nebi jako nová hvězda v Rytíři.",
+   "Roky nevěděli, na co se dívají. Jejich portály ztichly.",
+   "Přadeno mělo patřit nám.",
+   "V cestě mi stál jeden muž. Rauko Daerond. Tethyrský mág, kterému říkají lord.",
+   "U Orofinu jsme prohráli. Ale polovina jeho Aliance zůstala v písku.",
+   "Pak vtrhl s mnichem do Thultantharu. Ustoupil jsem do Chronosovy pyramidy.",
+   "Bůh času v okovech. A já na trůnu z hodin.",
+   "Vystoupal až na vrchol. Tam jsme to spolu dohráli.",
+   "Rozhodl to on. Padl jsem tam s bratrem Clariburnem a s námi Temní.",
+   "Byl lepší. O to víc jím pohrdám."
+  ],
+  "jazyk": "en",
   "skupina": "nepřátelé",
   "fokus": "31% 30%"
  },
@@ -879,21 +1203,20 @@
   "jmeno": "Sar Saratar",
   "role": "arcidemilich, spojenec Axela Adamantise",
   "strana": "nepřítel",
-  "vazba": "Při únosu knihovnice Arenkae se družině vysmál; proroctví ho postavilo proti velkému mágovi světla.",
+  "vazba": "Při únosu knihovnice Arenkae se družině vysmál; v bitvě o Anauroch ho rozdrtil Elminster.",
   "portret": "nove/n69",
   "hlas_popis": "hlas bez těla a věku, suchý chraptivý šepot, posměšný, pomalý, s cvakáním",
   "text": [
-   "Z knihovny Arenkae si pamatují hlavně můj pohled a nic jiného mi nezůstalo.",
-   "S Axelem a Devrel jsme tam byli dřív, a když se vymotali z iluzí k hangáru, knihovnice už seděla v poutech.",
-   "Jejich mág Rauko se k nim předtím prodral přes všechny bariéry té hory, a stejně přišel pozdě.",
-   "Tehdy jsem se tomu smál.",
-   "Pak mě Alaundovo proroctví nazvalo kostějem z cizího světa a postavilo proti mně velkého mága světla.",
-   "Těšil jsem se, kdo to bude.",
-   "Nakonec si pro mě došel starý mudrc ze Stinného údolí a moc se u toho nezapotil.",
-   "Rozdrtil mě, víc k tomu říkat nebudu.",
-   "Ten opožděný mág mezitím posadil krále k jednomu stolu a s mnichem došel až na vrchol Pyramidy času.",
-   "Pořád se mu směju, z dálky a z ničeho.",
-   "Jenom ten smích už cvaká jako staré kosti a nikoho nebaví."
+   "At Arenkae they remember my look. That's all I left them.",
+   "Axel, Devrel and I got there first. When they crawled out of the illusions…",
+   "…the librarian sat in chains. Their mage clawed through every barrier in that mountain.",
+   "And still came too late. I laughed then.",
+   "Then Alaundo's prophecy named me the deathless one from a foreign world.",
+   "And set a great mage of light against me. I wondered who.",
+   "In Anauroch the old sage of Shadowdale came for me. Barely broke a sweat. Crushed me.",
+   "Enough of that.",
+   "While I was ground to dust, that late little mage reached the top of the Pyramid of Time.",
+   "I still laugh at him. From nothing. Only now it clicks like old bones."
   ],
   "zdroje": [
    "s-2012-07-27",
@@ -907,7 +1230,20 @@
    "upřesnění autora 23. 11."
   ],
   "stav": "padl",
-  "stav_titulek": "† rozdrcen Elminsterem",
+  "stav_titulek": "† rozdrcen Elminsterem v bitvě o Anauroch",
+  "titulky": [
+   "Z Arenkae si pamatují můj pohled. Nic jiného jsem jim nenechal.",
+   "S Axelem a Devrel jsme tam byli první. Než se vymotali z iluzí…",
+   "…knihovnice seděla v poutech. Jejich mág se prodral všemi bariérami té hory.",
+   "A stejně přišel pozdě. Tehdy jsem se smál.",
+   "Pak mě Alaundovo proroctví nazvalo kostějem z cizího světa.",
+   "A postavilo proti mně velkého mága světla. Těšil jsem se, kdo to bude.",
+   "V Anaurochu si pro mě přišel mudrc ze Stinného údolí. Nezapotil se. Rozdrtil mě.",
+   "Dost o tom.",
+   "Zatímco mě drtil na prach, ten opožděný mág došel na vrchol Pyramidy času.",
+   "Pořád se mu směju. Z ničeho. Jenom ten smích teď cvaká jako staré kosti."
+  ],
+  "jazyk": "en",
   "skupina": "nepřátelé",
   "fokus": "37% 30%"
  },
@@ -920,16 +1256,16 @@
   "portret": "nove/n81",
   "hlas_popis": "velmi starý muž, chraplavý teplý hlas, pobavený, odbíhá, pak náhle vážný a pomalý",
   "text": [
-   "Nejdřív se mi doneslo, že nějaká parta z Tethyru sesadila v Castle Tethyr barona, což se tam stává každou druhou zimu.",
-   "Pak padl Šivan v Kozakuře a na dračí trůn Shou Lungu usedla dívka, kterou tam doprovodili.",
-   "Když nad Rytířem vyšla nová hvězda, tušil jsem, co je zač, a nechal je, ať na to přijdou sami.",
-   "Mnich mi později předal škapulíř s duší padlé devy.",
-   "U kulatého stolu v Castle Tethyr jsem pak seděl mezi králi, draky a trpaslíky a všechny je tam svolal Rauko.",
-   "Kostěje z cizího světa jsem si vzal na starost sám.",
-   "Dlouho to netrvalo.",
-   "Na vrcholu Chronosovy pyramidy pak Rauko s mnichem oddělili náš čas od jiného, ve kterém moje paní zemřela.",
-   "Klaním se málokdy.",
-   "Před mužem, který prohlédl závoj všech lží a spojil krále proti tmě, se skloním."
+   "First I heard, some band unseated a baron in Tethyr. In Tethyr!",
+   "They do it every other winter.",
+   "Then Shivan fell in Kozakura, and a girl they'd escorted took the Dragon Throne. Hm.",
+   "A new star rose in the Knight. I knew what it was. Let them find out.",
+   "Ho Wu Long gave me a scapular, a fallen deva inside. What that monk carries…",
+   "At the round table: kings, dragons, dwarves. Rauko called them all.",
+   "In Anauroch I took the deathless one myself. Quick work.",
+   "In that same hour, on the pyramid, they cut our time free of another…",
+   "…one where my lady died. I bow seldom.",
+   "Before the man who saw through the veil of every lie, and what he has done, I bow."
   ],
   "zdroje": [
    "s-2003",
@@ -944,6 +1280,19 @@
    "hymna",
    "upřesnění autora 23. 11."
   ],
+  "titulky": [
+   "Nejdřív se ke mně doneslo, že nějaká parta sesadila v Tethyru barona. V Tethyru!",
+   "To tam dělají každou druhou zimu.",
+   "Pak padl Šivan v Kozakuře a dívka, kterou doprovodili, usedla na Dračí trůn. Hm.",
+   "V Rytíři vyšla nová hvězda. Věděl jsem, co je zač. Ať na to přijdou sami.",
+   "Ho Wu Long mi dal škapulíř s padlou devou. Co ten mnich všechno nenosí…",
+   "U kulatého stolu: králové, draci, trpaslíci. Všechny je svolal Rauko.",
+   "V Anaurochu jsem si kostěje z cizího světa vzal sám. Netrvalo to dlouho.",
+   "V tutéž hodinu na pyramidě oddělili náš čas od jiného…",
+   "…od toho, v němž zemřela moje paní. Klaním se málokdy.",
+   "Před mužem, který prohlédl závoj všech lží, a před tím, co dokázal, se skláním."
+  ],
+  "jazyk": "en",
   "skupina": "nadhled",
   "fokus": "44% 30%"
  },
@@ -955,17 +1304,16 @@
   "vazba": "Z doslechu / z nadhledu: osobně s družinou v datech nejednala; nahradila otce, který zmizel, a o družině ví z Hlubiny (Xanatharův cech, illithidé, Alaundovo proroctví, Anauroch).",
   "hlas_popis": "mladší žena, jasný chladný hlas, rychlá a ostrá, věcná, státnická, bez úsměvu",
   "text": [
-   "Otec zmizel a Černou věž teď držím já.",
-   "O družině z Tethyru se v Hlubině začalo mluvit, když vyšlo najevo, že Temní Netherilci drží třináct zemských čaker a že kvůli nim ztichly portály v Říších.",
-   "Pak do Hlubiny přišli sami, mág Rauko Daerond a mnich Ho.",
-   "Hledali hlavu Alaunda, vyjednávali s illithidy z Oryndollu a z Xanatharova cechu vyšli živí, což se tu nestává často.",
-   "Proroctví nakonec získali.",
-   "Hlubina poslala do Anaurochu dva a půl tisíce mužů pod Aleenou Paladinstar.",
-   "Polovina Aliance se domů nevrátila, ale Thultanthar padl a s ním plán Temných na Přadeno.",
-   "Na vrcholu Pyramidy času ti dva odvrátili Magický mor.",
-   "Otcovy Chodící sochy proto zůstanou spát ve sférách kolem města, kam je ukryl.",
-   "Otec by teď mluvil o rovnováze.",
-   "Já to řeknu rovnou, Říše jim dluží víc, než kdy přiznají, a nikoho nežádali o svolení."
+   "My father vanished. Blackstaff Tower is mine now.",
+   "Waterdeep started talking about the Tethyrians when the portals went silent.",
+   "Then they came here themselves. Rauko Daerond and Ho Wu Long. For Alaundo's head.",
+   "They bargained with the illithids of Oryndoll.",
+   "They walked out of Xanathar's Guild alive. That doesn't happen here. They got the prophecy.",
+   "Waterdeep sent twenty-five hundred under Aleena Paladinstar.",
+   "Half the Alliance never came home. But Thultanthar fell.",
+   "On the summit of the Pyramid of Time, those two turned back the Spellplague.",
+   "So my father's Walking Statues stay asleep in their spheres around the city.",
+   "Father would talk of balance. I'll say it plainly. The Realms owe them."
   ],
   "zdroje": [
    "s-2012-03-16",
@@ -980,6 +1328,19 @@
    "b-posledni-souboj-na-pyramide-casu",
    "upřesnění autora 23. 11."
   ],
+  "titulky": [
+   "Otec zmizel. Černou věž teď držím já.",
+   "V Hlubině se o Tethyřanech začalo mluvit, když ztichly portály.",
+   "Pak přišli sami. Rauko Daerond a Ho Wu Long. Pro hlavu Alaunda.",
+   "Vyjednávali s illithidy z Oryndollu.",
+   "Z Xanatharova cechu vyšli živí. To se tu nestává. Proroctví získali.",
+   "Hlubina poslala dva a půl tisíce mužů pod Aleenou Paladinstar.",
+   "Půlka Aliance se domů nevrátila. Ale Thultanthar padl.",
+   "Na vrcholu Pyramidy času ti dva odvrátili Magický mor.",
+   "Otcovy Chodící sochy proto zůstanou spát ve sférách kolem města.",
+   "Otec by mluvil o rovnováze. Já to řeknu rovnou. Říše jim dluží."
+  ],
+  "jazyk": "en",
   "skupina": "nadhled",
   "fokus": "40% 30%"
  },
@@ -992,16 +1353,16 @@
   "portret": "nove/n09",
   "hlas_popis": "žena neurčitého věku, laskavý zvučný mezzosoprán, uhlazená, politicky opatrná, pomalá",
   "text": [
-   "Do Stříbroluní přišli poprvé kvůli čarodějce Lurně a odešli se známostí s mým synem a jeho Osmnáctkou.",
-   "Podruhé přiletěli po Rudé pevnosti, bez paladina, kterého v bitvě ztratili.",
-   "Zbytky hordy tou dobou táhly přes Stříbrnou marku do Anaurochu.",
-   "Vugur z mé tajné služby proti nim poslal záškodníky a dva z nich se k družině později přidali, Bastien a Mordai.",
-   "Sundabar jsme stejně neudrželi.",
-   "Jeden z Raukových rádců, Hypros, je navíc levoboček jednoho z mých mágů, takže jsem o nich věděla víc, než tušili.",
-   "Do Velké rady jsem poslala Mortuse.",
-   "Vedl Stříbroluní v Anaurochu a pak se stal vrchním velitelem Stříbrné legie.",
-   "Po bitvě zavelí elfové k Poslednímu pochodu a Sever zůstane lidem a trpaslíkům.",
-   "Bez Aliance, kterou ti dva sešili dohromady, by Stříbrné pochody dnes patřily skřetům."
+   "They first came to Silverymoon over the sorceress Lurna.",
+   "They left knowing my son Mortus and his Eighteen.",
+   "The second time they came after the Red Knight's fortress. Without their paladin.",
+   "What was left of the horde was crossing the Silver Marches toward Anauroch.",
+   "Vugur, of my quiet service, sent saboteurs after it.",
+   "Two of them later joined the Company. Bastien and Mordai.",
+   "We lost Sundabar all the same.",
+   "Rauko's adviser Hypros is a by-blow of one of my mages. I knew more than they suspected.",
+   "Mortus sat at the Grand Council for me, and led Silverymoon in Anauroch.",
+   "Without the Alliance those two stitched together, the Marches would belong to the orcs."
   ],
   "zdroje": [
    "s-2008",
@@ -1015,6 +1376,19 @@
    "s-2026-09-05-epilog",
    "txt:Rauko_popisky_TBM"
   ],
+  "titulky": [
+   "Do Stříbroluní přišli poprvé kvůli čarodějce Lurně.",
+   "Odešli se známostí s mým synem Mortusem a jeho Osmnáctkou.",
+   "Podruhé přiletěli po Rudé pevnosti. Bez svého paladina.",
+   "Zbytky hordy tehdy táhly přes Stříbrnou marku do Anaurochu.",
+   "Vugur z mé tajné služby na ně poslal záškodníky.",
+   "Dva z nich se pak přidali k družině. Bastien a Mordai.",
+   "Sundabar jsme stejně neudrželi.",
+   "Raukův rádce Hypros je levoboček mého mága. Věděla jsem víc, než tušili.",
+   "Mortus za mě zasedl ve Velké radě a v Anaurochu vedl Stříbroluní.",
+   "Bez Aliance, kterou ti dva sešili, by Stříbrné pochody patřily skřetům."
+  ],
+  "jazyk": "en",
   "skupina": "nadhled",
   "fokus": "38% 30%"
  },
@@ -1027,17 +1401,16 @@
   "portret": "nove/n47",
   "hlas_popis": "žena neurčitého věku, ostrý chladný hlas, rychlá, kousavá, sardonická",
   "text": [
-   "S Arenkae nemám nic společného, a kdo tvrdí opak, ať mi to dokáže.",
-   "Přesto vím, že tethyrská družina došla do té knihovny jen pár desítek hodin po Axelovi a Devrel.",
-   "Knihovnici nezachránili, ale zjistili, kdo za tím stojí, a to bylo v tu chvíli cennější.",
-   "Pak si z poslední základny en Rewinů odvedli Hackenovu sestru a u Lantanu se ptali po Vypovězeném, který umí Arenkae poskládat zpátky.",
-   "To jsem slyšela ráda.",
-   "Čistě teoreticky.",
-   "Austiova žena se kdysi učila i u mě, takže jsem o jejich družině neslyšela poprvé.",
-   "U kulatého stolu v Castle Tethyr jsem seděla a do Anaurochu jsem poslala tisíc mužů pod Renerem en Algonem.",
-   "Proti nám tam stáli nemrtví Rudých mágů.",
-   "Po bitvě je Thay nechal ležet v poušti a stáhl se.",
-   "Tohle mi ti dva dali, aniž by tušili, kolik to pro Aglarond znamená."
+   "I have nothing to do with Arenkae. Prove otherwise.",
+   "Still, I know the Tethyrians reached that library hours behind Axel and Devrel.",
+   "They didn't save the librarian. They learned who was pulling the strings.",
+   "Worth more, at the time.",
+   "Then, off Lantan, they took Hacken's sister. She knows of the Exile.",
+   "He can put Arenkae back together. I was glad to hear it. Purely in theory.",
+   "Austius's wife once studied with me as well. They weren't news to me.",
+   "I sat at the round table. I sent a thousand men to Anauroch under Rener en Algon.",
+   "Against us, the Red Wizards' undead. After the battle, Thay left them in the sand.",
+   "Those two gave me that, with no idea what it means for Aglarond."
   ],
   "zdroje": [
    "s-2012-04-07",
@@ -1050,6 +1423,19 @@
    "txt:Austius_popisky",
    "txt:zapisky"
   ],
+  "titulky": [
+   "S Arenkae nemám nic společného. Dokažte opak.",
+   "Přesto vím, že Tethyřané došli do té knihovny pár hodin po Axelovi a Devrel.",
+   "Knihovnici nezachránili. Zjistili, kdo tahá za provázky.",
+   "To mělo tehdy větší cenu.",
+   "Pak si u Lantanu odvedli Hackenovu sestru. Ví o Vypovězeném.",
+   "Ten umí Arenkae dát znovu dohromady. To jsem slyšela ráda. Čistě teoreticky.",
+   "Austiova žena se kdysi učila i u mě. Nebyli pro mě novinka.",
+   "Seděla jsem u kulatého stolu. Do Anaurochu jsem poslala tisíc mužů.",
+   "Proti nám nemrtví Rudých mágů. Po bitvě je Thay nechal ležet v písku.",
+   "To mi ti dva dali a netuší, co to pro Aglarond znamená."
+  ],
+  "jazyk": "en",
   "skupina": "nadhled",
   "fokus": "37% 30%"
  },
@@ -1062,17 +1448,16 @@
   "portret": "nove/n22",
   "hlas_popis": "žena kolem čtyřiceti, pevný hlas vojačky, rázná, stručná, suchý humor",
   "text": [
-   "V Cormyru jsme o nich nejdřív slyšeli od vlastních lidí.",
-   "Gareth, který s nimi chodil, kdysi střílel pro naši tajnou službu, a Sakaar, který vede Austiovy ostrostřelce, nosil léta cormyrský stejnokroj.",
-   "Vážně jsem je začala brát, když po Rudé pevnosti odtáhly zbytky hordy do Anaurochu, blíž k mým hranicím, než bych chtěla.",
-   "Pak se k Alianci zavázala Velká trhlina, a když se trpaslíci k něčemu zavážou, děje se něco velkého.",
-   "U kulatého stolu v Castle Tethyr jsem slíbila pět tisíc osm set mužů.",
-   "K Orofinu jsem je vedla sama.",
-   "Domů se vrátila polovina Aliance.",
-   "Thultanthar pak padl a s ním plán Temných na Přadeno.",
-   "Prý existuje jiná přímka času, kde Temní ovládli Sembii a stali se velmocí.",
-   "Sembie začíná hned za naší východní hranicí.",
-   "Jak tam vypadá Cormyr, vědět nechci."
+   "In Cormyr we first heard of them from our own people.",
+   "Gareth, who rode with them, used to shoot for our secret service.",
+   "Sakaar wore Cormyr's colours for years.",
+   "I took them seriously when the horde's leftovers fell back into Anauroch.",
+   "Closer to my border than I like. Then the Great Rift bound itself to the Alliance.",
+   "When dwarves commit, something big is coming.",
+   "At the round table I promised fifty-eight hundred men. I led them to Orofin myself.",
+   "Half the Alliance came home. Then Thultanthar fell, and their plan for the Weave with it.",
+   "They say in another line of time the Shadovar took Sembia. Sembia is right next door.",
+   "What Cormyr looks like there, I don't want to know."
   ],
   "zdroje": [
    "txt:Nemesiani",
@@ -1084,6 +1469,19 @@
    "s-2026-05-30",
    "s-2026-08-01"
   ],
+  "titulky": [
+   "V Cormyru jsme o nich nejdřív slyšeli od vlastních lidí.",
+   "Gareth, co s nimi jezdil, kdysi střílel pro naši tajnou službu.",
+   "Sakaar léta nosil cormyrský stejnokroj.",
+   "Vážně jsem je brala, když zbytky hordy odtáhly do Anaurochu.",
+   "Blíž k mé hranici, než bych chtěla. Pak se k Alianci zavázala Velká trhlina.",
+   "Když se zavážou trpaslíci, chystá se něco velkého.",
+   "U kulatého stolu jsem slíbila 5 800 mužů. K Orofinu jsem je vedla sama.",
+   "Domů se vrátila půlka Aliance. Pak padl Thultanthar a s ním plán na Přadeno.",
+   "Prý v jiné přímce času ovládli Temní Sembii. A Sembie je hned za hranicí.",
+   "Jak tam vypadá Cormyr, vědět nechci."
+  ],
+  "jazyk": "en",
   "skupina": "nadhled",
   "fokus": "44% 30%"
  }

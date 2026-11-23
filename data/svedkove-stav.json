@@ -2,7 +2,7 @@
   "popis": "Rok smrti nebo zmizení svědků, kteří nežijí. Rok vychází ze sezení a bitev, o které se svědectví opírá (pole zdroje).",
   "kung-lao": {
     "rok": 1377,
-    "kde": "Feng Asay",
+    "kde": "Feng Asay · Broskvová zahrada",
     "zdroj": "s-2011-07-14"
   },
   "ruda-rytirka": {
@@ -17,17 +17,22 @@
   },
   "yamoh-hokhra": {
     "rok": 1385,
-    "kde": "Pyramida času (poslední souboj)",
+    "kde": "bitva v Anaurochu (zmizel v dračí podobě)",
     "zdroj": "s-2026-08-01"
   },
   "sar-saratar": {
     "rok": 1385,
-    "kde": "Pyramida času (poslední souboj)",
+    "kde": "bitva v Anaurochu",
     "zdroj": "s-2026-08-01"
   },
   "rivalen": {
     "rok": 1385,
     "kde": "Pyramida času",
     "zdroj": "s-2026-08-01"
+  },
+  "chuang-li": {
+    "rok": 1384,
+    "kde": "Cham Fau, v souboji s Ho Wu Longem",
+    "zdroj": "s-2023-08-26"
   }
 }

@@ -21,7 +21,7 @@ export function ensure(id) {
 }
 
 // události mezi oddíly: nejdřív se vykreslí cílový oddíl, pak se událost pošle
-const TARGET = { witness: 'svedectvi', map: 'mapa', registry: 'rejstrik', party: 'druzina', prophecy: 'proroctvi', story: 'pribeh' };
+const TARGET = { witness: 'svedectvi', map: 'mapa', registry: 'lexikon', lexikon: 'lexikon', party: 'druzina', prophecy: 'proroctvi', story: 'pribeh' };
 export function emit(name, detail = {}) {
   const sec = TARGET[name.split(':')[0]];
   return (sec ? ensure(sec) : Promise.resolve()).then(() => window.dispatchEvent(new CustomEvent(name, { detail })));

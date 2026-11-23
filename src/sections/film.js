@@ -11,7 +11,7 @@ import { D, need } from '../lib/data.js';
 import { img } from '../lib/img.js';
 import { routeSvg } from '../lib/minimap.js';
 import { voice, load as loadVoice, stop as stopVoice, unlock, getVolume, setVolume, isMuted, setMuted, onVolume } from '../lib/audio.js';
-import { createStage, grain, STAGE_HTML, sideLabel } from '../lib/wstage.js';
+import { createStage, grain, STAGE_HTML, sideLabel, subMode, setSubMode, SUB_LABEL } from '../lib/wstage.js';
 import { $, $$, esc, reduced } from '../lib/util.js';
 
 const baseOf = (f) => f.replace(/\.[^.]+$/, '');
@@ -266,7 +266,8 @@ function create(timing) {
     let readyCb = null;
     if (s.type === 'sv') {
       const w = D.witById[s.id];
-      const m = stage.setWitness(w, { useVideo: true, video: HAS_VIDEO[s.id] ? `assets/video/${HAS_VIDEO[s.id]}` : '' });
+      const fullV = w.video_plne && HAS_VIDEO[s.id + '_plne'];
+      const m = stage.setWitness(w, { useVideo: true, video: fullV ? `assets/video/${fullV}` : HAS_VIDEO[s.id] ? `assets/video/${HAS_VIDEO[s.id]}` : '', full: !!fullV });
       const t = timing?.[s.id];
       starts = t && t.starts?.length === w.text.length ? t.starts.slice() : (() => { const lens = w.text.map((x) => Math.max(1.9, x.length * 0.064) + 0.35); let tt = 0.9; return lens.map((l) => { const a = tt; tt += l; return a; }); })();
       hasAudio = false;
@@ -332,6 +333,7 @@ function create(timing) {
     paintTl();
     if (s.type === 'sv') {
       const w = D.witById[s.id];
+      stage.sync(t, playing && !(hasAudio && voice.paused));
       let i = -1; for (let k = 0; k < starts.length; k++) if (t >= starts[k]) i = k;
       if (cc) stage.setSub(i, w); else stage.clearSub();
       stage.lower.classList.toggle('in', t > 0.35 && t < s.dur - DUR.tail - 0.4);
@@ -466,7 +468,16 @@ function create(timing) {
   }
   volEl.addEventListener('input', () => setVolume(volEl.value / 100));
   onVolume(syncVol);
-  const toggleCc = () => { cc = !cc; const b = $s('#fCc'); b.setAttribute('aria-pressed', cc); b.setAttribute('aria-label', `Titulky ${cc ? 'zapnuty' : 'vypnuty'} (C)`); root.classList.toggle('no-cc', !cc); if (!cc) { stage.clearSub(); lyr.classList.remove('in'); } };
+  // titulky: CZ (výchozí) → EN (anglický originál dabingu) → vypnuto → CZ
+  const syncCc = () => {
+    const m = subMode(); cc = m !== 'off';
+    const b = $s('#fCc'); b.setAttribute('aria-pressed', cc); b.setAttribute('aria-label', `Titulky: ${m === 'cs' ? 'česky' : m === 'en' ? 'anglicky' : 'vypnuto'} (C přepíná)`);
+    $('span', b).textContent = m === 'off' ? 'CC' : SUB_LABEL[m];
+    root.classList.toggle('no-cc', !cc); if (!cc) { stage.clearSub(); lyr.classList.remove('in'); }
+  };
+  const toggleCc = () => { const m = subMode(); setSubMode(m === 'cs' ? 'en' : m === 'en' ? 'off' : 'cs'); };
+  window.addEventListener('submode', syncCc);
+  syncCc();
   const toggleFs = () => { if (document.fullscreenElement) document.exitFullscreen?.(); else root.requestFullscreen?.({ navigationUI: 'hide' }).catch(() => {}); };
   const toggle = () => { if (!started) { go(); return; } if (finished) return; setPlaying(!playing); };
 

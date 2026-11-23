@@ -53,7 +53,7 @@ with sync_playwright() as p:
         go(pg, 'mapa')
         heads = pg.evaluate("[...document.querySelectorAll('main > section .sh-no span')].map(s => s.textContent.replace(/\\s+/g,' ').trim())")
         ok(len(heads) >= 1, T + 'nadpisy oddílů mají číslování', heads)
-        for s in ('svedectvi', 'druzina', 'bitvy', 'proroctvi', 'osa', 'rejstrik', 'stul', 'hymna', 'podekovani', 'pribeh'): go(pg, s, 500)
+        for s in ('svedectvi', 'druzina', 'bitvy', 'proroctvi', 'osa', 'lexikon', 'stul', 'hymna', 'podekovani', 'pribeh'): go(pg, s, 500)
         heads = pg.evaluate("[...document.querySelectorAll('main > section .sh-no span')].map(s => s.textContent.replace(/\\s+/g,' ').trim())")
         ok(heads == ['Oddíl I', 'Oddíl II', 'Oddíl III', 'Oddíl IV', 'Oddíl V', 'Oddíl VI', 'Oddíl VII', 'Oddíl VIII', 'Oddíl IX', 'Oddíl X', 'Oddíl XI'] or len(heads) == 11, T + 'oddíly číslované I–XI', heads)
         go(pg, 'mapa', 1200)
@@ -100,7 +100,7 @@ with sync_playwright() as p:
         pr = pg.evaluate("""() => ({ful: [...document.querySelectorAll('.pr-v.ful')].map(v => v.id), fulLinks: [...document.querySelectorAll('.pr-link a.ful')].map(a => a.getAttribute('href') + ' | ' + a.textContent.trim()),
             mention: [...document.querySelectorAll('.pr-link a:not(.ful)')].map(a => a.getAttribute('href')), lines: document.querySelectorAll('.pr-v .vl').length, prog: document.querySelectorAll('.pr-prog span').length})""")
         ok(pr['ful'] == ['pv-3-6', 'pv-3-7', 'pv-3-12'], T + 'proroctví: naplněné verše', pr['ful'])
-        ok(all('ch-thultanthar-a-pyramida-casu' in x for x in pr['fulLinks']) and len(pr['fulLinks']) == 3, T + 'naplněné verše odkazují na kapitolu, kde se naplnily', pr['fulLinks'])
+        ok(all('b-bitva-v-anaurochu' in x for x in pr['fulLinks']) and len(pr['fulLinks']) == 3, T + 'naplněné verše odkazují na bitvu v Anaurochu, kde se souboje dohrály (upřesnění autora, it7)', pr['fulLinks'])
         ok(len(pr['mention']) >= 4, T + 'další verše odkazují na kapitoly, kde se o nich píše', pr['mention'])
         ok(pr['lines'] > 100 and pr['prog'] == 3, T + 'verše po řádcích, ukazatel kapitol I–III', pr)
         pg.evaluate("document.getElementById('pv-3-7').scrollIntoView({behavior:'instant',block:'center'})"); pg.wait_for_timeout(1800)
@@ -108,8 +108,8 @@ with sync_playwright() as p:
         ok(lit['lit'] and lit['in'] and lit['op'] == 1, T + 'čtený verš se rozsvítí a řádky se odhalí', lit)
         pg.evaluate("document.querySelector('#pv-3-7 .pr-link a.ful').scrollIntoView({behavior:'instant',block:'center'})"); pg.wait_for_timeout(300)
         jclick(pg, '#pv-3-7 .pr-link a.ful'); pg.wait_for_timeout(3500)
-        yy = pg.evaluate("(() => { const e = document.getElementById('ch-thultanthar-a-pyramida-casu'); const r = e.getBoundingClientRect(); return {top: r.top, h: innerHeight, hash: location.hash} })()")
-        ok(-50 < yy['top'] < yy['h'] * 0.6 and 'thultanthar' in yy['hash'], T + 'klik na naplnění doskroluje na kapitolu Thultanthar a Pyramida času', yy)
+        yy = pg.evaluate("(() => { const e = document.getElementById('b-bitva-v-anaurochu'); const r = e.getBoundingClientRect(); return {top: r.top, h: innerHeight, hash: location.hash} })()")
+        ok(-50 < yy['top'] < yy['h'] * 0.6 and 'anauroch' in yy['hash'], T + 'klik na naplnění doskroluje na bitvu v Anaurochu', yy)
         # ------------------------------------------------------------ časová osa
         go(pg, 'osa', 1200)
         tl = pg.evaluate("""() => { const m = document.getElementById('tlMob'); const cs = [...m.querySelectorAll('.tl-y')]; const vis = getComputedStyle(m).display !== 'none';

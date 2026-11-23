@@ -102,9 +102,12 @@ with sync_playwright() as p:
             pg.keyboard.press('ArrowUp'); v = pg.evaluate("__voice.volume"); ok('[desktop] ↑ změní hlasitost', v > 0.9 or v == 1, str(v))
             # titulky: najít svědka
             sv = pg.evaluate("__film.segs.findIndex(s => s.type === 'sv')"); pg.evaluate(f"__film.seekScene({sv}, 0)"); wait_idx(pg, sv); pg.wait_for_timeout(3500)
-            a = pg.evaluate("getComputedStyle(document.querySelector('#film .w-sub')).display"); pg.keyboard.press('c'); pg.wait_for_timeout(300)
+            # C přepíná titulky CZ → EN → vypnuto → CZ (od iterace 7: anglický dabing, české titulky výchozí)
+            a = pg.evaluate("getComputedStyle(document.querySelector('#film .w-sub')).display"); lab0 = pg.evaluate("document.getElementById('fCc').textContent.trim()")
+            pg.keyboard.press('c'); pg.wait_for_timeout(300); lab1 = pg.evaluate("document.getElementById('fCc').textContent.trim()")
+            pg.keyboard.press('c'); pg.wait_for_timeout(300)
             b2 = pg.evaluate("getComputedStyle(document.querySelector('#film .w-sub')).display")
-            ok('[desktop] C vypne a zapne titulky', a != 'none' and b2 == 'none', f'{a} → {b2}'); pg.keyboard.press('c')
+            ok('[desktop] C přepíná titulky CZ → EN → vypnuto', a != 'none' and lab0 == 'CZ' and lab1 == 'EN' and b2 == 'none', f'{a} {lab0} → {lab1} → {b2}'); pg.keyboard.press('c')
             pg.keyboard.press('m'); ok('[desktop] M ztlumí', pg.evaluate("__voice.muted")); pg.keyboard.press('m')
         # zavření
         if name == 'desktop': pg.keyboard.press('Escape')

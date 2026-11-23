@@ -6,9 +6,12 @@ import { openLightbox } from '../lib/lightbox.js';
 
 const NAMES = ['první', 'druhá', 'třetí'];
 const ROM = ['I', 'II', 'III'];
-// Verše třetí kapitoly, které kronika výslovně označuje za naplněné ve finále 1. 8. 2026 (kapitola „Thultanthar a Pyramida času“:
-// „Naplnila se třetí kapitola proroctví se svými spárovanými souboji“): Ho × Yamoh (3-6, 3-7) a Sar Saratar (3-12).
-const FUL = { '3-6': 'ch-thultanthar-a-pyramida-casu', '3-7': 'ch-thultanthar-a-pyramida-casu', '3-12': 'ch-thultanthar-a-pyramida-casu' };
+// Verše třetí kapitoly, které kronika výslovně označuje za naplněné ve finále 1. 8. 2026: Ho × Yamoh (3-6, 3-7)
+// a Elminster × Sar Saratar (3-12). Podle upřesnění autora se ty souboje dohrály v bitvě o Anauroch,
+// souběžně s finále na Pyramidě času (vyprávění je v kapitole „Thultanthar a Pyramida času“).
+const FIN_CH = 'ch-thultanthar-a-pyramida-casu';
+const FUL = { '3-6': 'b-bitva-v-anaurochu', '3-7': 'b-bitva-v-anaurochu', '3-12': 'b-bitva-v-anaurochu' };
+const FUL_LABEL = 'Bitva v Anaurochu, 1. 8. 2026';
 /** Které kapitoly vyprávění odkazují na který verš (odkazy (p:kapitola-verš) v textech kapitol). */
 function refsOf() {
   const m = {};
@@ -23,8 +26,8 @@ function linkRow(key) {
   const refs = [...(refsOf.cache[key] || [])];
   const ful = FUL[key];
   if (!ful && !refs.length) return '';
-  const others = refs.filter((c) => c !== ful);
-  return `<div class="pr-link">${ful ? `<a class="ful" href="#${ful}">✦ Naplnilo se · ${esc(chTitle(ful))} ▸</a>` : ''}${!ful ? others.map((c) => `<a href="#${c}">V kronice · ${esc(chTitle(c))} ▸</a>`).join('') : ''}${ful && others.length ? `<span class="ref">Výklad: ${others.map((c) => `<a href="#${c}">${esc(chTitle(c))}</a>`).join(', ')}</span>` : ''}</div>`;
+  const others = ful ? [...new Set([FIN_CH, ...refs])] : refs;
+  return `<div class="pr-link">${ful ? `<a class="ful" href="#${ful}">✦ Naplnilo se · ${esc(FUL_LABEL)} ▸</a>` : ''}${!ful ? others.map((c) => `<a href="#${c}">V kronice · ${esc(chTitle(c))} ▸</a>`).join('') : ''}${ful && others.length ? `<span class="ref">Výklad: ${others.map((c) => `<a href="#${c}">${esc(chTitle(c))}</a>`).join(', ')}</span>` : ''}</div>`;
 }
 
 export function renderProphecy() {
@@ -37,7 +40,7 @@ export function renderProphecy() {
     <div class="pr-grid wrap">
       <div class="pr-art" aria-hidden="true">${P.chapters.map((c, i) => `<div class="pr-pic${i === 0 ? ' on' : ''}" data-ch="${i}">${img('ilu/' + (c.img || P.img), { alt: '', sizes: '(max-width:900px) 100vw, 40vw', pos: '50% 30%' })}</div>`).join('')}<div class="pr-art-shade"></div><div class="pr-prog" aria-hidden="true">${ROM.map((r, i) => `<span class="${i === 0 ? 'on' : ''}" data-ch="${i}">${r}</span>`).join('')}</div></div>
       <div class="pr-text">
-        <p class="pr-sum"><span><b>Naplnění.</b> Třetí kapitola se podle kroniky naplnila ve finále 1. srpna 2026. Verše s doloženým výkladem odkazují na kapitolu, kde se to stalo.</span><a href="#${FUL['3-6']}">${esc(chTitle(FUL['3-6']))} ▸</a></p>
+        <p class="pr-sum"><span><b>Naplnění.</b> Třetí kapitola se podle kroniky naplnila ve finále 1. srpna 2026. Spárované souboje skončily v bitvě o Anauroch, souběžně s finále na Pyramidě času. Verše s doloženým výkladem odkazují na místo, kde se to stalo.</span><a href="#${FIN_CH}">${esc(chTitle(FIN_CH))} ▸</a></p>
         <p class="pr-note ui">U ${known} dvojverší je z her známo, komu patří. Klepněte na <span class="pr-key">✦</span>.</p>
         ${P.chapters.map((c, i) => `<section class="pr-ch" data-ch="${i}" aria-label="Kapitola ${NAMES[i]}">
           <div class="pr-mobpic">${img('ilu/' + (c.img || P.img), { alt: '', sizes: '100vw', pos: '50% 30%' })}</div>

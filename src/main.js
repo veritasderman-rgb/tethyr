@@ -21,6 +21,7 @@ import './styles/base.css';
 import './styles/sections.css';
 import './styles/system.css';
 import './styles/scenes.css';
+import './styles/it7.css';
 
 import { need } from './lib/data.js';
 import { register, ensure, sections, emit } from './lib/sections.js';
@@ -33,7 +34,10 @@ import { renderParty } from './sections/party.js';
 import { renderBattles } from './sections/battles.js';
 import { renderProphecy } from './sections/prophecy.js';
 import { renderTimeline } from './sections/timeline.js';
-import { renderRegistry } from './sections/registry.js';
+import { renderLexikon } from './sections/lexikon.js';
+import { initMenu, setCurrent } from './lib/menu.js';
+import { initSearch } from './lib/search.js';
+import { initHoverCards } from './lib/hovercard.js';
 import { renderTable } from './sections/table.js';
 import { renderHymna } from './sections/hymna.js';
 import { renderPodekovani } from './sections/podekovani.js';
@@ -50,7 +54,7 @@ register('druzina', renderParty, ['images', 'characters', 'sessions', 'svedectvi
 register('bitvy', renderBattles, ['images', 'world', 'sessions', 'svedectvi', 'map']);
 register('proroctvi', renderProphecy, ['images', 'prophecy', 'books', 'vypraveni']);
 register('osa', renderTimeline, ['images', 'timeline', 'characters']);
-register('rejstrik', renderRegistry, ['npcs', 'sessions']);
+register('lexikon', renderLexikon, ['lexikon', 'sessions', 'images']);
 register('stul', renderTable, ['images', 'gallery', 'sessions']);
 register('hymna', renderHymna, ['images']);
 register('podekovani', renderPodekovani, ['images']);
@@ -58,21 +62,15 @@ register('podekovani', renderPodekovani, ['images']);
 const BASE_TITLE = document.title;
 function nav() {
   const bar = $('#topbar');
-  const btn = $('#menuBtn');
-  const more = $('#moreBtn');
-  const menu = $('#mainNav');
-  const setOpen = (o) => { [btn, more].forEach((b) => b.setAttribute('aria-expanded', o)); menu.classList.toggle('open', o); document.body.classList.toggle('nav-open', o); };
-  [btn, more].forEach((b) => b.addEventListener('click', () => setOpen(b.getAttribute('aria-expanded') !== 'true')));
-  menu.addEventListener('click', (e) => { if (e.target.closest('a, button')) setOpen(false); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && menu.classList.contains('open')) setOpen(false); });
-  document.addEventListener('pointerdown', (e) => { if (menu.classList.contains('open') && !e.target.closest('#mainNav, #moreBtn, #menuBtn')) setOpen(false); });
+  initMenu(); initSearch(); initHoverCards();
   const onScroll = () => bar.classList.toggle('solid', window.scrollY > window.innerHeight * 0.6);
   window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
   // zvýraznění aktivního oddílu
-  const links = [...$$('a', menu), ...$$('a', $('#bottomNav'))];
+  const links = [...$$('a', $('#bottomNav'))];
   const io = new IntersectionObserver((ents) => {
     for (const e of ents) if (e.isIntersecting) {
       links.forEach((a) => a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id));
+      setCurrent(e.target.id);
       // titulek karty podle toho, kde čtenář je (u kapitol příběhu titulek nastavuje story.js)
       const id = e.target.id, lab = SECTION_LABEL[id];
       if (lab) document.title = id === 'uvod' ? BASE_TITLE : id === 'pribeh' && window.__chTitle ? `${window.__chTitle} · Příběh · Západní draci` : `${lab} · Západní draci`;
@@ -88,6 +86,7 @@ function sectionOf(hash) {
   if (/^b-/.test(sec)) return 'bitvy';
   if (/^pv-/.test(sec)) return 'proroctvi';
   if (sec === 'mapa3d') return 'mapa';
+  if (sec === 'lx' || sec === 'rejstrik') return 'lexikon';
   return sec;
 }
 
@@ -132,6 +131,12 @@ async function route(first) {
   const hash = decodeURIComponent(location.hash.slice(1));
   if (!hash) return;
   const [sec, sub] = hash.split('/');
+  if (sec === 'lx' && sub) {
+    await ensure('lexikon');
+    window.dispatchEvent(new CustomEvent('lexikon:open', { detail: { id: sub } }));
+    return;
+  }
+  if (sec === 'rejstrik') { await ensure('lexikon'); settleScroll(document.getElementById('lexikon')); return; }
   if (sec === 'svedectvi' && sub) {
     emit('witness:open', { id: sub, autoplay: false });
     return;

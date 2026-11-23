@@ -17,7 +17,7 @@ with sync_playwright() as p:
         groups = pg.evaluate("[...document.querySelectorAll('.wg')].map(g => [g.dataset.g, g.querySelectorAll('.wc').length])")
         ok(f'[{name}] tři skupiny galerie', [g[0] for g in groups] == ['spojenci', 'nepratele', 'mocni'], str(groups))
         past = pg.evaluate("[...document.querySelectorAll('.wc.past')].map(c => c.querySelector('.wc-name').textContent + ' ' + c.querySelector('.wc-x').textContent.trim())")
-        ok(f'[{name}] padlí mají křížek a letopočet', len(past) == 6 and all('138' in x or '137' in x for x in past), str(past))
+        ok(f'[{name}] padlí mají křížek a letopočet', len(past) == 7 and all('138' in x or '137' in x for x in past), str(past))  # od it7 i Chuang-Li (zrádkyně, † Cham Fau)
         pg.evaluate("document.querySelector('#wGal').scrollIntoView({behavior:'instant'})"); pg.wait_for_timeout(900)
         pg.screenshot(path=f'{OUT}/{name}-galerie-spojenci.png')
         pg.evaluate("document.querySelector('.wg[data-g=nepratele]').scrollIntoView({behavior:'instant', block:'start'})"); pg.wait_for_timeout(900)
@@ -31,7 +31,7 @@ with sync_playwright() as p:
         tap('[data-f=nepratele]'); pg.wait_for_timeout(300)
         tap('[data-act=next]'); pg.wait_for_timeout(3500)
         cur = pg.evaluate("__wit.cur")
-        ok(f'[{name}] další v střihu Nepřátelé', cur in ['thalaxia', 'yamun-ii', 'yamoh-hokhra', 'axel-adamantis', 'devrel', 'rivalen', 'sar-saratar'], cur)
+        ok(f'[{name}] další v střihu Nepřátelé', cur in ['thalaxia', 'yamun-ii', 'yamoh-hokhra', 'axel-adamantis', 'devrel', 'rivalen', 'sar-saratar', 'chuang-li'], cur)
         pg.screenshot(path=f'{OUT}/{name}-prehravac-nepritel.png')
         # skok +10 s
         t1 = pg.evaluate("__voice.currentTime"); tap('[data-act=fwd]'); pg.wait_for_timeout(400); t2 = pg.evaluate("__voice.currentTime")

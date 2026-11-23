@@ -7,11 +7,20 @@ Formát zdroje (ručně psané, fakta z dat kroniky a z textů hráčů):
   > citace z textu hráče
   > — Jméno, název textu
 Řádky začínající „# “ jsou poznámky.
+
+Odkazy x: na hesla Lexikonu doplňuje automaticky scripts/build-lexikon.py (první výskyt jména v odstavci);
+ručně je psát nemusíte. Kontrola (validate) hlídá i to, že marginálie {s-…} patří ke kapitole a že
+kapitola nemá méně než MIN_WORDS slov (u řídce zapsaných kapitol je výjimka v SPARSE: zdroje mlčí).
 """
 import glob, os, re
 
-LINK = re.compile(r'\[([^\]]+)\]\(([wmbpcs]):([^)]+)\)')
+LINK = re.compile(r'\[([^\]]+)\]\(([wmbpcsx]):([^)]+)\)')
 FORBID = re.compile(r'Granan|Silverkin|Schamedar|Wu Lej|Třešňák|Kubás|Zerzan|Zerzán|Lukač|Krčm|Tetek|Pavlovi|@|https?://|tapisér|v srdci', re.I)
+MIN_WORDS = 160
+# kapitoly, kde zdroje (sezení, svět, postavy, texty hráčů, deník mistra Ho, kniha v12) víc neříkají
+SPARSE = set()  # od iterace 7 mají všechny kapitoly aspoň MIN_WORDS slov (doplněno z dat postav, NPC a bitev)
+# marginálie se sezením jiné kapitoly, kde je to oprávněné (s-2006 shrnuje celé tažení Shou Lungem)
+SHARED = {('ch-shou-lung-a-velke-tazeni', 's-2006')}
 KDO = {'Pepa', 'Lukáš', 'Vojta', 'Zdeněk T.', 'Zdeněk K.', 'Terka', 'Tomáš', 'Venca', 'Jana'}
 
 
@@ -81,7 +90,30 @@ def validate(V, chapters, ids):
                 print(f'  !! vyprávění {ch}: otazník (řečnická otázka?) v odstavci'); bad += 1
             if 'q' in b and b['kdo'] not in KDO:
                 print(f'  !! vyprávění {ch}: citace bez hráče/PJ jako autora: {b["kdo"]!r}'); bad += 1
+    sess_of = {c['id']: set(c.get('sessions', [])) for c in chapters}
+    for ch, blocks in V.items():
+        own = sess_of.get(ch, set())
+        for b in blocks:
+            for s in b.get('s', []):
+                if own and s not in own and (ch, s) not in SHARED:
+                    print(f'  !! vyprávění {ch}: marginálie {s} nepatří ke kapitole'); bad += 1
+            if 'q' in b and not b.get('zdroj'):
+                print(f'  !! vyprávění {ch}: citace bez názvu zdroje'); bad += 1
+        n = words(blocks)
+        if n < MIN_WORDS and ch not in SPARSE:
+            print(f'  !! vyprávění {ch}: jen {n} slov (minimum {MIN_WORDS}, jinak zapsat do SPARSE)'); bad += 1
     for c in chapters:
         if c['id'] not in V:
             print('  !! kapitola bez vyprávění:', c['id']); bad += 1
     return bad
+
+
+def report(V):
+    """Počty slov a odstavců po kapitolách (python3 scripts/vypraveni.py)."""
+    for ch, blocks in V.items():
+        np = sum(1 for b in blocks if 'p' in b); nq = sum(1 for b in blocks if 'q' in b)
+        print(f'{ch:42s} {words(blocks):4d} slov  {np} odst.  {nq} cit.{"  (zdroje mlčí)" if ch in SPARSE else ""}')
+
+
+if __name__ == '__main__':
+    report(parse(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'vypraveni')))

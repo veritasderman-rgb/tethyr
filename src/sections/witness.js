@@ -6,12 +6,14 @@ import media from 'virtual:media';
 import { D } from '../lib/data.js';
 import { small } from '../lib/img.js';
 import { voice, load as loadVoice, stop as stopVoice, unlock, getVolume, setVolume, isMuted, setMuted, onVolume } from '../lib/audio.js';
-import { createStage, grain, STAGE_HTML, sideLabel, isFoe, isPast, stavShort, stavTitle, stavInfo, groupOf } from '../lib/wstage.js';
+import { createStage, grain, STAGE_HTML, sideLabel, isFoe, isPast, stavShort, stavTitle, stavInfo, groupOf, subsCs, subMode, setSubMode, SUB_LABEL } from '../lib/wstage.js';
 import { $, $$, esc, reduced, plural, settleScroll } from '../lib/util.js';
 
 const baseOf = (f) => f.replace(/\.[^.]+$/, '');
 const VOICE_FILE = Object.fromEntries(media.voices.map((f) => [baseOf(f), f]));
 const HAS_VIDEO = Object.fromEntries(media.video.map((f) => [baseOf(f), f]));
+// video v celé délce se synchronizovanými ústy (assets/video/<id>_plne.mp4, příznak `video_plne` v datech svědka)
+const FULL_VIDEO = Object.fromEntries(media.video.filter((f) => /_plne\.[^.]+$/.test(f)).map((f) => [baseOf(f).replace(/_plne$/, ''), f]));
 const HAS_TIMING = media.timings.includes('timing.json');
 const mmss = (t) => `${Math.floor(t / 60)}:${String(Math.round(t % 60)).padStart(2, '0')}`;
 
@@ -67,6 +69,7 @@ export function renderWitness() {
       </div>
       <div class="w-ctl-c">
         <button class="btn sm red" data-act="doc" id="wDoc">▶ Celý dokument</button>
+        <span class="w-cc" role="group" aria-label="Titulky (hlas je anglicky)"><span class="w-cc-l" aria-hidden="true">Titulky</span>${['cs', 'en', 'off'].map((m) => `<button class="btn sm ghost" data-cc="${m}" aria-pressed="${subMode() === m}">${SUB_LABEL[m]}</button>`).join('')}</span>
         <button class="btn sm ghost" data-act="trans" aria-expanded="false" aria-controls="wTrans">Přepis</button>
       </div>
     </div>
@@ -148,6 +151,7 @@ export function renderWitness() {
     const step = () => {
       if (state !== 'play' || !w) return;
       const t = clock();
+      stage.sync(t, !(hasAudio && voice.paused));
       let i = -1; for (let k = 0; k < starts.length; k++) if (t >= starts[k]) i = k;
       stage.setSub(i, w);
       const p = Math.min(1, t / total);
@@ -170,7 +174,8 @@ export function renderWitness() {
     const ix = list.findIndex((x) => x.id === w.id); cur = ix;
     $('#wStart', el).classList.add('gone');
     $('#wTap', el).hidden = true;
-    const m = stage.setWitness(w, { useVideo: true, video: HAS_VIDEO[w.id] ? `assets/video/${HAS_VIDEO[w.id]}` : '' });
+    const fullV = w.video_plne && FULL_VIDEO[w.id];
+    const m = stage.setWitness(w, { useVideo: true, video: fullV ? `assets/video/${fullV}` : HAS_VIDEO[w.id] ? `assets/video/${HAS_VIDEO[w.id]}` : '', full: !!fullV });
     $('#wProg', el).style.transform = 'scaleX(0)';
     markOn(); count(); info(w); trans(w); ui();
     let dur = 0;
@@ -205,7 +210,7 @@ export function renderWitness() {
     cancelNext();
     if (state !== 'play') return;
     acc = clock(); state = 'pause';
-    voice.pause(); stage.freeze(true);
+    voice.pause(); stage.freeze(true); stage.sync(acc, false);
     ui();
   }
   const toggle = () => (state === 'play' ? pause() : play());
@@ -251,7 +256,8 @@ export function renderWitness() {
     const box = $('#wTrans', el);
     if (!w) { box.innerHTML = ''; return; }
     box.innerHTML = `<h3>${esc(w.jmeno)}</h3><p class="w-tr-role">${esc(w.role)} · ${sideLabel(w)}${isPast(w) ? ` · ${esc(stavTitle(w))}` : ''}</p>
-      ${w.text.map((t) => `<p>${esc(t)}</p>`).join('')}`;
+      ${subsCs(w).map((t) => `<p>${esc(t)}</p>`).join('')}
+      ${w.jazyk === 'en' ? `<details class="w-tr-en"><summary>Anglický originál (namluvené znění)</summary>${w.text.map((t) => `<p lang="en">${esc(t)}</p>`).join('')}</details>` : ''}`;
   }
 
   // ---------- zrno a pauza mimo obrazovku
@@ -271,7 +277,7 @@ export function renderWitness() {
     if (state === 'idle' || !total) return;
     t = Math.max(0, Math.min(total - 0.2, t));
     if (hasAudio) voice.currentTime = t; else { acc = t; t0 = performance.now(); }
-    stage.clearSub();
+    stage.clearSub(); stage.sync(t, state === 'play');
     if (state === 'end') { state = 'pause'; play(); return; }
     let i = -1; for (let k = 0; k < starts.length; k++) if (t >= starts[k]) i = k;
     stage.setSub(i, curW()); $('#wProg', el).style.transform = `scaleX(${t / total})`;
@@ -302,6 +308,8 @@ export function renderWitness() {
   }
   const scrollToStage = () => stageEl.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
   el.addEventListener('click', (e) => {
+    const cc = e.target.closest('[data-cc]');
+    if (cc) { setSubMode(cc.dataset.cc); return; }
     const a = e.target.closest('[data-act]')?.dataset.act;
     if (a === 'play') toggle();
     else if (a === 'prev') step(-1);
@@ -336,12 +344,13 @@ export function renderWitness() {
     const w = D.witById[e.detail.id] || D.witById[ALIAS[e.detail.id]]; if (!w) return;
     if (!list.some((x) => x.id === w.id)) setFilter('all');
     const auto0 = e.detail.autoplay !== false;
-    if (!auto0) settleScroll(stageEl); // hluboký odkaz: stránka se ještě skládá
-    else scrollToStage();
+    // hluboký odkaz i proklik: oddíly mezi tím se ještě skládají (líné vykreslení), proto poloha dorovnávat
+    settleScroll(stageEl, { smooth: auto0 });
     history.replaceState(null, '', `#svedectvi/${w.id}`);
     // zvuk je odemčený při prvním doteku kdekoli na stránce (lib/audio.js); prodleva jen pro dojezd posunu
     setTimeout(() => loadW(w, { autoplay: auto0 }), auto0 ? 350 : 450);
   });
+  window.addEventListener('submode', (e) => $$('[data-cc]', el).forEach((b) => b.setAttribute('aria-pressed', b.dataset.cc === e.detail)));
   window.addEventListener('witness:focus', () => stageEl.focus({ preventScroll: true }));
 
   renderGal(); count(); ui();

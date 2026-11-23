@@ -7,6 +7,11 @@ import { ash } from '../lib/ash.js';
 import { openLightbox } from '../lib/lightbox.js';
 import { emit } from '../lib/sections.js';
 import { routeSvg, lazyMaps } from '../lib/minimap.js';
+import media from 'virtual:media';
+import STAV from '../../data/svedkove-stav.json';
+import { subsCs as subs } from '../lib/wstage.js';
+
+const VIDEO = Object.fromEntries(media.video.map((f) => [f.replace(/\.[^.]+$/, ''), f]));
 
 const KEY_POS = 'zd-cteni', KEY_DONE = 'zd-precteno';
 const store = {
@@ -14,7 +19,7 @@ const store = {
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* soukromé okno, plné úložiště */ } },
 };
 const usedWit = new Set();
-const LINK = /\[([^\]]+)\]\(([wmbpcs]):([^)]+)\)/g;
+const LINK = /\[([^\]]+)\]\(([wmbpcsx]):([^)]+)\)/g;
 
 // ---------------------------------------------------------------- texty a odkazy
 function placeOf(id) {
@@ -26,7 +31,8 @@ function link3d(id) {
 }
 /** Text vyprávění → HTML (nejdřív escapovat, pak nahradit značky odkazů). */
 function rich(t) {
-  return nb(esc(t)).replace(/\[([^\]]+)\]\(([wmbpcs]):([^)]+)\)/g, (_, txt, k, id) => {
+  return nb(esc(t)).replace(/\[([^\]]+)\]\(([wmbpcsx]):([^)]+)\)/g, (_, txt, k, id) => {
+    if (k === 'x') return `<a class="lk lk-x" href="#lx/${id}" data-lx="${id}">${txt}</a>`;
     if (k === 'w') {
       const w = D.witById[id];
       return `<a class="lk lk-w" href="#svedectvi/${id}" data-wit="${id}" title="Pustit svědectví: ${esc(w?.jmeno || '')}">${txt}<i aria-hidden="true">▶</i></a>`;
@@ -56,23 +62,24 @@ function linksIn(blocks, kind) {
 
 // ---------------------------------------------------------------- střihy a doplňky
 function quoteOf(w) {
-  const c = w.text.filter((t) => t.length > 50 && t.length < 150);
-  return (c.sort((a, b) => b.length - a.length)[0]) || w.text[0];
+  const tx = subs(w);
+  const c = tx.filter((t) => t.length > 50 && t.length < 150);
+  return (c.sort((a, b) => b.length - a.length)[0]) || tx[0];
 }
-function witnessCut(sids, skip) {
-  const cands = [];
-  for (const sid of sids) for (const id of D.witBySrc[sid] || []) if (!usedWit.has(id) && !skip.includes(id)) cands.push(id);
-  if (!cands.length) return '';
-  const id = cands[0]; usedWit.add(id);
+/** Vsazený „hlas svědka“ uprostřed textu: živý portrét (video ve smyčce, bez zvuku), jedna věta ze svědectví, Přehrát. */
+function voiceCard(cands) {
+  const id = cands.find((x) => D.witById[x] && !usedWit.has(x));
+  if (!id) return '';
+  usedWit.add(id);
   const w = D.witById[id];
-  return `<aside class="cut rv" aria-label="Střih na svědectví">
-    <div class="cut-img">${img(w.portret, { alt: w.jmeno, sizes: '(max-width:760px) 100vw, 50vw', pos: w.fokus || '50% 30%' })}</div>
-    <div class="cut-txt">
-      <p class="cut-k">Svědectví · ${w.strana === 'nepřítel' ? '<b class="foe">nepřítel</b>' : 'spojenec'}</p>
+  const past = w.stav && w.stav !== 'žije';
+  const vid = VIDEO[id];
+  return `<aside class="vc rv${w.strana === 'nepřítel' ? ' foe' : ''}${past ? ' past' : ''}" aria-label="Hlas svědka: ${esc(w.jmeno)}">
+    <div class="vc-m">${img(w.portret, { alt: '', sizes: '(max-width:760px) 40vw, 260px', pos: w.fokus || '50% 30%' })}${vid ? `<video class="vc-v" data-src="assets/video/${esc(vid)}" muted loop playsinline preload="none" aria-hidden="true"></video>` : ''}</div>
+    <div class="vc-t"><p class="vc-k">Hlas svědka · ${w.strana === 'nepřítel' ? '<b class="foe">nepřítel</b>' : w.skupina === 'nadhled' ? 'z nadhledu' : 'spojenec'}${past ? ` · ${esc(w.stav)}${STAV[id]?.rok ? ` ${STAV[id].rok} DR` : ''}` : ''}</p>
       <blockquote>„${esc(quoteOf(w))}“</blockquote>
-      <p class="cut-n"><b>${esc(w.jmeno)}</b><span>${esc(w.role)}</span></p>
-      <button class="btn sm" data-wit="${esc(w.id)}">▶ Pustit celé svědectví</button>
-    </div></aside>`;
+      <p class="vc-n"><b>${esc(w.jmeno)}</b><span>${esc(w.role)}</span></p>
+      <button class="btn sm red" data-wit="${esc(w.id)}" aria-label="Přehrát svědectví: ${esc(w.jmeno)}">▶ Přehrát</button></div></aside>`;
 }
 function chapMap(c, book) {
   const r = routeSvg(c.route, { cls: 'mc', lazy: true });
@@ -113,12 +120,16 @@ function chapterHtml(c, book, n, prev, next) {
   const list = c.sessions.map((id) => D.sesById[id]).filter(Boolean);
   const lead = c.gallery.find((g) => g.k.startsWith('ilu/'));
   let pi = 0, lastS = '';
+  const nP = blocks.filter((b) => b.p).length;
+  const voiceAt = Math.max(2, Math.min(nP - 1, Math.ceil(nP / 2)));
+  const voiceCands = [...new Set([...linksIn(blocks, 'w'), ...c.sessions.flatMap((s) => D.witBySrc[s] || [])])];
   const body = blocks.map((b) => {
-    if (b.q) return `<blockquote class="vq rv"><p>${/^[„"]/.test(b.q) ? rich(b.q) : `„${rich(b.q)}“`}</p><footer>— ${esc(b.kdo)}${b.zdroj ? `, <cite>${esc(b.zdroj)}</cite>` : ''}</footer></blockquote>`;
+    if (b.q) return `<blockquote class="vq rv"><p class="vq-k">${b.kdo === 'Zdeněk T.' ? 'Z textů Pána jeskyně' : 'Z deníků a textů hráčů'}</p><p>${/^[„"]/.test(b.q) ? rich(b.q) : `„${rich(b.q)}“`}</p><footer><b>${esc(b.kdo)}</b>${b.zdroj ? `<cite>${esc(b.zdroj)}</cite>` : ''}</footer></blockquote>`;
     pi++;
     const sk = (b.s || []).join();
     let h = `<div class="vp-w">${sk && sk !== lastS ? margin(b.s) : ''}<p class="vp${pi === 1 ? ' dc' : ''}">${rich(b.p)}</p></div>`;
     if (sk) lastS = sk;
+    if (pi === voiceAt) h += voiceCard(voiceCands);
     if (pi === 2 && lead) h += `<figure class="v-fig rv" data-lb="${esc(largest(lead.k))}" data-cap="${esc(lead.cap)}"><div class="pic" style="aspect-ratio:${ratio(lead.k).toFixed(3)}">${img(lead.k, { alt: lead.cap, sizes: '(max-width:820px) 92vw, 760px' })}</div><figcaption>${esc(lead.cap)}</figcaption></figure>`;
     return h;
   }).join('');
@@ -128,6 +139,7 @@ function chapterHtml(c, book, n, prev, next) {
   const gal = c.gallery;
   const real = c.real, dr = c.drs;
   return `<section class="chap" id="${c.id}" data-ch="${c.id}" aria-labelledby="${c.id}-h">
+    <div class="chap-tr" aria-hidden="true">${lead ? `<div class="chap-tr-img">${img(lead.k, { alt: '', sizes: '100vw', pos: '50% 40%' })}</div>` : ''}<span class="chap-tr-n">${n}</span></div>
     <header class="chap-h rv"><p class="chap-n">${esc(book.kap)} · kapitola ${n}</p><h3 id="${c.id}-h">${esc(c.title)}</h3>
       <p class="chap-m"><span>${esc(real)} u stolu</span>${dr ? `<span>${esc(dr)}</span>` : ''}<span>${plural(list.length, 'sezení', 'sezení', 'sezení')}</span><span>čtení asi ${c.min} min</span></p>
       <button class="chap-print" type="button" data-print="${c.id}" aria-label="Vytisknout kapitolu ${esc(c.title)}">Vytisknout kapitolu</button></header>
@@ -141,9 +153,38 @@ function chapterHtml(c, book, n, prev, next) {
     ${chapMap(c, book)}
     ${gal.length ? `<div class="chap-gal rv" aria-label="Galerie kapitoly"><h5>Obrazy a fotky od stolu <span>${gal.length}</span></h5><div class="cg">${gal.slice(0, 12).map((g, i) => `<button class="cg-i${g.k.startsWith('foto/') ? ' ph' : ''}" data-gi="${i}" aria-label="Zvětšit: ${esc(g.cap)}"><img src="${small(g.k)}" alt="" loading="lazy" decoding="async"></button>`).join('')}${gal.length > 12 ? `<button class="cg-more" data-gi="12">+${gal.length - 12}</button>` : ''}</div></div>` : ''}
     <details class="chap-ses"><summary>Kronika sezení <span>${list.length}</span></summary><ol class="sessions">${list.map(sessionHtml).join('')}</ol></details>
-    ${witnessCut(c.sessions, [])}
     <nav class="chap-nav" aria-label="Další kapitoly">${prev ? `<a href="#${prev.id}" class="cn-prev"><span>◂ Kapitola ${n - 1}</span><b>${esc(prev.title)}</b></a>` : '<span></span>'}${next ? `<a href="#${next.id}" class="cn-next"><span>Kapitola ${n + 1} ▸</span><b>${esc(next.title)}</b></a>` : '<a href="#svedectvi" class="cn-next"><span>Dál ▸</span><b>Svědectví</b></a>'}</nav>
   </section>`;
+}
+
+// ---------------------------------------------------------------- konec knihy: co se změnilo (jen z dat)
+function castOf(b) { return new Set(b.chapters.flatMap((c) => (c.cast || []).map(([ch]) => ch))); }
+function changes(b, books) {
+  const i = books.indexOf(b);
+  const before = new Set(books.slice(0, i).flatMap((x) => [...castOf(x)]));
+  const after = new Set(books.slice(i + 1).flatMap((x) => [...castOf(x)]));
+  const now = castOf(b);
+  const pBefore = new Set(books.slice(0, i).flatMap((x) => x.chapters.flatMap((c) => c.players || [])));
+  const pNow = [...new Set(b.chapters.flatMap((c) => c.players || []))];
+  const came = [...now].filter((x) => !before.has(x));
+  const left = i < books.length - 1 ? [...now].filter((x) => !after.has(x)) : [];
+  const newPlayers = i ? pNow.filter((x) => !pBefore.has(x)) : [];
+  const sesIds = new Set(b.chapters.flatMap((c) => c.sessions));
+  const bats = D.world.battles.filter((x) => sesIds.has(x.session));
+  const fallen = Object.entries(STAV).filter(([k, v]) => k !== 'popis' && v && (sesIds.has(v.zdroj) || bats.some((x) => x.id === v.zdroj))).map(([k, v]) => [D.witById[k]?.jmeno || k, v, D.witById[k]?.stav]);
+  const seenPl = new Set(D.map.route.filter((r) => ['I', 'II', 'III', 'IV', 'V'].indexOf(r.era) < i).map((r) => r.place));
+  const newPl = [...new Set(D.map.route.filter((r) => r.era === b.key).map((r) => r.place))].filter((p) => !seenPl.has(p));
+  const li = (k, v) => v ? `<div class="bc-r"><dt>${k}</dt><dd>${v}</dd></div>` : '';
+  const rows = [
+    li('Nově v družině', came.length ? came.map(esc).join(', ') : ''),
+    li('Noví hráči u stolu', newPlayers.map(esc).join(', ')),
+    li('Naposledy ve hře', left.length ? left.map(esc).join(', ') : ''),
+    li('Padli a zmizeli', fallen.map(([n, v, s]) => `${esc(n.split(' (')[0])} <span>(${s === 'zmizel' ? 'zmizel' : 'padl'}, ${esc(v.kde)})</span>`).join(', ')),
+    li('Bitvy', bats.map((x) => `<a href="#${x.id}">${esc(x.name)}</a> <span>${esc(x.outcome.split('.')[0])}</span>`).join('<br>')),
+    li('Poprvé na mapě', newPl.length ? `${newPl.length} míst: ${newPl.slice(0, 8).map(esc).join(', ')}${newPl.length > 8 ? ' …' : ''}` : ''),
+  ].join('');
+  return `<aside class="book-chg rv" aria-label="Co se změnilo v knize ${esc(b.key)}"><p class="bc-k">${esc(b.kap)} · konec</p><h4>Co se změnilo</h4><dl>${rows}</dl>
+    <p class="bc-f">Sestaveno z dat kroniky: obsazení kapitol, bojová hlášení, trasa a stav svědků.</p></aside>`;
 }
 
 // ---------------------------------------------------------------- oddíl
@@ -162,18 +203,27 @@ export function renderStory() {
     <nav class="booknav" aria-label="Knihy">${books.map((b) => `<a href="#kniha-${b.key}"><b>${b.key}</b><span>${esc(b.title)}</span></a>`).join('')}</nav>`;
   let n = 0;
   for (const b of books) {
+    const sent = b.summary.match(/[^.!]+[.!]+(\s|$)/g) || [b.summary];
+    const head = sent.slice(0, 2).join('').trim(), rest = sent.slice(2).join('').trim();
+    const players = [...new Set(b.chapters.flatMap((c) => c.players || []))];
+    const bRoute = [...new Set(b.chapters.flatMap((c) => c.route || []))].sort((x, y) => x - y);
+    const bmap = routeSvg(bRoute, { cls: 'bm', lazy: true, label: false, aspect: 1.5, pad: 50 });
     html += `<article class="book" id="kniha-${b.key}" aria-label="${esc(b.kap)}: ${esc(b.title)}">
       <div class="book-open">
         <div class="book-bg">${img('ilu/' + b.img, { alt: '', sizes: '100vw', pos: '50% 35%' }).replace('<img ', '<img data-par="0.12" data-scale="1.16" ')}</div>
         <div class="book-shade"></div>
+        <span class="book-num" aria-hidden="true">${b.key}</span>
         <div class="book-t">
           <p class="book-k rv">${esc(b.kap)}</p>
           <h3 class="rv d1">${esc(b.title)}</h3>
-          <dl class="book-3 rv d2"><div><dt>Ve hře</dt><dd>${esc(b.dr)}</dd></div><div><dt>U stolu</dt><dd>${esc(b.real)}</dd></div><div><dt>Sezení</dt><dd>${b.sessions}</dd></div><div><dt>Čtení</dt><dd>${b.chapters.reduce((s, c) => s + c.min, 0)} min</dd></div></dl>
+          <p class="book-perex rv d2">${esc(nb(head))}</p>
+          <dl class="book-3 rv d2"><div><dt>U stolu</dt><dd>${esc(b.real)}</dd></div><div><dt>Ve hře</dt><dd>${esc(b.dr)}</dd></div><div><dt>Sezení</dt><dd>${b.sessions}</dd></div><div><dt>Kapitol</dt><dd>${b.chapters.length}</dd></div></dl>
+          <p class="book-who rv d3"><span>Hráli</span>${players.map((x) => `<b>${esc(x)}</b>`).join('')}</p>
         </div>
+        ${bmap ? `<figure class="book-map rv d3" aria-label="Úsek mapy ${esc(b.kap.toLowerCase())}">${bmap.svg}<figcaption>${esc(bmap.names.length)} míst na trase</figcaption></figure>` : ''}
       </div>
       <div class="book-intro wrap-text">
-        <p class="lead rv">${esc(nb(b.summary))}</p>
+        ${rest ? `<p class="lead rv">${esc(nb(rest))}</p>` : ''}
         <div class="book-keys rv"><div><h5>Hlavní místa</h5><p>${b.key_places.map((x) => `<span class="chip">${esc(x)}</span>`).join(' ')}</p></div>
         <div><h5>Protivníci</h5><p>${b.key_enemies.map((x) => `<span class="chip red">${esc(x)}</span>`).join(' ')}</p></div></div>
         ${b.side.map((c) => `<div class="side rv"><p class="side-k">Souběžně · ${esc(c.real)} u stolu · ${esc(c.dr)}</p><h5>${esc(c.title)}</h5><p>${esc(nb(c.summary))}</p></div>`).join('')}
@@ -184,7 +234,7 @@ export function renderStory() {
       const prev = chs[n - 2]?.c, next = chs[n]?.c;
       html += chapterHtml(c, b, n, prev, next);
     });
-    html += `</article>`;
+    html += changes(b, books) + `</article>`;
   }
   // obsah s postupem čtení (na širokých obrazovkách vlevo, jinak jako vysouvací list)
   html += `<div class="toc-bar" aria-hidden="true"><i id="tocBarI"></i></div>
@@ -200,6 +250,23 @@ export function renderStory() {
 
   wireClicks(el);
   wireReading(el, chs);
+  wireVoices(el);
+}
+
+/** Živé portréty ve vsazených hlasech svědků: video (bez zvuku) hraje jen ve viditelné kartě, na desktopu a bez úsporného režimu. */
+function wireVoices(el) {
+  const ok = !reduced() && window.matchMedia('(min-width: 761px)').matches && !navigator.connection?.saveData;
+  if (!ok) return;
+  const io = new IntersectionObserver((ents) => {
+    for (const e of ents) {
+      const v = e.target.querySelector('video'); if (!v) continue;
+      if (e.isIntersecting) {
+        if (!v.src) { v.src = v.dataset.src; v.addEventListener('playing', () => v.classList.add('on'), { once: true }); }
+        v.play().catch(() => {});
+      } else v.pause();
+    }
+  }, { threshold: 0.5 });
+  $$('.vc', el).forEach((c) => io.observe(c));
 }
 
 function wireClicks(el) {
@@ -284,6 +351,7 @@ function wireReading(el, chs) {
       if (cur >= 0) items[secs[cur].id].lastElementChild.style.setProperty('--p', done.has(secs[cur].id) ? 1 : 0);
       cur = k; curAt = performance.now();
       window.__chTitle = k >= 0 ? chs[k].c.title : '';
+      window.__chId = k >= 0 ? chs[k].c.id : '';
       if (inStory && k >= 0) document.title = `${chs[k].c.title} · Příběh · Západní draci`;
       Object.values(items).forEach((a) => a.classList.remove('on'));
       if (k >= 0) {

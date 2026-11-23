@@ -18,11 +18,20 @@ export function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
 export const nb = (s) => String(s ?? '').replace(/(^|[\s(„])([kKsSvVzZoOuUaAiI])\s+/g, '$1$2 ');
 /** Doskroluje na prvek a polohu několikrát dorovná (lazy obrázky nad ním posouvají rozložení), dokud uživatel sám neposkroluje. */
 export function settleScroll(el, { smooth = false, key = () => true, now = true } = {}) {
-  const go = (b) => { const y = el.getBoundingClientRect().top + window.scrollY - (document.getElementById('topbar')?.offsetHeight || 0) - 12; window.scrollTo({ top: y, behavior: b ? 'smooth' : 'auto' }); };
+  let lastY = null, touched = false;
+  const target = () => el.getBoundingClientRect().top + window.scrollY - (document.getElementById('topbar')?.offsetHeight || 0) - 12;
+  const go = (b) => { const y = target(); lastY = b ? null : y; window.scrollTo({ top: y, behavior: b ? 'smooth' : 'instant' }); if (b) setTimeout(() => { lastY = window.scrollY; }, 900); };
   if (now) requestAnimationFrame(() => go(smooth && !reduced()));
-  let touched = false;
   const stop = () => { touched = true; };
   window.addEventListener('wheel', stop, { once: true, passive: true });
   window.addEventListener('touchstart', stop, { once: true, passive: true });
-  [450, 1000, 1900, 3300].forEach((ms) => setTimeout(() => { if (!touched && key()) go(false); }, ms));
+  window.addEventListener('keydown', stop, { once: true });
+  // dorovnat jen tehdy, když stránkou mezitím neposunul někdo jiný (jiný odkaz, skript, klávesnice)
+  [450, 1000, 1900, 3300].forEach((ms) => setTimeout(() => {
+    if (touched || !key()) return;
+    // posun jinam (ne k cíli) = někdo jiný stránkou pohnul (jiný odkaz, skript, klávesnice): přestat dorovnávat
+    const tg = target();
+    if (lastY != null && Math.abs(window.scrollY - lastY) > 60 && Math.abs(tg - window.scrollY) > Math.abs(tg - lastY) && Math.abs(tg - window.scrollY) > window.innerHeight) { touched = true; return; }
+    go(false);
+  }, ms));
 }
