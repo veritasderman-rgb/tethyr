@@ -5,7 +5,8 @@ import { img, largest, small, ratio } from '../lib/img.js';
 import { $, $$, esc, nb, plural, reduced, settleScroll } from '../lib/util.js';
 import { ash } from '../lib/ash.js';
 import { openLightbox } from '../lib/lightbox.js';
-import { emit } from '../lib/sections.js';
+import { emit, navigate, bookPath, chPath, sesPath, nextAfter } from '../lib/router.js';
+import { observe, parallax } from '../lib/reveal.js';
 import { routeSvg, lazyMaps } from '../lib/minimap.js';
 import media from 'virtual:media';
 import STAV from '../../data/svedkove-stav.json';
@@ -140,9 +141,8 @@ function chapterHtml(c, book, n, prev, next) {
   const real = c.real, dr = c.drs;
   return `<section class="chap" id="${c.id}" data-ch="${c.id}" aria-labelledby="${c.id}-h">
     <div class="chap-tr" aria-hidden="true">${lead ? `<div class="chap-tr-img">${img(lead.k, { alt: '', sizes: '100vw', pos: '50% 40%' })}</div>` : ''}<span class="chap-tr-n">${n}</span></div>
-    <header class="chap-h rv"><p class="chap-n">${esc(book.kap)} · kapitola ${n}</p><h3 id="${c.id}-h">${esc(c.title)}</h3>
-      <p class="chap-m"><span>${esc(real)} u stolu</span>${dr ? `<span>${esc(dr)}</span>` : ''}<span>${plural(list.length, 'sezení', 'sezení', 'sezení')}</span><span>čtení asi ${c.min} min</span></p>
-      <button class="chap-print" type="button" data-print="${c.id}" aria-label="Vytisknout kapitolu ${esc(c.title)}">Vytisknout kapitolu</button></header>
+    <header class="chap-h rv"><p class="chap-n">${esc(book.kap)} · kapitola ${n}</p><h1 id="${c.id}-h" tabindex="-1">${esc(c.title)}</h1>
+      <p class="chap-m"><span>${esc(real)} u stolu</span>${dr ? `<span>${esc(dr)}</span>` : ''}<span>${plural(list.length, 'sezení', 'sezení', 'sezení')}</span><span>čtení asi ${c.min} min</span></p></header>
     ${c.cast?.length ? `<p class="chap-cast rv"><b>Kdo hrál</b> ${c.cast.map(([ch, p]) => `<span>${esc(ch)}${p ? ` <i>${esc(p)}</i>` : ''}</span>`).join('')}</p>` : ''}
     <div class="chap-body">${body}</div>
     <div class="chap-x rv">
@@ -153,7 +153,8 @@ function chapterHtml(c, book, n, prev, next) {
     ${chapMap(c, book)}
     ${gal.length ? `<div class="chap-gal rv" aria-label="Galerie kapitoly"><h5>Obrazy a fotky od stolu <span>${gal.length}</span></h5><div class="cg">${gal.slice(0, 12).map((g, i) => `<button class="cg-i${g.k.startsWith('foto/') ? ' ph' : ''}" data-gi="${i}" aria-label="Zvětšit: ${esc(g.cap)}"><img src="${small(g.k)}" alt="" loading="lazy" decoding="async"></button>`).join('')}${gal.length > 12 ? `<button class="cg-more" data-gi="12">+${gal.length - 12}</button>` : ''}</div></div>` : ''}
     <details class="chap-ses"><summary>Kronika sezení <span>${list.length}</span></summary><ol class="sessions">${list.map(sessionHtml).join('')}</ol></details>
-    <nav class="chap-nav" aria-label="Další kapitoly">${prev ? `<a href="#${prev.id}" class="cn-prev"><span>◂ Kapitola ${n - 1}</span><b>${esc(prev.title)}</b></a>` : '<span></span>'}${next ? `<a href="#${next.id}" class="cn-next"><span>Kapitola ${n + 1} ▸</span><b>${esc(next.title)}</b></a>` : '<a href="#svedectvi" class="cn-next"><span>Dál ▸</span><b>Svědectví</b></a>'}</nav>
+    <p class="chap-pr"><button class="chap-print" type="button" data-print="${c.id}" aria-label="Vytisknout kapitolu ${esc(c.title)}">Vytisknout kapitolu</button></p>
+    <nav class="chap-nav" aria-label="Předchozí kapitola a obsah knihy">${prev ? `<a href="${chPath(prev.id)}" class="cn-prev"><span>◂ Kapitola ${n - 1}</span><b>${esc(prev.title)}</b></a>` : `<a href="/pribeh" class="cn-prev"><span>◂ Příběh</span><b>Přehled pěti knih</b></a>`}<a href="${bookPath(book.key)}" class="cn-next cn-book"><span>Obsah knihy ${book.key}</span><b>${esc(book.title)}</b></a></nav>
   </section>`;
 }
 
@@ -187,35 +188,65 @@ function changes(b, books) {
     <p class="bc-f">Sestaveno z dat kroniky: obsazení kapitol, bojová hlášení, trasa a stav svědků.</p></aside>`;
 }
 
-// ---------------------------------------------------------------- oddíl
+// ---------------------------------------------------------------- stránky Příběhu
+// /pribeh = rozcestník pěti knih, /pribeh/kniha-N = kniha (předěl, perex, obsah), /pribeh/kniha-N/<kapitola> = kapitola.
+// Žádná nekonečná stránka: každá kapitola je samostatná stránka, na konci „Dál“ na další kapitolu (router).
+let chs = [], view = null, stopReading = null;
+const chIndex = (id) => chs.findIndex((x) => x.c.id === id);
+
 export function renderStory() {
   const el = $('#pribeh');
+  chs = D.books.flatMap((b) => b.chapters.map((c) => ({ c, b })));
+  el.innerHTML = `<div id="stView"></div>
+    <div class="toc-bar" aria-hidden="true"><i id="tocBarI"></i></div>
+    <nav class="toc" id="toc" aria-label="Obsah příběhu">
+      <div class="toc-h"><b>Obsah</b><span id="tocPct">0 %</span><button class="toc-x" type="button" aria-label="Zavřít obsah">×</button></div>
+      <ol>${D.books.map((b) => `<li class="toc-b"><a href="${bookPath(b.key)}" class="toc-bk"><b>${b.key}</b> ${esc(b.title)}</a><ol>${b.chapters.map((c) => `<li><a href="${chPath(c.id)}" data-toc="${c.id}"><span class="tn">${chIndex(c.id) + 1}</span><span class="tt">${esc(c.title)}</span><span class="tm">${c.min}′</span><i style="--p:0"></i></a></li>`).join('')}</ol></li>`).join('')}</ol>
+      <p class="toc-f">← → předchozí a další kapitola</p>
+    </nav>
+    <button class="toc-btn" id="tocBtn" type="button" aria-controls="toc" aria-expanded="false"><span>☰ Obsah</span><b id="tocBtnCh"></b></button>`;
+  wireClicks(el);
+  wireKeys();
+  const done = new Set(store.get(KEY_DONE, []));
+  for (const id of done) $(`[data-toc="${id}"]`, el)?.classList.add('done');
+}
+
+function viewIndex() {
   const books = D.books;
-  const chs = books.flatMap((b) => b.chapters.map((c) => ({ c, b })));
   const totalMin = chs.reduce((n, x) => n + x.c.min, 0);
   const pos = store.get(KEY_POS, null);
-  const posCh = pos && chs.findIndex((x) => x.c.id === pos.ch);
-  let html = `<header class="sec-head"><p class="kicker">Příběh</p><h2 id="pribeh-h">Pět knih</h2>
-    <p class="lead">Třiadvacet let hry převyprávěných ve třiceti šesti kapitolách, podrobněji než v tištěné kronice. Na okraji stojí, kdy se hrálo u stolu a kdy se to stalo ve hře. Podtržená jména otevírají svědectví, místa na mapě, bitvy, verše proroctví a karty postav.</p>
-    <p class="st-meta">${chs.length} kapitol · čtení celkem asi ${Math.round(totalMin / 5) * 5} minut · mezi kapitolami šipkami ← →</p>
-    ${posCh > 0 ? `<p class="st-cont"><a class="btn red" href="#${pos.ch}" data-cont>Pokračovat ve čtení ▸</a><span>naposledy kapitola ${posCh + 1}: ${esc(chs[posCh].c.title)}</span></p>` : ''}
+  const posCh = pos ? chIndex(pos.ch) : -1;
+  const done = new Set(store.get(KEY_DONE, []));
+  return `<header class="sec-head"><p class="kicker">Příběh</p><h1 id="pribeh-h" tabindex="-1">Pět knih</h1>
+    <p class="lead">Třiadvacet let hry převyprávěných ve třiceti šesti kapitolách, podrobněji než v tištěné kronice. Každá kapitola je samostatná stránka; na okraji stojí, kdy se hrálo u stolu a kdy se to stalo ve hře. Podtržená jména otevírají svědectví, místa na mapě, bitvy, verše proroctví a karty postav.</p>
+    <p class="st-meta">${chs.length} kapitol · čtení celkem asi ${Math.round(totalMin / 5) * 5} minut · přečteno ${done.size} z ${chs.length}</p>
+    <p class="st-cont">${posCh >= 0 ? `<a class="btn red" href="${chPath(pos.ch)}" data-cont>Pokračovat ve čtení ▸</a><span>naposledy kapitola ${posCh + 1}: ${esc(chs[posCh].c.title)}</span>` : `<a class="btn red" href="${chPath(chs[0].c.id)}">Začít číst: kapitola 1 ▸</a><span>${esc(chs[0].c.title)}</span>`}</p>
     <div class="orn">✦</div></header>
-    <nav class="booknav" aria-label="Knihy">${books.map((b) => `<a href="#kniha-${b.key}"><b>${b.key}</b><span>${esc(b.title)}</span></a>`).join('')}</nav>`;
-  let n = 0;
-  for (const b of books) {
-    const sent = b.summary.match(/[^.!]+[.!]+(\s|$)/g) || [b.summary];
-    const head = sent.slice(0, 2).join('').trim(), rest = sent.slice(2).join('').trim();
-    const players = [...new Set(b.chapters.flatMap((c) => c.players || []))];
-    const bRoute = [...new Set(b.chapters.flatMap((c) => c.route || []))].sort((x, y) => x - y);
-    const bmap = routeSvg(bRoute, { cls: 'bm', lazy: true, label: false, aspect: 1.5, pad: 50 });
-    html += `<article class="book" id="kniha-${b.key}" aria-label="${esc(b.kap)}: ${esc(b.title)}">
+    <ol class="bk-cards wrap" aria-label="Knihy">${books.map((b) => {
+      const n = b.chapters.filter((c) => done.has(c.id)).length;
+      const all = b.summary.match(/[^.!]+[.!]+(\s|$)/g) || [b.summary];
+      const sent = (all[0].length < 70 ? all.slice(0, 2) : all.slice(0, 1)).join('').trim();
+      return `<li class="bk-card rv"><a href="${bookPath(b.key)}"><span class="bk-img">${img('ilu/' + b.img, { alt: '', sizes: '(max-width:760px) 100vw, 33vw', pos: '50% 35%' })}</span>
+        <span class="bk-t"><span class="bk-k">${esc(b.kap)} · ${esc(b.real)} u stolu</span><b>${esc(b.title)}</b><span class="bk-p">${esc(nb(sent))}</span>
+        <span class="bk-m">${b.chapters.length} kapitol · ${b.sessions} sezení${n ? ` · přečteno ${n}` : ''}</span></span><span class="bk-no" aria-hidden="true">${b.key}</span></a></li>`;
+    }).join('')}</ol>`;
+}
+
+function viewBook(b) {
+  const sent = b.summary.match(/[^.!]+[.!]+(\s|$)/g) || [b.summary];
+  const head = sent.slice(0, 2).join('').trim(), rest = sent.slice(2).join('').trim();
+  const players = [...new Set(b.chapters.flatMap((c) => c.players || []))];
+  const bRoute = [...new Set(b.chapters.flatMap((c) => c.route || []))].sort((x, y) => x - y);
+  const bmap = routeSvg(bRoute, { cls: 'bm', lazy: true, label: false, aspect: 1.5, pad: 50 });
+  const done = new Set(store.get(KEY_DONE, []));
+  return `<article class="book" id="kniha-${b.key}" aria-labelledby="kniha-${b.key}-h">
       <div class="book-open">
-        <div class="book-bg">${img('ilu/' + b.img, { alt: '', sizes: '100vw', pos: '50% 35%' }).replace('<img ', '<img data-par="0.12" data-scale="1.16" ')}</div>
+        <div class="book-bg">${img('ilu/' + b.img, { alt: '', sizes: '100vw', pos: '50% 35%', eager: true }).replace('<img ', '<img data-par="0.12" data-scale="1.16" ')}</div>
         <div class="book-shade"></div>
         <span class="book-num" aria-hidden="true">${b.key}</span>
         <div class="book-t">
           <p class="book-k rv">${esc(b.kap)}</p>
-          <h3 class="rv d1">${esc(b.title)}</h3>
+          <h1 class="rv d1" id="kniha-${b.key}-h" tabindex="-1">${esc(b.title)}</h1>
           <p class="book-perex rv d2">${esc(nb(head))}</p>
           <dl class="book-3 rv d2"><div><dt>U stolu</dt><dd>${esc(b.real)}</dd></div><div><dt>Ve hře</dt><dd>${esc(b.dr)}</dd></div><div><dt>Sezení</dt><dd>${b.sessions}</dd></div><div><dt>Kapitol</dt><dd>${b.chapters.length}</dd></div></dl>
           <p class="book-who rv d3"><span>Hráli</span>${players.map((x) => `<b>${esc(x)}</b>`).join('')}</p>
@@ -224,33 +255,85 @@ export function renderStory() {
       </div>
       <div class="book-intro wrap-text">
         ${rest ? `<p class="lead rv">${esc(nb(rest))}</p>` : ''}
-        <div class="book-keys rv"><div><h5>Hlavní místa</h5><p>${b.key_places.map((x) => `<span class="chip">${esc(x)}</span>`).join(' ')}</p></div>
-        <div><h5>Protivníci</h5><p>${b.key_enemies.map((x) => `<span class="chip red">${esc(x)}</span>`).join(' ')}</p></div></div>
-        ${b.side.map((c) => `<div class="side rv"><p class="side-k">Souběžně · ${esc(c.real)} u stolu · ${esc(c.dr)}</p><h5>${esc(c.title)}</h5><p>${esc(nb(c.summary))}</p></div>`).join('')}
-        <ol class="book-toc rv">${b.chapters.map((c, i) => `<li><a href="#${c.id}"><span>${n + i + 1}</span>${esc(c.title)}<i>${c.min} min</i></a></li>`).join('')}</ol>
-      </div>`;
-    b.chapters.forEach((c) => {
-      n++;
-      const prev = chs[n - 2]?.c, next = chs[n]?.c;
-      html += chapterHtml(c, b, n, prev, next);
-    });
-    html += changes(b, books) + `</article>`;
-  }
-  // obsah s postupem čtení (na širokých obrazovkách vlevo, jinak jako vysouvací list)
-  html += `<div class="toc-bar" aria-hidden="true"><i id="tocBarI"></i></div>
-    <nav class="toc" id="toc" aria-label="Obsah příběhu">
-      <div class="toc-h"><b>Obsah</b><span id="tocPct">0 %</span><button class="toc-x" aria-label="Zavřít obsah">×</button></div>
-      <ol>${books.map((b) => `<li class="toc-b"><a href="#kniha-${b.key}" class="toc-bk"><b>${b.key}</b> ${esc(b.title)}</a><ol>${b.chapters.map((c) => `<li><a href="#${c.id}" data-toc="${c.id}"><span class="tn">${chs.findIndex((x) => x.c.id === c.id) + 1}</span><span class="tt">${esc(c.title)}</span><span class="tm">${c.min}′</span><i style="--p:0"></i></a></li>`).join('')}</ol></li>`).join('')}</ol>
-      <p class="toc-f">← → předchozí a další kapitola</p>
-    </nav>
-    <button class="toc-btn" id="tocBtn" aria-controls="toc" aria-expanded="false"><span>☰ Obsah</span><b id="tocBtnCh"></b></button>`;
-  el.innerHTML = html;
-  lazyMaps(el);
-  $$('.book-open', el).forEach((b) => ash(b, { count: 26 }));
+        <h2 class="book-toc-h">Kapitoly</h2>
+        <ol class="book-toc rv">${b.chapters.map((c) => { const i = chIndex(c.id); return `<li><a href="${chPath(c.id)}"${done.has(c.id) ? ' class="done"' : ''}><span>${i + 1}</span>${esc(c.title)}<i>${c.min} min${done.has(c.id) ? ' · přečteno' : ''}</i></a></li>`; }).join('')}</ol>
+        <div class="book-keys rv"><div><h3>Hlavní místa</h3><p>${b.key_places.map((x) => `<span class="chip">${esc(x)}</span>`).join(' ')}</p></div>
+        <div><h3>Protivníci</h3><p>${b.key_enemies.map((x) => `<span class="chip red">${esc(x)}</span>`).join(' ')}</p></div></div>
+        ${b.side.map((c) => `<div class="side rv"><p class="side-k">Souběžně · ${esc(c.real)} u stolu · ${esc(c.dr)}</p><h3>${esc(c.title)}</h3><p>${esc(nb(c.summary))}</p></div>`).join('')}
+      </div>
+    </article>`;
+}
 
-  wireClicks(el);
-  wireReading(el, chs);
-  wireVoices(el);
+function viewChapter(c, b) {
+  const i = chIndex(c.id);
+  const last = b.chapters[b.chapters.length - 1].id === c.id;
+  usedWit.clear();
+  return `<article class="book book-one">${chapterHtml(c, b, i + 1, chs[i - 1]?.c, chs[i + 1]?.c)}${last ? changes(b, D.books) : ''}</article>`;
+}
+
+/** Vstup na stránku Příběhu podle adresy. */
+export function enter(r, ctx = {}) {
+  const el = $('#pribeh'), box = $('#stView', el);
+  stopReading?.(); stopReading = null;
+  const b = r.book && D.books.find((x) => x.key === r.book);
+  const c = r.ch && D.chById[r.ch];
+  let key;
+  if (r.ch && (!c || !b)) { key = 'nf'; box.innerHTML = `<header class="sec-head"><p class="kicker">Příběh</p><h1 tabindex="-1">Kapitola nenalezena</h1><p class="lead">Tahle kapitola v kronice není. Vyberte knihu nebo kapitolu v obsahu.</p><p class="st-cont"><a class="btn red" href="/pribeh">Přehled pěti knih</a></p></header>`; }
+  else if (c && c.book !== b.key) { navigate(chPath(c.id) + (r.hash ? '#' + r.hash : ''), { replace: true }); return; }
+  else if (c) key = c.id;
+  else if (b) key = 'kniha-' + b.key;
+  else key = 'index';
+  if (key !== view || key === 'index') {
+    view = key;
+    if (key === 'index') box.innerHTML = viewIndex();
+    else if (key.startsWith('kniha-')) box.innerHTML = viewBook(b);
+    else if (key !== 'nf') box.innerHTML = viewChapter(c, b);
+    lazyMaps(box);
+    $$('.book-open', box).forEach((x) => ash(x, { count: 26 }));
+    wireVoices(box);
+    observe(box); parallax(box);
+  }
+  const reading = !!c && key !== 'nf';
+  document.body.classList.toggle('in-story', reading);
+  $$('[data-toc]', el).forEach((a) => { const on = reading && a.dataset.toc === c.id; a.classList.toggle('on', on); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  $('#tocBtnCh').textContent = reading ? `kap. ${chIndex(c.id) + 1}` : '';
+  if (reading) {
+    window.__chTitle = c.title; window.__chId = c.id;
+    stopReading = wireReading(c);
+    // sezení v kronice kapitoly (#s-…): rozbalit a doskrolovat
+    if (ctx.state?.para) {
+      // výsledek hledání v textu kapitoly: doskrolovat na odstavec a zvýraznit ho
+      const t = $$('.chap-body .vp', box)[ctx.state.para - 1];
+      if (t) { t.classList.add('hit'); setTimeout(() => t.classList.remove('hit'), 4500); settleScroll(t, { key: () => location.pathname === chPath(c.id) }); }
+    } else if (r.hash && /^s-/.test(r.hash)) {
+      const t = document.getElementById(r.hash);
+      if (t) { for (let d = t.closest('details'); d; d = d.parentElement?.closest('details')) d.open = true; t.classList.add('hit'); setTimeout(() => t.classList.remove('hit'), 4000); settleScroll(t, { key: () => location.hash === '#' + r.hash }); }
+    } else if (ctx.state?.resume) {
+      const pos = store.get(KEY_POS, null);
+      if (pos?.ch === c.id && pos.y > 300) settleScroll({ getBoundingClientRect: () => ({ top: pos.y - window.scrollY + (document.getElementById('topbar')?.offsetHeight || 0) + 12 }) }, { key: () => location.pathname === chPath(c.id) });
+    }
+  } else { window.__chTitle = ''; window.__chId = ''; }
+}
+export function leave() { stopReading?.(); stopReading = null; document.body.classList.remove('in-story'); toggleToc(false); }
+
+/** Drobečky, titulek a „Dál“ pro stránky Příběhu. */
+export function meta(r) {
+  const b = r.book && D.books.find((x) => x.key === r.book);
+  const c = r.ch && D.chById[r.ch];
+  if (!b) return { crumbs: [], title: 'Příběh · Západní draci', next: { href: bookPath('I'), label: `${D.books[0].kap}: ${D.books[0].title}`, sub: `${D.books[0].chapters.length} kapitol · ${D.books[0].real} u stolu` } };
+  const bk = `${b.kap}: ${b.title}`;
+  if (!c) {
+    const f = b.chapters[0];
+    return { crumbs: [['Příběh', '/pribeh'], [bk, null]], title: `${b.kap} · ${b.title} · Příběh · Západní draci`, desc: b.summary.slice(0, 180),
+      next: { href: chPath(f.id), label: `Kapitola ${chIndex(f.id) + 1}: ${f.title}`, sub: `čtení asi ${f.min} min`, k: 'Začít číst' } };
+  }
+  const i = chIndex(c.id), nx = chs[i + 1];
+  let next;
+  if (!nx) next = { ...nextAfter('pribeh'), k: 'Dál' };
+  else if (nx.b.key !== b.key) next = { href: bookPath(nx.b.key), label: `${nx.b.kap}: ${nx.b.title}`, sub: `${nx.b.chapters.length} kapitol · ${nx.b.real} u stolu` };
+  else next = { href: chPath(nx.c.id), label: `Kapitola ${i + 2}: ${nx.c.title}`, sub: `čtení asi ${nx.c.min} min` };
+  return { crumbs: [['Příběh', '/pribeh'], [`Kniha ${b.key}`, bookPath(b.key)], [`Kapitola ${i + 1}: ${c.title}`, null]],
+    title: `${c.title} · Příběh · Západní draci`, desc: `${b.kap}, kapitola ${i + 1}: ${c.title}. ${c.real} u stolu${c.drs ? `, ${c.drs}` : ''}.`, next };
 }
 
 /** Živé portréty ve vsazených hlasech svědků: video (bez zvuku) hraje jen ve viditelné kartě, na desktopu a bez úsporného režimu. */
@@ -284,13 +367,13 @@ function wireClicks(el) {
     const pl = e.target.closest('[data-place]');
     if (pl) { e.preventDefault(); emit('map:place', { id: pl.dataset.place }); return; }
     const v = e.target.closest('[data-verse]');
-    if (v) { e.preventDefault(); history.replaceState(null, '', '#' + v.dataset.verse); emit('prophecy:verse', { id: v.dataset.verse }); return; }
+    if (v) { e.preventDefault(); emit('prophecy:verse', { id: v.dataset.verse }); return; }
     const ch = e.target.closest('[data-char]');
     if (ch) { e.preventDefault(); emit('party:open', { id: ch.dataset.char }); return; }
     const m = e.target.closest('[data-era]');
-    if (m) { emit('map:era', { era: m.dataset.era }); return; }
+    if (m) { e.preventDefault(); emit('map:era', { era: m.dataset.era }); return; }
     const np = e.target.closest('[data-npc]');
-    if (np) { emit('registry:search', { q: np.dataset.npc }); return; }
+    if (np) { e.preventDefault(); emit('registry:search', { q: np.dataset.npc }); return; }
     const f = e.target.closest('.v-fig');
     if (f) { openLightbox([{ src: f.dataset.lb, cap: f.dataset.cap }]); return; }
     const g = e.target.closest('[data-gi]');
@@ -311,86 +394,49 @@ function toggleToc(force) {
   if (open) $('a.on', toc)?.scrollIntoView({ block: 'center' });
 }
 
-// ---------------------------------------------------------------- čtení: poloha, postup, klávesy
-function wireReading(el, chs) {
-  const toc = $('#toc'), bar = $('#tocBarI'), pct = $('#tocPct'), btnCh = $('#tocBtnCh');
+// ---------------------------------------------------------------- čtení jedné kapitoly: poloha, postup, přečteno
+function wireReading(c) {
+  const sec = document.getElementById(c.id);
+  const bar = $('#tocBarI'), pct = $('#tocPct');
+  const item = $(`[data-toc="${c.id}"]`);
   const done = new Set(store.get(KEY_DONE, []));
-  const items = Object.fromEntries($$('[data-toc]', toc).map((a) => [a.dataset.toc, a]));
-  const secs = chs.map((x) => document.getElementById(x.c.id));
-  for (const id of done) items[id]?.classList.add('done');
-  let cur = -1, ticking = false, saveT = 0, curAt = performance.now();
-  const timeIn = {};
-  const minFor = (i) => Math.min(25, chs[i].c.min * 60 * 0.3) * 1000; // přečteno = konec kapitoly na obrazovce a aspoň chvíle v ní
-
+  const t0 = performance.now();
+  const need = Math.min(25, c.min * 60 * 0.3) * 1000; // přečteno = konec kapitoly na obrazovce a aspoň chvíle v ní
+  let ticking = false, saveT = 0;
   function update() {
     ticking = false;
-    const vh = window.innerHeight, y = window.scrollY;
-    const r = el.getBoundingClientRect();
-    const inStory = r.top < vh * 0.5 && r.bottom > vh * 0.5;
-    document.body.classList.toggle('in-story', inStory);
-    const total = Math.max(1, el.offsetHeight - vh);
-    const p = Math.min(1, Math.max(0, -r.top / total));
+    const vh = window.innerHeight;
+    const total = Math.max(1, document.documentElement.scrollHeight - vh);
+    const p = Math.min(1, Math.max(0, window.scrollY / total));
     bar.style.transform = `scaleX(${p.toFixed(4)})`;
     pct.textContent = `${Math.round(p * 100)} %`;
-    // aktuální kapitola: ta, jejíž horní hrana je nad 40 % výšky okna
-    let k = -1;
-    for (let i = 0; i < secs.length; i++) { if (secs[i].getBoundingClientRect().top < vh * 0.4) k = i; else break; }
-    // průběh v jednotlivých kapitolách
-    for (let i = Math.max(0, k - 1); i <= Math.min(secs.length - 1, k + 1); i++) {
-      const s = secs[i]; if (!s) continue;
-      const rr = s.getBoundingClientRect();
-      const body = $('.chap-body', s).getBoundingClientRect();
-      const pp = Math.min(1, Math.max(0, (vh * 0.6 - body.top) / Math.max(1, body.height)));
-      if (i === k) items[s.id].lastElementChild.style.setProperty('--p', pp.toFixed(3));
-      const spent = (timeIn[s.id] || 0) + (i === cur ? performance.now() - curAt : 0);
-      if (pp >= 0.95 && i === k && spent >= minFor(i) && !done.has(s.id)) { done.add(s.id); items[s.id].classList.add('done'); store.set(KEY_DONE, [...done]); }
-      void rr;
-    }
-    if (k !== cur) {
-      if (cur >= 0) timeIn[secs[cur].id] = (timeIn[secs[cur].id] || 0) + performance.now() - curAt;
-      if (cur >= 0) items[secs[cur].id].lastElementChild.style.setProperty('--p', done.has(secs[cur].id) ? 1 : 0);
-      cur = k; curAt = performance.now();
-      window.__chTitle = k >= 0 ? chs[k].c.title : '';
-      window.__chId = k >= 0 ? chs[k].c.id : '';
-      if (inStory && k >= 0) document.title = `${chs[k].c.title} · Příběh · Západní draci`;
-      Object.values(items).forEach((a) => a.classList.remove('on'));
-      if (k >= 0) {
-        const id = secs[k].id; items[id].classList.add('on');
-        btnCh.textContent = `kap. ${k + 1}`;
-        if (toc.matches(':hover') === false && window.matchMedia('(min-width: 1280px)').matches) {
-          const a = items[id], box = toc;
-          const ar = a.getBoundingClientRect(), br = box.getBoundingClientRect();
-          if (ar.top < br.top + 40 || ar.bottom > br.bottom - 40) box.scrollTop += ar.top - br.top - br.height / 2;
-        }
-      } else btnCh.textContent = '';
-    }
-    // uložit polohu (nejvýš jednou za 2 s)
-    if (k >= 0 && inStory) {
-      const rec = { ch: secs[k].id, n: k + 1, title: chs[k].c.title, y: Math.round(y), t: Date.now() };
-      clearTimeout(saveT); saveT = setTimeout(() => store.set(KEY_POS, rec), 700); // uložit, až se čtenář zastaví
-    }
-    // nad plátny knih obsah ztlumit
-    const veil = $$('.book-open', el).some((b) => { const q = b.getBoundingClientRect(); return q.top < vh * 0.55 && q.bottom > vh * 0.45; });
-    toc.classList.toggle('veil', veil);
+    const body = $('.chap-body', sec)?.getBoundingClientRect();
+    if (!body) return;
+    const pp = Math.min(1, Math.max(0, (vh * 0.6 - body.top) / Math.max(1, body.height)));
+    item?.lastElementChild.style.setProperty('--p', pp.toFixed(3));
+    if (pp >= 0.95 && performance.now() - t0 >= need && !done.has(c.id)) { done.add(c.id); item?.classList.add('done'); store.set(KEY_DONE, [...done]); }
+    clearTimeout(saveT);
+    saveT = setTimeout(() => store.set(KEY_POS, { ch: c.id, n: chIndex(c.id) + 1, title: c.title, y: Math.round(window.scrollY), t: Date.now() }), 700);
   }
   const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
-  setInterval(() => { if (document.body.classList.contains('in-story') && !document.hidden) onScroll(); }, 4000);
+  const iv = setInterval(() => { if (!document.hidden) onScroll(); }, 4000);
+  store.set(KEY_POS, { ...(store.get(KEY_POS, {}) || {}), ch: c.id, n: chIndex(c.id) + 1, title: c.title, t: Date.now(), y: store.get(KEY_POS, {})?.ch === c.id ? store.get(KEY_POS, {}).y : 0 });
   update();
+  return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); clearInterval(iv); clearTimeout(saveT); item?.lastElementChild.style.setProperty('--p', done.has(c.id) ? 1 : 0); };
+}
 
-  // klávesy ← → mezi kapitolami (jen když je čtenář v Příběhu a nepíše ani neovládá přehrávač)
+// klávesy ← → mezi kapitolami (jen na stránce kapitoly, když čtenář nepíše ani neovládá přehrávač)
+function wireKeys() {
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
     if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || e.defaultPrevented) return;
-    if (e.target.closest?.('input, textarea, select, [contenteditable], .w-stage, .leaflet-container, .tl-scroll, #lightbox, .drawer')) return;
-    if (!document.body.classList.contains('in-story')) return;
-    const i = Math.max(0, cur) + (e.key === 'ArrowRight' ? 1 : -1);
-    const target = cur < 0 && e.key === 'ArrowRight' ? secs[0] : secs[i];
-    if (!target) return;
+    if (e.target.closest?.('input, textarea, select, [contenteditable], .w-stage, .leaflet-container, .tl-scroll, #lightbox, .drawer, .navp, .srch')) return;
+    if (document.body.dataset.page !== 'pribeh' || !window.__chId) return;
+    const i = chIndex(window.__chId) + (e.key === 'ArrowRight' ? 1 : -1);
+    const t = chs[i]; if (!t) return;
     e.preventDefault();
-    history.replaceState(null, '', '#' + target.id);
-    settleScroll(target, { smooth: true });
+    navigate(chPath(t.c.id), { gesture: true });
   });
-  void reduced;
 }

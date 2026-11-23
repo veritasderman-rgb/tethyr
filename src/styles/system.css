@@ -6,7 +6,7 @@
 /* ---- typografie: jedna škála pro všechny oddíly */
 .sec-head { padding: var(--space-sec) 0 clamp(28px, 5vh, 56px); position: relative; }
 .sec-head .kicker { font: 500 var(--t-eyebrow)/1 var(--f-ui); letter-spacing: .34em; color: var(--gold2); }
-.sec-head h2 { font: 400 var(--t-h2)/1.04 var(--f-title); letter-spacing: .06em; text-wrap: balance; }
+.sec-head :is(h1, h2) { font: 400 var(--t-h2)/1.04 var(--f-title); letter-spacing: .06em; text-wrap: balance; }
 .sec-head .lead { font: italic 400 var(--t-lead)/1.55 var(--f-head); color: var(--parch-dim); max-width: 40em; text-wrap: pretty; }
 h3 { text-wrap: balance; }
 p { text-wrap: pretty; }
@@ -37,7 +37,7 @@ main > section[data-ready]:not(.hero)::before { content: ''; display: block; hei
     @keyframes par-y { from { transform: scale(1.2) translateY(-5%); } to { transform: scale(1.04) translateY(5%); } }
     @keyframes wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0); } }
     .sec-head .rv { opacity: 1; transform: none; transition: none; animation: sh-up linear both; animation-timeline: view(); animation-range: entry 4% entry 62%; }
-    .sec-head h2.rv { animation-name: sh-title; animation-range: entry 0% entry 75%; transform-origin: center; }
+    .sec-head :is(h1, h2).rv { animation-name: sh-title; animation-range: entry 0% entry 75%; transform-origin: center; }
     .sh-no i { animation: sh-line linear both; animation-timeline: view(); animation-range: entry 0% entry 70%; transform-origin: right; }
     .sh-no i:last-child { animation-name: sh-line-r; transform-origin: left; }
     .bt .dp-top .pic img { animation: par-y linear both; animation-timeline: view(); animation-range: cover 0% cover 100%; transition: opacity .8s; }

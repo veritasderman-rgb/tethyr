@@ -4,7 +4,7 @@ import path from 'node:path';
 
 // Svědectví: audio a video dodá zadavatel do assets/voices/<id>.mp3 a assets/video/<id>.mp4.
 // Plugin z nich udělá manifest (virtual:media), aby web věděl, co existuje, a při buildu je zkopíruje do dist/.
-const MEDIA = { voices: /\.(mp3|m4a|ogg|wav)$/i, video: /\.(mp4|webm)$/i, hymna: /\.(mp3|mp4|webm|json)$/i };
+const MEDIA = { voices: /\.(mp3|m4a|ogg|wav)$/i, video: /\.(mp4|webm)$/i, hymna: /\.(mp3|mp4|webm|json)$/i, proroctvi: /\.mp3$/i };
 function ls(dir, re) {
   try { return fs.readdirSync(dir).filter((f) => re.test(f)); } catch { return []; }
 }
@@ -36,7 +36,7 @@ function mediaPlugin() {
       server.watcher.on('unlink', bump);
     },
     closeBundle() {
-      for (const [dir, re] of [['voices', MEDIA.voices], ['video', MEDIA.video], ['voices', /\.json$/i], ['hymna', MEDIA.hymna]]) {
+      for (const [dir, re] of [['voices', MEDIA.voices], ['video', MEDIA.video], ['voices', /\.json$/i], ['hymna', MEDIA.hymna], ['proroctvi', MEDIA.proroctvi]]) {
         const src = path.resolve('assets', dir);
         const dst = path.resolve('dist/assets', dir);
         for (const f of ls(src, re)) {

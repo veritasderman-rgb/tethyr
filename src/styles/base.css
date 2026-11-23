@@ -53,7 +53,7 @@ p { margin: 0 0 1em; }
 /* nadpisy oddílů */
 .sec-head { width: var(--w); margin: 0 auto; padding: clamp(72px, 12vh, 140px) 0 clamp(28px, 5vh, 56px); text-align: center; }
 .sec-head .kicker { font: 500 .72rem/1 var(--f-ui); letter-spacing: .32em; text-transform: uppercase; color: var(--gold2); }
-.sec-head h2 { font: 400 clamp(2.2rem, 5vw, 4.2rem)/1.05 var(--f-title); letter-spacing: .06em; margin: .35em 0 .3em; text-transform: uppercase; }
+.sec-head :is(h1, h2) { font: 400 clamp(2.2rem, 5vw, 4.2rem)/1.05 var(--f-title); letter-spacing: .06em; margin: .35em 0 .3em; text-transform: uppercase; }
 .sec-head .lead { max-width: 46em; margin: 0 auto; color: var(--parch-dim); font-style: italic; }
 .orn { display: flex; align-items: center; justify-content: center; gap: 14px; color: var(--gold); margin: 18px auto 0; }
 .orn::before, .orn::after { content: ''; height: 1px; width: min(120px, 18vw); background: linear-gradient(90deg, transparent, var(--gold)); }

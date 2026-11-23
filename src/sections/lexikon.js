@@ -4,7 +4,7 @@
 import { D } from '../lib/data.js';
 import { small, img } from '../lib/img.js';
 import { $, $$, esc, norm, plural, reduced } from '../lib/util.js';
-import { emit } from '../lib/sections.js';
+import { emit, lexPath, syncMeta } from '../lib/router.js';
 
 const TYPES = [['', 'Vše'], ['osoba', 'Osoby'], ['misto', 'Místa'], ['frakce', 'Frakce a organizace'], ['pojem', 'Pojmy']];
 const TNAME = { osoba: 'osoba', misto: 'místo', frakce: 'frakce', pojem: 'pojem' };
@@ -29,7 +29,7 @@ export function renderLexikon() {
   const by = Object.fromEntries(E.map((e) => [e.id, e]));
   L._by = L._by || by;
   const cnt = (t) => E.filter((e) => e.t === t).length;
-  el.innerHTML = `<header class="sec-head"><p class="kicker">Lexikon</p><h2 id="lexikon-h">Kdo je kdo a co je co</h2>
+  el.innerHTML = `<header class="sec-head"><p class="kicker">Lexikon</p><h1 id="lexikon-h" tabindex="-1">Kdo je kdo a co je co</h1>
     <p class="lead">${plural(cnt('osoba'), 'osoba', 'osoby', 'osob')}, ${plural(cnt('misto'), 'místo', 'místa', 'míst')}, ${cnt('frakce')} frakcí a organizací a ${cnt('pojem')} pojmů a předmětů z kroniky. U osob stav, vazba na družinu, kapitoly a svědectví, u míst odkaz do 2D i 3D mapy. Texty hesel jsou převzaté z dat kroniky.</p><div class="orn">✦</div></header>
     <div class="wrap lx-ctl">
       <label class="lx-q"><span class="sr">Rychlé hledání v Lexikonu</span><input type="search" id="lxQ" placeholder="Jméno, přezdívka, místo, skupina…" autocomplete="off"></label>
@@ -100,7 +100,7 @@ export function renderLexikon() {
     if (scroll && window.matchMedia('(max-width: 900px)').matches) det.focus({ preventScroll: true });
     else if (scroll) { const r = det.getBoundingClientRect(); if (r.top < 0 || r.top > innerHeight * 0.5) el.querySelector('.lx-body').scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' }); }
   }
-  const closeDet = () => { det.classList.remove('open'); document.body.classList.remove('lx-open'); };
+  const closeDet = () => { det.classList.remove('open'); document.body.classList.remove('lx-open'); if (location.pathname.startsWith('/lexikon/')) { history.replaceState(history.state, '', '/lexikon'); syncMeta(); } };
 
   $('#lxQ', el).addEventListener('input', (e) => {
     st.q = e.target.value; st.shown = PAGE;
@@ -118,13 +118,13 @@ export function renderLexikon() {
     const l = e.target.closest('[data-l]');
     if (l) { st.l = l.dataset.l; $$('[data-l]', el).forEach((x) => { x.classList.toggle('on', x === l); x.setAttribute('aria-pressed', x === l); }); st.shown = PAGE; run(); return; }
     const i = e.target.closest('.lx-i');
-    if (i) { history.replaceState(null, '', '#lx/' + i.dataset.id); open(i.dataset.id); return; }
+    if (i) { history.replaceState(history.state, '', lexPath(i.dataset.id)); syncMeta(); open(i.dataset.id); return; }
     if (e.target.closest('.lx-x')) { closeDet(); return; }
     const w = e.target.closest('[data-wit]'); if (w) { emit('witness:open', { id: w.dataset.wit }); return; }
     const c = e.target.closest('[data-char]'); if (c) { emit('party:open', { id: c.dataset.char }); return; }
     const p = e.target.closest('[data-place]'); if (p) { emit('map:place', { id: p.dataset.place }); return; }
-    const a = e.target.closest('a[href^="#lx/"]');
-    if (a) { e.preventDefault(); const id = a.getAttribute('href').slice(4); history.replaceState(null, '', '#lx/' + id); showEntry(id); }
+    const a = e.target.closest('a[href^="/lexikon/"], a[href^="#lx/"]');
+    if (a) { e.preventDefault(); const id = a.getAttribute('href').replace(/^(\/lexikon\/|#lx\/)/, ''); history.replaceState(history.state, '', lexPath(id)); syncMeta(); showEntry(id); }
   });
   det.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDet(); });
 
@@ -151,4 +151,10 @@ export function renderLexikon() {
   });
   window.__lexikon = { open: showEntry, count: () => E.length };
   run();
+}
+
+/** /lexikon/<heslo> otevře heslo, /lexikon?q=… vyhledá. */
+export function enter(r) {
+  if (r.sub) window.dispatchEvent(new CustomEvent('lexikon:open', { detail: { id: r.sub } }));
+  else if (r.query.q) window.dispatchEvent(new CustomEvent('registry:search', { detail: { q: r.query.q } }));
 }

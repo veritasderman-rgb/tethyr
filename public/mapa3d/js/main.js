@@ -21,7 +21,7 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const cz=(n,d=0)=>n.toLocaleString('cs-CZ',{minimumFractionDigits:d,maximumFractionDigits:d});
 const norm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
 const v3=(a)=>new THREE.Vector3(a[0],a[1],a[2]);
-const WEB='../index.html';                                  // kronika (mapa je ve složce /mapa3d/)
+const WEB='../';                                            // kronika (mapa je ve složce /mapa3d/); staré kotvy #… přesměruje router kroniky na nové adresy
 
 // ================================================================ výkon a přístupnost
 const qs=new URLSearchParams(location.search);

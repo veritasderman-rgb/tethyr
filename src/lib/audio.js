@@ -73,3 +73,36 @@ export function load(src) {
 export function stop() { voice.pause(); voice.onended = null; }
 
 window.__voice = voice; // pro testy a ladění
+
+// ------------------------------------------------------------------ jeden zvuk najednou (iterace 8)
+// Sdílený <audio> používají Svědectví, Proroctví i Dokument. Kdo začne hrát, „převezme“ zvuk (claim) a dosavadní
+// vlastník dostane zprávu (onLost), aby přepnul svůj přehrávač do pauzy. Hymna a klipy mají vlastní prvky:
+// jakmile začne hrát kterýkoli zvučný prvek, ostatní zvučné se pozastaví.
+let owner = null, ownerLost = null;
+export function claim(name, onLost) {
+  if (owner && owner !== name) { const f = ownerLost; owner = null; ownerLost = null; try { f?.(); } catch (e) { console.error(e); } }
+  owner = name; ownerLost = onLost;
+}
+export const audioOwner = () => owner;
+export function release(name) { if (owner === name) { owner = null; ownerLost = null; } }
+document.addEventListener('play', (e) => {
+  const m = e.target;
+  if (!(m instanceof HTMLMediaElement) || m.muted) return;
+  for (const x of document.querySelectorAll('audio, video')) if (x !== m && !x.paused && !x.muted) x.pause();
+  if (m !== voice && owner) { const f = ownerLost; owner = null; ownerLost = null; try { f?.(); } catch (er) { console.error(er); } }
+}, true);
+
+/** Plynulé ztišení sdíleného hlasu a pauza (odchod ze stránky). */
+export function fadeOut(ms = 700) {
+  return new Promise((res) => {
+    if (voice.paused) { res(); return; }
+    const v0 = voice.volume, t0 = performance.now();
+    const step = (t) => {
+      const k = Math.min(1, (t - t0) / ms);
+      voice.volume = Math.max(0, v0 * (1 - k));
+      if (k < 1 && !voice.paused) requestAnimationFrame(step);
+      else { voice.pause(); voice.volume = vol; res(); }
+    };
+    requestAnimationFrame(step);
+  });
+}

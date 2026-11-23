@@ -5,7 +5,8 @@
 import media from 'virtual:media';
 import { D } from '../lib/data.js';
 import { small } from '../lib/img.js';
-import { voice, load as loadVoice, stop as stopVoice, unlock, getVolume, setVolume, isMuted, setMuted, onVolume } from '../lib/audio.js';
+import { navigate, witPath, syncMeta } from '../lib/router.js';
+import { voice, load as loadVoice, stop as stopVoice, unlock, claim, getVolume, setVolume, isMuted, setMuted, onVolume } from '../lib/audio.js';
 import { createStage, grain, STAGE_HTML, sideLabel, isFoe, isPast, stavShort, stavTitle, stavInfo, groupOf, subsCs, subMode, setSubMode, SUB_LABEL } from '../lib/wstage.js';
 import { $, $$, esc, reduced, plural, settleScroll } from '../lib/util.js';
 
@@ -38,7 +39,7 @@ export function renderWitness() {
   const nMighty = all.filter((w) => groupOf(w) === 'mocni').length;
   const nVoice = all.filter((w) => VOICE_FILE[w.id]).length;
   const nDead = all.filter(isPast).length;
-  el.innerHTML = `<header class="sec-head"><p class="kicker">Svědectví</p><h2 id="svedectvi-h">Hlasy z obou stran</h2>
+  el.innerHTML = `<header class="sec-head"><p class="kicker">Svědectví</p><h1 id="svedectvi-h" tabindex="-1">Hlasy z obou stran</h1>
     <p class="lead">${all.length} lidí a bytostí, kteří družinu znali: spojenci, ${plural(nFoe, 'nepřítel', 'nepřátelé', 'nepřátel')} a ${plural(nMighty, 'mocný', 'mocní', 'mocných')} Faerûnu. ${nDead ? `${plural(nDead, 'z nich už nežije nebo zmizel', 'z nich už nežijí nebo zmizeli', 'z nich už nežije nebo zmizelo')}, jejich hlas je „z minulosti“. ` : ''}Mluví o tom, co s družinou zažili. Každé slovo se opírá o konkrétní hru, o hráčských postavách mluví ve třetí osobě.</p><div class="orn">✦</div></header>
     <div class="w-stage" id="wStage" tabindex="0" aria-roledescription="přehrávač svědectví" aria-label="Přehrávač svědectví, mezerník přehraje nebo pozastaví">
       ${STAGE_HTML}
@@ -171,6 +172,7 @@ export function renderWitness() {
     stopVoice(); hasAudio = false;
     cancelAnimationFrame(raf);
     curId = w.id;
+    if (document.body.dataset.page === 'svedectvi' && location.pathname !== witPath(w.id)) { history.replaceState(history.state, '', witPath(w.id)); syncMeta(); }
     const ix = list.findIndex((x) => x.id === w.id); cur = ix;
     $('#wStart', el).classList.add('gone');
     $('#wTap', el).hidden = true;
@@ -194,6 +196,7 @@ export function renderWitness() {
     if (state === 'idle') { const w = list[Math.max(cur, 0)] || list[0]; if (w) loadW(w); return; }
     if (state === 'end') { const w = curW(); if (w) loadW(w); return; }
     cancelNext();
+    claim('svedectvi', pause);
     state = 'play'; t0 = performance.now();
     $('#wTap', el).hidden = true;
     if (hasAudio) {
@@ -317,7 +320,7 @@ export function renderWitness() {
     else if (a === 'back') seekTo(clock() - 10);
     else if (a === 'fwd') seekTo(clock() + 10);
     else if (a === 'first') { const w = list[0]; if (w) { loadW(w); } }
-    else if (a === 'doc') window.dispatchEvent(new CustomEvent('film:open', { detail: { autostart: true } }));
+    else if (a === 'doc') navigate('/dokument', { gesture: true });
     else if (a === 'cancelnext') { cancelNext(); }
     else if (a === 'auto') { auto = !auto; if (!auto) cancelNext(); ui(); }
     else if (a === 'mute') setMuted(!isMuted());
@@ -328,6 +331,8 @@ export function renderWitness() {
     const f = e.target.closest('[data-f]'); if (f) setFilter(f.dataset.f);
     const c = e.target.closest('.wc');
     if (c) { const w = D.witById[c.dataset.id]; if (w) { if (!list.some((x) => x.id === w.id)) setFilter('all'); loadW(w); scrollToStage(); } }
+    const so = e.target.closest('.w-srcs a');
+    if (so) pause();
   });
   stageEl.addEventListener('click', (e) => {
     if (e.target.closest('button, .w-prog') || state === 'idle') return;
@@ -346,7 +351,6 @@ export function renderWitness() {
     const auto0 = e.detail.autoplay !== false;
     // hluboký odkaz i proklik: oddíly mezi tím se ještě skládají (líné vykreslení), proto poloha dorovnávat
     settleScroll(stageEl, { smooth: auto0 });
-    history.replaceState(null, '', `#svedectvi/${w.id}`);
     // zvuk je odemčený při prvním doteku kdekoli na stránce (lib/audio.js); prodleva jen pro dojezd posunu
     setTimeout(() => loadW(w, { autoplay: auto0 }), auto0 ? 350 : 450);
   });
@@ -359,5 +363,13 @@ export function renderWitness() {
   first.layer.classList.add('idle');
   stage.lower.classList.remove('in');
   $('#wInfo', el).innerHTML = '';
+  // odchod na jinou stránku: zastavit (skrytý přehrávač by jinak hrál dál)
+  window.addEventListener('page:change', (e) => { if (e.detail.from === 'svedectvi') { pause(); cancelNext(); } });
   window.__wit = { get state() { return state; }, get cur() { return curId; }, voice };
+}
+
+/** Vstup na stránku /svedectvi/<id>: otevřít svědka. Po kliknutí (gesto) hned hraje, při přímém otevření adresy čeká na klepnutí. */
+export function enter(r, ctx = {}) {
+  if (!r.sub) return;
+  window.dispatchEvent(new CustomEvent('witness:open', { detail: { id: r.sub, autoplay: !!ctx.gesture && !ctx.pop && ctx.state?.autoplay !== false } }));
 }

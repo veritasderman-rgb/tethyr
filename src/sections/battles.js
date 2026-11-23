@@ -1,8 +1,8 @@
 // 6. Bitvy jako bojová hlášení: strany, velitelé, jednotky, průběh, výsledek, svědectví obou stran.
 import { D } from '../lib/data.js';
-import { img, largest } from '../lib/img.js';
+import { img, largest, small } from '../lib/img.js';
 import { $, esc, nb } from '../lib/util.js';
-import { emit } from '../lib/sections.js';
+import { emit, battlePath, nextAfter } from '../lib/router.js';
 import { openLightbox } from '../lib/lightbox.js';
 
 const real = (v) => v && !['—', '–', '-', '?'].includes(String(v).trim());
@@ -23,9 +23,9 @@ function side(sd, i) {
 export function renderBattles() {
   const el = $('#bitvy');
   const B = D.world.battles;
-  el.innerHTML = `<header class="sec-head"><p class="kicker">Bitvy</p><h2 id="bitvy-h">Bojová hlášení</h2>
+  el.innerHTML = `<header class="sec-head"><p class="kicker">Bitvy</p><h1 id="bitvy-h" tabindex="-1">Bojová hlášení</h1>
     <p class="lead">${B.length} bitev a střetnutí, od dávné Bitvy kostí po poslední souboj na vrcholu Pyramidy času. Velké bitvy se hrály podle vlastního bitevního systému s kartami jednotek, nejdelší z nich rok na plastické hexové ploše.</p><div class="orn">✦</div></header>
-    <div class="bt-index wrap">${B.map((b, i) => `<a href="#${b.id}"><span>${String(i + 1).padStart(2, '0')}</span>${esc(b.name)}<i>${esc(b.dr)} DR</i></a>`).join('')}</div>
+    <div class="bt-cards wrap" id="btCards">${B.map((b, i) => `<a class="bt-card" href="${battlePath(b.id)}">${b.images?.[0] ? `<img src="${small('ilu/' + b.images[0])}" alt="" loading="lazy" decoding="async">` : '<span class="bt-ph"></span>'}<span class="bt-cn">Hlášení č. ${String(i + 1).padStart(2, '0')} · ${esc(b.dr)} DR</span><b>${esc(b.name)}</b><span class="bt-co">${esc(String(b.outcome || '').split('.')[0])}</span></a>`).join('')}</div>
     ${B.map((b, i) => {
       const wit = [...new Set([...(D.witBySrc[b.id] || []), ...(b.session ? D.witBySrc[b.session] || [] : [])])].map((id) => D.witById[id]).filter(Boolean);
       const fr = wit.filter((w) => w.strana !== 'nepřítel'), fo = wit.filter((w) => w.strana === 'nepřítel');
@@ -52,6 +52,7 @@ export function renderBattles() {
           ${links ? `<div class="dp-links">${links}</div>` : ''}
           ${sd.some((x) => x.units?.length) ? `<details class="dp-det"><summary>Soupisky jednotek</summary><div class="bt-sides">${sd.map(side).join('')}</div></details>` : ''}
         </div>
+        <nav class="bt-pn" aria-label="Další hlášení">${i > 0 ? `<a href="${battlePath(B[i - 1].id)}">◂ Hlášení č. ${String(i).padStart(2, '0')}: ${esc(B[i - 1].name)}</a>` : '<span></span>'}<a href="/bitvy">Všechna hlášení</a></nav>
       </article>`;
     }).join('')}`;
   el.addEventListener('click', (e) => {
@@ -61,4 +62,33 @@ export function renderBattles() {
     const pm = e.target.closest('[data-place]'); if (pm) { e.preventDefault(); emit('map:place', { id: pm.dataset.place }); return; }
     const f = e.target.closest('.bt-img'); if (f) openLightbox([{ src: f.dataset.lb, cap: f.dataset.cap }]);
   });
+}
+
+/** /bitvy = přehled hlášení, /bitvy/<bitva> = jedno hlášení (jako samostatná stránka). */
+export function enter(r) {
+  const el = document.getElementById('bitvy');
+  const one = r.sub && document.getElementById(r.sub);
+  el.toggleAttribute('data-one', !!one);
+  el.querySelectorAll('.bt').forEach((a) => { a.hidden = !!one ? a !== one : true; });
+  if (one) one.classList.add('in');
+  const lead = el.querySelector('.sec-head .lead'); if (lead) lead.hidden = !!one;
+  // jedno hlášení: název nese obraz depeše, hlavička stránky zůstane jen pro čtečky (žádný dvojí titulek)
+  el.querySelector('.sec-head')?.classList.toggle('sr', !!one);
+  const B = D.world.battles, i = B.findIndex((b) => b.id === r.sub);
+  const h = el.querySelector('#bitvy-h'), k = el.querySelector('.sec-head .kicker');
+  h.textContent = one ? B[i].name : 'Bojová hlášení';
+  if (k) k.textContent = one ? `Bojové hlášení č. ${String(i + 1).padStart(2, '0')} z ${B.length}` : 'Bitvy';
+  document.getElementById('btCards').hidden = !!one;
+}
+export function meta(r) {
+  const B = D.world.battles;
+  const i = B.findIndex((b) => b.id === r.sub);
+  if (i < 0) return null;
+  const b = B[i], n = B[i + 1];
+  return {
+    crumbs: [['Bitvy', '/bitvy'], [b.name, null]],
+    title: `${b.name} · Bitvy · Západní draci`,
+    desc: `Bojové hlášení: ${b.name}, ${b.dr} DR. ${String(b.outcome || '').split('.')[0]}.`,
+    next: n ? { href: battlePath(n.id), label: n.name, sub: `Hlášení č. ${String(i + 2).padStart(2, '0')} · ${n.dr} DR` } : nextAfter('bitvy'),
+  };
 }

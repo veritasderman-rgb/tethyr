@@ -2,6 +2,7 @@
 // Fulltext přes odstavce kapitol, sezení, osoby, místa, frakce, pojmy, bitvy, verše proroctví a svědectví.
 // Index (public/data/search.json) staví scripts/build-lexikon.py a web ho stahuje až při prvním otevření.
 import { $, $$, esc, norm } from './util.js';
+import { navigate, legacy } from './router.js';
 
 const KIND = {
   kap: ['Kapitoly', 9], os: ['Osoby', 8], mi: ['Místa', 7], bit: ['Bitvy', 6], sv: ['Svědectví', 6], fr: ['Frakce a organizace', 5],
@@ -69,7 +70,7 @@ function run(q) {
     const show = g.slice(0, k === 'odst' ? 8 : 6);
     return `<li class="srch-g"><h3>${KIND[k][0]} <span>${g.length}</span></h3><ul>${show.map((it) => {
       const i = flat.push(it) - 1;
-      return `<li><a href="${esc(it.h)}" class="srch-i k-${k}" data-i="${i}" id="srch-${i}" role="option"><b>${hi(it.t, toks)}</b><span class="srch-s">${esc(it.s)}</span>${k === 'odst' || k === 'ses' || k === 'sv' || k === 'ver' ? `<span class="srch-x">${snippet(it, toks)}</span>` : ''}</a></li>`;
+      return `<li><a href="${esc(legacy(it.h) || it.h)}" class="srch-i k-${k}" data-i="${i}" id="srch-${i}" role="option"><b>${hi(it.t, toks)}</b><span class="srch-s">${esc(it.s)}</span>${k === 'odst' || k === 'ses' || k === 'sv' || k === 'ver' ? `<span class="srch-x">${snippet(it, toks)}</span>` : ''}</a></li>`;
     }).join('')}${g.length > show.length ? `<li class="srch-more">a dalších ${g.length - show.length} · upřesněte dotaz</li>` : ''}</ul></li>`;
   }).join('');
   setActive(flat.length ? 0 : -1);
@@ -84,9 +85,8 @@ function setActive(i) {
 
 function go(it) {
   closeSearch(false);
-  const h = it.h;
-  if (location.hash === h) window.dispatchEvent(new HashChangeEvent('hashchange'));
-  else location.hash = h;
+  const para = it.k === 'odst' ? +(/odstavec (\d+)/.exec(it.s)?.[1] || 0) : 0;
+  navigate(legacy(it.h) || it.h, { gesture: true, state: para ? { para } : {} });
 }
 
 export function openSearch(q = '') {

@@ -4,6 +4,8 @@ klávesy, časová lišta, titulky, zavření. Desktop 1440×900 a mobil 390×84
 Předpoklad: běží `npx vite preview --port 4173`."""
 import os, sys, time, json
 from playwright.sync_api import sync_playwright
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from nav8 import go, open_, ready, here
 URL = os.environ.get('SHOT_URL', 'http://127.0.0.1:4173/'); OUT = os.environ.get('SHOT_OUT', '/home/claude/webshots/it4'); os.makedirs(OUT, exist_ok=True)
 FAST = os.environ.get('FILM_FULL', '1') == '1'
 res, errs = [], []
@@ -24,12 +26,12 @@ with sync_playwright() as p:
         pg.on('console', lambda m, n=name: errs.append(f'[{n}] {m.type}: {m.text}') if m.type in ('error', 'warning') else None)
         pg.on('pageerror', lambda e, n=name: errs.append(f'[{n}] pageerror: {e}'))
         pg.on('response', lambda r, n=name: errs.append(f'[{n}] HTTP {r.status}: {r.url}') if r.status >= 400 else None)
-        pg.goto(URL, wait_until='networkidle'); pg.wait_for_selector('#loading', state='detached', timeout=15000)
-        pg.wait_for_timeout(800)
-        # spuštění: nav (desktop) / spodní lišta (mobil)
+        open_(pg, URL, '/', 800)
+        # spuštění: horní lišta (desktop) / vstup na úvodu (mobil); od it8 má Dokument adresu /dokument
         if name == 'desktop': pg.click('.nav-film')
-        else: pg.tap('#bottomNav [data-film]')
+        else: pg.tap('.doors [data-film]')
         pg.wait_for_function("window.__film && __film.started && !__film.busy", timeout=15000)
+        ok(f'[{name}] adresa /dokument', here(pg) == '/dokument', here(pg))
         info = pg.evaluate("({n: __film.segs.length, total: __film.total, ch: __film.chapters.map(c => [c.label, Math.round(c.dur)]), types: [...new Set(__film.segs.map(s => s.type))], sv: __film.segs.filter(s => s.type === 'sv').map(s => s.id)})")
         if name == 'desktop': print(json.dumps(info, ensure_ascii=False))
         mm = f"{int(info['total'] // 60)}:{int(info['total'] % 60):02d}"
@@ -115,6 +117,12 @@ with sync_playwright() as p:
         pg.wait_for_timeout(500)
         ok(f'[{name}] zavření filmu ({"Esc" if name == "desktop" else "✕"})', pg.evaluate("document.getElementById('film').hidden") and not pg.evaluate("!__voice.paused"))
         ok(f'[{name}] stránka za filmem zůstala nepřetečená', pg.evaluate("document.documentElement.scrollWidth <= innerWidth + 1"))
+        ok(f'[{name}] po zavření se adresa vrátí na úvod', here(pg) == '/', here(pg))
+        # přímý vstup na /dokument: úvodní karta filmu nad úvodem, Esc vrátí na /
+        open_(pg, URL, '/dokument', 1500)
+        ok(f'[{name}] přímý vstup /dokument otevře film (úvodní karta)', pg.evaluate("!document.getElementById('film').hidden && !document.getElementById('fStart').hidden"))
+        pg.keyboard.press('Escape'); pg.wait_for_timeout(600)
+        ok(f'[{name}] Esc z přímého vstupu vede na úvod', here(pg) == '/' and pg.evaluate("document.getElementById('film').hidden"), here(pg))
         ctx.close()
     b.close()
 print('chyby konzole:', errs or 'žádné')

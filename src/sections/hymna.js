@@ -14,7 +14,7 @@ const mmss = (t) => { t = Math.max(0, t || 0); return `${Math.floor(t / 60)}:${S
 export function renderHymna() {
   const el = $('#hymna');
   const secs = HY.sekce;
-  el.innerHTML = `<header class="sec-head"><p class="kicker">Hymna</p><h2 id="hymna-h">Rauko</h2>
+  el.innerHTML = `<header class="sec-head"><p class="kicker">Hymna</p><h1 id="hymna-h" tabindex="-1">Rauko</h1>
     <p class="lead">Hymna družiny, napsaná ke čtvrtstoletí hry. Poslouchejte nahlas.</p><div class="orn">✦</div></header>
     ${HAS_CLIP ? `<figure class="hy-vid wrap"><video id="hyClip" controls playsinline preload="metadata" poster="hymna/rauko_klip.jpg" aria-label="Videoklip k hymně Rauko"><source src="hymna/rauko_klip.mp4" type="video/mp4"></video><figcaption>Videoklip k hymně · text písně se pod videem zvýrazňuje podle zpěvu, klepnutím na řádek video skočí na to místo</figcaption></figure>` : ''}
     <div class="hy wrap${HAS_CLIP ? ' with-clip' : ''}">
@@ -55,6 +55,8 @@ export function renderHymna() {
 
   const dur = () => (isFinite(m.duration) && m.duration > 0 ? m.duration : HY.delka || 360);
   const playing = () => !m.paused && !m.ended;
+  // odchod na jinou stránku: hymna ztichne (skrytá stránka by jinak hrála dál)
+  window.addEventListener('page:change', (e) => { if (e.detail.from === 'hymna') { audio.pause(); clip.pause(); } });
 
   // ---------- WebAudio analyser (vytvoří se až po prvním přehrání, kvůli autoplay politice)
   function setupAudio() {

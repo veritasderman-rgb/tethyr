@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Iterace 4: svědectví otevřené prokliknutím z kapitoly Příběhu musí hrát se zvukem po uživatelském kliknutí.
+"""Iterace 4 (od it8 na podstránkách): svědectví otevřené prokliknutím z kapitoly Příběhu musí hrát se zvukem po uživatelském kliknutí.
 Bez příznaku autoplay (skutečná politika prohlížeče), skutečné kliknutí myší / dotyk. Předpoklad: běží `npx vite preview --port 4173`."""
 import os, sys
 from playwright.sync_api import sync_playwright
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from nav8 import go, open_, ready, here
 
 URL = os.environ.get('SHOT_URL', 'http://127.0.0.1:4173/')
 OUT = os.environ.get('SHOT_OUT', '/home/claude/webshots/it4')
@@ -20,9 +22,7 @@ with sync_playwright() as p:
         ctx = b.new_context(**opts); pg = ctx.new_page()
         pg.on('console', lambda m, n=name: errs.append(f'[{n}] {m.type}: {m.text}') if m.type in ('error', 'warning') else None)
         pg.on('pageerror', lambda e, n=name: errs.append(f'[{n}] pageerror: {e}'))
-        pg.goto(URL, wait_until='networkidle'); pg.wait_for_selector('#loading', state='detached', timeout=15000)
-        pg.evaluate("document.getElementById('ch-feng-asay-a-tempat-larang').scrollIntoView({behavior:'instant'})")
-        pg.wait_for_timeout(1500)
+        open_(pg, URL, '/'); go(pg, 'ch-feng-asay-a-tempat-larang', 1500)
         link = pg.locator('#ch-feng-asay-a-tempat-larang .lk-w[data-wit="kung-lao"]').first
         link.scroll_into_view_if_needed(); pg.wait_for_timeout(300)
         if name == 'mobile': link.tap()
@@ -45,13 +45,15 @@ with sync_playwright() as p:
         pg.click('[data-act=next]') if name == 'desktop' else pg.tap('[data-act=next]')
         pg.wait_for_timeout(3500); a5 = audio_state(pg); ok(f'[{name}] další svědek hraje (jiný zdroj)', not a5['paused'] and a5['src'] != 'kung-lao.mp3' and a5['t'] > 1, str(a5))
         # odkaz z bitvy a z hash
-        pg.evaluate("document.getElementById('bitvy').scrollIntoView({behavior:'instant'})"); pg.wait_for_timeout(1500)
-        bl = pg.locator('#bitvy [data-wit]').first
+        go(pg, 'b-bitva-o-rudou-pevnost', 1500)
+        ok(f'[{name}] adresa hlášení', here(pg) == '/bitvy/bitva-o-rudou-pevnost', here(pg))
+        bl = pg.locator('#bitvy .bt:not([hidden]) [data-wit]').first
         if bl.count():
             bl.scroll_into_view_if_needed(); pg.wait_for_timeout(300)
             bl.tap() if name == 'mobile' else bl.click()
             pg.wait_for_timeout(4500); a6 = audio_state(pg)
             ok(f'[{name}] odkaz z Bitev hraje se zvukem', not a6['paused'] and a6['t'] > 1.5, str(a6))
+            ok(f'[{name}] adresa svědka', here(pg).startswith('/svedectvi/'), here(pg))
         ctx.close()
     b.close()
 print('\n'.join(res)); print('chyby konzole:', errs or 'žádné')

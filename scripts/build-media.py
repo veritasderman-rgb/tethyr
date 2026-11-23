@@ -37,8 +37,8 @@ def bitrate(p):
     except ValueError: return 0
 
 
-def mp3(src, dst, kbps=96, mono=True):
-    """Řeč: mono 96 kb/s, bez metadat a obrázků (časy vět zůstanou, kodér přidá jen ~25 ms)."""
+def mp3(src, dst, kbps=64, mono=True):
+    """Řeč: mono 64 kb/s (od iterace 8 kvůli váze repa; dřív 96), bez metadat a obrázků (časy vět zůstanou, kodér přidá jen ~25 ms)."""
     tmp = dst + '.tmp.mp3'
     r = subprocess.run(['ffmpeg', '-y', '-v', 'error', '-i', src, '-map', '0:a:0', '-map_metadata', '-1'] + (['-ac', '1'] if mono else []) +
                        ['-c:a', 'libmp3lame', '-b:a', f'{kbps}k', tmp])
@@ -71,7 +71,7 @@ def main():
         s = f'{VOICES}/{i}.mp3'
         if os.path.exists(s):
             d = av + i + '.mp3'
-            if newer(s, d) or bitrate(d) > 100000: mp3(s, d); nv += 1
+            if newer(s, d) or bitrate(d) > 72000: mp3(s, d); nv += 1
         else:
             print('  chybí hlas:', i)
         s = f'{VID}/{i}.mp4'

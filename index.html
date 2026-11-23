@@ -2,6 +2,7 @@
 <html lang="cs">
 <head>
   <meta charset="utf-8" />
+  <base href="/" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Západní draci – kronika Tethyrské královské družiny</title>
   <meta name="description" content="Kronika jedné kampaně Forgotten Realms: Tethyrská královská družina, ve hře 1372–1385 DR, u stolu 2003–2026. Příběh v pěti knihách, mapa tažení, hlasy přátel i nepřátel, bojová hlášení a Alaundovo proroctví." />
@@ -23,13 +24,13 @@
   <link rel="icon" href="img/misc/favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="img/misc/favicon-32.png" type="image/png" sizes="32x32" />
   <link rel="apple-touch-icon" href="img/misc/apple-touch-icon.png" />
-  <link rel="preload" as="image" imagesrcset="img/ilu/D_01-720.webp 720w, img/ilu/D_01-1360.webp 1360w" imagesizes="100vw" />
+  <script>if ((location.pathname === '/' || location.pathname === '/index.html') && !location.hash) { var l = document.createElement('link'); l.rel = 'preload'; l.as = 'image'; l.setAttribute('imagesrcset', 'img/ilu/D_01-720.webp 720w, img/ilu/D_01-1360.webp 1360w'); l.setAttribute('imagesizes', '100vw'); document.head.appendChild(l); }</script>
 </head>
 <body>
-  <a class="skip" href="#pribeh">Přeskočit na příběh</a>
+  <a class="skip" href="#obsah" data-skip>Přeskočit na obsah</a>
 
   <header class="topbar" id="topbar">
-    <a class="brand" href="#uvod" aria-label="Na začátek"><img src="img/misc/znak.svg" alt="" width="34" height="17" /><span>Západní draci</span></a>
+    <a class="brand" href="/" aria-label="Západní draci, na úvod"><img src="img/misc/znak.svg" alt="" width="34" height="17" /><span>Západní draci</span></a>
     <div class="tb-r">
       <button class="nav-film" type="button" data-film>▶ <span>Dokument</span></button>
       <button class="tb-search" type="button" id="searchBtn" aria-label="Hledat v kronice (klávesa /)" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg><span>Hledat</span><kbd>/</kbd></button>
@@ -45,31 +46,35 @@
   <div class="hcard" id="hoverCard" role="tooltip" hidden></div>
 
   <nav class="bottomnav" id="bottomNav" aria-label="Hlavní navigace">
-    <a href="#pribeh"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11"/></svg><span>Příběh</span></a>
-    <a href="#mapa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/></svg><span>Mapa</span></a>
-    <a href="#svedectvi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg><span>Svědectví</span></a>
-    <button type="button" data-film><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg><span>Dokument</span></button>
+    <a href="/pribeh" data-sec="pribeh"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11"/></svg><span>Příběh</span></a>
+    <a href="/mapa" data-sec="mapa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/></svg><span>Mapa</span></a>
+    <a href="/svedectvi" data-sec="svedectvi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg><span>Svědectví</span></a>
+    <button type="button" class="bn-search" data-search><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg><span>Hledat</span></button>
     <button type="button" id="moreBtn" aria-expanded="false" aria-controls="navPanel" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Menu</span></button>
   </nav>
 
-  <main>
+  <nav class="crumbs wrap" id="crumbs" aria-label="Drobečková navigace" hidden></nav>
+  <main id="obsah" tabindex="-1">
     <section id="uvod" class="hero" aria-label="Úvod"></section>
-    <section id="pribeh" class="story" aria-labelledby="pribeh-h"></section>
-    <section id="mapa" class="mapsec dark" aria-labelledby="mapa-h"></section>
-    <section id="svedectvi" class="witness" aria-labelledby="svedectvi-h"></section>
-    <section id="druzina" class="party" aria-labelledby="druzina-h"></section>
-    <section id="bitvy" class="battles dark" aria-labelledby="bitvy-h"></section>
-    <section id="proroctvi" class="prophecy" aria-labelledby="proroctvi-h"></section>
-    <section id="osa" class="timeline" aria-labelledby="osa-h"></section>
-    <section id="lexikon" class="lexikon" aria-labelledby="lexikon-h"></section>
-    <section id="stul" class="table" aria-labelledby="stul-h"></section>
-    <section id="hymna" class="hymna" aria-labelledby="hymna-h"></section>
-    <section id="podekovani" class="podekovani" aria-labelledby="podekovani-h"></section>
+    <section id="pribeh" class="story" aria-labelledby="pribeh-h" hidden></section>
+    <section id="druzina" class="party" aria-labelledby="druzina-h" hidden></section>
+    <section id="svedectvi" class="witness" aria-labelledby="svedectvi-h" hidden></section>
+    <section id="bitvy" class="battles dark" aria-labelledby="bitvy-h" hidden></section>
+    <section id="mapa" class="mapsec dark" aria-labelledby="mapa-h" hidden></section>
+    <section id="m3d" class="m3dsec dark" aria-labelledby="m3d-h" hidden></section>
+    <section id="proroctvi" class="prophecy" aria-labelledby="proroctvi-h" hidden></section>
+    <section id="osa" class="timeline" aria-labelledby="osa-h" hidden></section>
+    <section id="lexikon" class="lexikon" aria-labelledby="lexikon-h" hidden></section>
+    <section id="stul" class="table" aria-labelledby="stul-h" hidden></section>
+    <section id="hymna" class="hymna" aria-labelledby="hymna-h" hidden></section>
+    <section id="podekovani" class="podekovani" aria-labelledby="podekovani-h" hidden></section>
+    <section id="nenalezeno" class="notfound" aria-label="Stránka nenalezena" hidden></section>
   </main>
+  <nav class="nextp" id="nextPage" aria-label="Další stránka" hidden></nav>
 
   <footer class="foot">
     <span class="foot-orn" aria-hidden="true">✦ ✦ ✦</span>
-    <nav aria-label="Oddíly v patičce"><a href="#pribeh">Příběh</a><a href="#mapa">Mapa</a><a href="#svedectvi">Svědectví</a><a href="#druzina">Družina</a><a href="#bitvy">Bitvy</a><a href="#proroctvi">Proroctví</a><a href="#osa">Časová osa</a><a href="#lexikon">Lexikon</a><a href="#stul">U stolu</a><a href="#hymna">Hymna</a><a href="#mapa3d">3D mapa</a><a href="#podekovani">Poděkování</a></nav>
+    <nav aria-label="Stránky v patičce"><a href="/" data-sec="uvod">Úvod</a><a href="/pribeh" data-sec="pribeh">Příběh</a><a href="/druzina" data-sec="druzina">Družina</a><a href="/svedectvi" data-sec="svedectvi">Svědectví</a><a href="/bitvy" data-sec="bitvy">Bitvy</a><a href="/mapa" data-sec="mapa">Mapa</a><a href="/mapa/3d">3D mapa</a><a href="/proroctvi" data-sec="proroctvi">Proroctví</a><a href="/osa" data-sec="osa">Časová osa</a><a href="/lexikon" data-sec="lexikon">Lexikon</a><a href="/u-stolu" data-sec="stul">U stolu</a><a href="/hymna" data-sec="hymna">Hymna</a><a href="/dokument">Dokument</a><a href="/podekovani" data-sec="podekovani">Poděkování</a></nav>
     <p>Kronika Tethyrské královské družiny · hraje se od roku 2003 · hru vede Zdeněk T.</p>
     <p class="small">Forgotten Realms a Dungeons &amp; Dragons jsou ochranné známky Wizards of the Coast. Obrazy a portréty vznikly pro tuto kroniku.</p>
   </footer>

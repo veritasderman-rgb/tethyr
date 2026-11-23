@@ -2,6 +2,8 @@
 """Iterace 4: galerie svědectví (skupiny, jmenovky, padlí), přehrávač (hlasitost, přeskoky, automatické pokračování). Snímky do /home/claude/webshots/it4/."""
 import os, sys
 from playwright.sync_api import sync_playwright
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from nav8 import go, open_, ready, here
 URL = os.environ.get('SHOT_URL', 'http://127.0.0.1:4173/'); OUT = os.environ.get('SHOT_OUT', '/home/claude/webshots/it4'); os.makedirs(OUT, exist_ok=True)
 res, errs = [], []
 def ok(n, c, x=''): res.append(f"{'OK   ' if c else 'CHYBA'} {n} {x}")
@@ -11,8 +13,7 @@ with sync_playwright() as p:
         ctx = b.new_context(**opts); pg = ctx.new_page()
         pg.on('console', lambda m, n=name: errs.append(f'[{n}] {m.type}: {m.text}') if m.type in ('error', 'warning') else None)
         pg.on('pageerror', lambda e, n=name: errs.append(f'[{n}] pageerror: {e}'))
-        pg.goto(URL, wait_until='networkidle'); pg.wait_for_selector('#loading', state='detached', timeout=15000)
-        pg.evaluate("document.getElementById('svedectvi').scrollIntoView({behavior:'instant'})"); pg.wait_for_timeout(1500)
+        open_(pg, URL, '/svedectvi', 1500)
         tap = (lambda sel: pg.tap(sel)) if name == 'mobile' else (lambda sel: pg.click(sel))
         groups = pg.evaluate("[...document.querySelectorAll('.wg')].map(g => [g.dataset.g, g.querySelectorAll('.wc').length])")
         ok(f'[{name}] tři skupiny galerie', [g[0] for g in groups] == ['spojenci', 'nepratele', 'mocni'], str(groups))

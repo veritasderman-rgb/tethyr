@@ -15,7 +15,7 @@ with sync_playwright() as p:
         ctx = b.new_context(**opts); pg = ctx.new_page()
         pg.on('console', lambda m, n=name: errs.append(f'[{n}] console {m.type}: {m.text}') if m.type in ('error', 'warning') else None)
         pg.on('pageerror', lambda e, n=name: errs.append(f'[{n}] pageerror: {e}'))
-        pg.goto(URL + '#mapa', wait_until='networkidle')
+        pg.goto(URL.rstrip('/') + '/mapa', wait_until='networkidle')  # od it8 samostatná stránka
         pg.wait_for_function('window.__map2d', timeout=15000); pg.locator('#leaf').scroll_into_view_if_needed(); pg.wait_for_function('!!window.__map2d.map', timeout=15000)
         pg.wait_for_timeout(1200)
         pg.locator('#mapUi').scroll_into_view_if_needed()
@@ -52,12 +52,12 @@ with sync_playwright() as p:
         check(pg.get_attribute('.map-eras [data-era="III"]', 'aria-pressed') == 'true', f'[{name}] klávesa 3 = kniha III')
         pg.keyboard.press('0'); pg.wait_for_timeout(500)
         # karta místa
-        pg.evaluate("window.dispatchEvent(new CustomEvent('map:place',{detail:{id:'castle-tethyr'}}))"); pg.wait_for_timeout(1500)
+        pg.evaluate("window.__router.navigate('/mapa?misto=castle-tethyr')"); pg.wait_for_timeout(1500)
         txt = pg.text_content('#mpPanel')
         check('Castle Tethyr' in txt and 'V Příběhu' in txt and 'Svědci' in txt, f'[{name}] karta místa (příběh, svědci)')
         pg.screenshot(path=f'{OUT}/{name}-mapa-karta.png')
         links = pg.evaluate("[...document.querySelectorAll('#mpPanel a')].map(a=>a.getAttribute('href'))")
-        check(any(h.startswith('#ch-') for h in links) and any(h.startswith('#svedectvi/') for h in links) and any('mapa3d' in h for h in links), f'[{name}] prokliky karty: {len(links)}')
+        check(any(h.startswith('/pribeh/kniha-') for h in links) and any(h.startswith('/svedectvi/') for h in links) and any('mapa3d' in h for h in links), f'[{name}] prokliky karty (nové adresy): {len(links)}')
         # bitva
         pg.evaluate("__map2d.setView('all')"); pg.wait_for_timeout(900)
         pg.locator('.bmk').first.click(force=True); pg.wait_for_timeout(500)

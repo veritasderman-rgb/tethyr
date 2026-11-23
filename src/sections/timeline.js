@@ -3,7 +3,7 @@ import L from 'leaflet';
 import { D } from '../lib/data.js';
 import { img, largest } from '../lib/img.js';
 import { $, $$, esc, norm } from '../lib/util.js';
-import { emit } from '../lib/sections.js';
+import { emit } from '../lib/router.js';
 
 const T0 = 2003, T1 = 2027;
 // tmavé barvy linek (z malované osy na pergamenu) zesvětlit pro tmavé pozadí
@@ -135,7 +135,7 @@ function wireMobile(el) {
 export function renderTimeline() {
   const el = $('#osa');
   const dr = D.timeline.dr_events;
-  el.innerHTML = `<header class="sec-head"><p class="kicker">Časová osa</p><h2 id="osa-h">Dvojí čas</h2>
+  el.innerHTML = `<header class="sec-head"><p class="kicker">Časová osa</p><h1 id="osa-h" tabindex="-1">Dvojí čas</h1>
     <p class="lead">Nahoře léta u stolu, dole letopočet Údolí. Každá barevná linka je jedna postava a ten, kdo ji hrál. Tečky jsou sezení, klepnutím se otevřou v kronice.</p><div class="orn">✦</div></header>
     <div class="wrap tl-ctl"><div><button class="btn sm" data-z="-1" aria-label="Oddálit">−</button><button class="btn sm" data-z="1" aria-label="Přiblížit">+</button></div>
       <button class="btn sm" id="tlPaint">Malovaná osa ▸</button></div>

@@ -1,28 +1,29 @@
-// Oddíly se vykreslují líně: až když se k nim čtenář blíží, nebo když na ně vede odkaz či událost.
+// Stránky webu (iterace 8): každá položka menu je samostatná stránka s vlastní adresou (viz router.js).
+// Kód stránky se načítá dynamickým importem a data stránky až při prvním vstupu (need). Vykresluje se jednou,
+// při dalším vstupu se jen zavolá enter() s parametry z adresy.
 import { need } from './data.js';
 import { observe, parallax } from './reveal.js';
 import { decorate } from './chrome.js';
 
 const REG = {};
-/** Zaregistruje oddíl: id elementu <section>, vykreslovací funkce a soubory dat, které potřebuje. */
-export function register(id, fn, needs = []) { REG[id] = { id, fn, needs, done: null }; }
+/**
+ * Zaregistruje stránku: id elementu <section>, funkce, která vrátí modul ({render, enter?, leave?}), a data.
+ * enter(route, ctx) dostane rozebranou adresu (route.sub, route.query, route.hash) a ctx {gesture, pop, state}.
+ */
+export function register(id, load, needs = []) { REG[id] = { id, load, needs, done: null, mod: null }; }
 export const sections = () => Object.keys(REG);
+export const moduleOf = (id) => REG[id]?.mod || null;
 
-/** Vykreslí oddíl (jednou) a vrátí slib, který se splní po vykreslení. */
+/** Načte kód a data stránky a vykreslí ji (jednou). Vrátí slib s modulem stránky. */
 export function ensure(id) {
   const r = REG[id];
-  if (!r) return Promise.resolve();
-  return (r.done ||= need(...r.needs).then(() => {
+  if (!r) return Promise.resolve(null);
+  return (r.done ||= Promise.all([r.load(), need(...r.needs)]).then(([mod]) => {
+    r.mod = mod;
     const el = document.getElementById(id);
-    try { r.fn(); decorate(id, el); } catch (e) { console.error(r.fn.name, e); }
+    try { mod.render?.(); decorate(id, el); } catch (e) { console.error('vykreslení stránky', id, e); }
     el?.setAttribute('data-ready', '');
     if (el) { observe(el); parallax(el); }
-  }).catch((e) => { console.error('data pro oddíl', id, e); r.done = null; }));
-}
-
-// události mezi oddíly: nejdřív se vykreslí cílový oddíl, pak se událost pošle
-const TARGET = { witness: 'svedectvi', map: 'mapa', registry: 'lexikon', lexikon: 'lexikon', party: 'druzina', prophecy: 'proroctvi', story: 'pribeh' };
-export function emit(name, detail = {}) {
-  const sec = TARGET[name.split(':')[0]];
-  return (sec ? ensure(sec) : Promise.resolve()).then(() => window.dispatchEvent(new CustomEvent(name, { detail })));
+    return mod;
+  }).catch((e) => { console.error('stránka', id, e); r.done = null; throw e; }));
 }

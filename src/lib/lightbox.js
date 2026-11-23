@@ -16,7 +16,9 @@ function key(e) { if (e.key === 'Escape') close(); else if (e.key === 'ArrowLeft
 let tx = 0;
 export function openLightbox(list, i = 0) {
   items = list; idx = i; last = document.activeElement;
-  const el = lb(); el.hidden = false; document.body.style.overflow = 'hidden'; show();
+  const el = lb(); el.hidden = false; document.body.style.overflow = 'hidden';
+  el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'Zvětšený obrázek');
+  show();
   document.addEventListener('keydown', key);
   el.ontouchstart = (e) => { tx = e.touches[0].clientX; };
   el.ontouchend = (e) => { const d = e.changedTouches[0].clientX - tx; if (Math.abs(d) > 50) go(d < 0 ? 1 : -1); };
@@ -27,10 +29,10 @@ export function close() {
   document.removeEventListener('keydown', key); last?.focus?.();
 }
 // Šuplík s detailem (postava, bitva…)
-let lastD = null;
+let lastD = null, onCloseD = null;
 function dkey(e) { if (e.key === 'Escape') closeDrawer(); }
-export function openDrawer(html, onReady) {
-  const el = $('#drawer'); lastD = document.activeElement;
+export function openDrawer(html, onReady, onClose) {
+  const el = $('#drawer'); lastD = document.activeElement; onCloseD = onClose || null;
   el.innerHTML = `<div class="dr-panel" role="dialog" aria-modal="true"><button class="dr-close" aria-label="Zavřít">×</button>${html}</div>`;
   el.hidden = false; document.body.style.overflow = 'hidden';
   el.onclick = (e) => { if (e.target === el) closeDrawer(); };
@@ -40,6 +42,8 @@ export function openDrawer(html, onReady) {
   setTimeout(() => $('.dr-close', el)?.focus(), 30);
 }
 export function closeDrawer() {
-  const el = $('#drawer'); el.hidden = true; el.innerHTML = ''; document.body.style.overflow = '';
+  const el = $('#drawer'); if (el.hidden) return;
+  const f = onCloseD; onCloseD = null; f?.();
+  el.hidden = true; el.innerHTML = ''; document.body.style.overflow = '';
   document.removeEventListener('keydown', dkey); lastD?.focus?.();
 }

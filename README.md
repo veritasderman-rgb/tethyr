@@ -2,7 +2,7 @@
 
 Soukromý web pro družinu, která v letech 2003–2026 hrála jednu kampaň ve Forgotten Realms (1372–1385 DR). Převypráví tištěnou kroniku ve větším detailu a jádrem jsou **svědectví**: přátelé i nepřátelé družiny vzpomínají do kamery, po vzoru filmu *Prelude to Axanar*.
 
-Statický web (Vite + čistý JavaScript), bez serveru. Nasaditelný na GitHub Pages i Vercel, všechny cesty jsou relativní (`base: './'`).
+Statický web (Vite + čistý JavaScript), bez serveru, nasazený na Vercelu. Od iterace 8 má každá stránka vlastní adresu (History API, `vercel.json` přepisuje cesty stránek na `index.html`, `<base href="/">` drží relativní cesty k datům a obrázkům).
 
 ## Spuštění
 
@@ -62,7 +62,7 @@ Data zastávek (`public/data/map.json` `route[]`) mají `k` (rok), `s` (sezení 
 ## Váha a média
 
 - Obrázky WebP ve dvou šířkách (`srcset`), malby, podklady PJ a fotky kvalita 68 (method 6), portréty 78–80. Mapka kapitoly v Příběhu stahuje podklad až při přiblížení (`lazyMaps` v `src/lib/minimap.js`).
-- Hlasy svědků mono 96 kb/s, hymna 128 kb/s (`build-media.py` překóduje sám), videa svědků 1280×720 crf 27 bez zvuku, klip hymny H.264 crf 31 + AAC 128 kb/s, `preload="metadata"`/`none`.
+- Hlasy svědků mono 64 kb/s (od iterace 8), hlas proroctví mono 64 kb/s, hymna 128 kb/s (`build-media.py` překóduje sám), videa svědků 1280×720 crf 27 bez zvuku, klip hymny H.264 crf 31 + AAC 128 kb/s, `preload="metadata"`/`none`.
 - 3D mapa nemá vlastní kopie médií: obrázky bere z `../img`, videa a hlasy svědků z `../assets` (Vite je kopíruje do `dist/assets`).
 - Kontrola: `python3 scripts/weight.py` (první načtení úvodní stránky a velikost repa), `python3 public/mapa3d/tools/perf.py` (doba načtení, draw calls a trojúhelníky 3D mapy v headless Chromiu).
 
@@ -87,6 +87,15 @@ Text kapitol je v `data/vypraveni/1.md`–`4.md`: `## <id kapitoly>`, odstavce o
 - **Video v celé délce** (`<id>_lipsync.mp4` ve složce videí → `assets/video/<id>_plne.mp4`, příznak `video_plne`): přehrávač i Dokument ho řídí časem zvuku (`stage.sync`).
 - Test: `scripts/test-it7.py` (snímky `/home/claude/webshots/it7/`).
 
+## Iterace 8: podstránky a hlas proroctví
+
+- **Adresy** (`src/lib/router.js`): `/`, `/pribeh`, `/pribeh/kniha-1…5`, `/pribeh/kniha-N/<kapitola>[#s-…]`, `/druzina[/<postava>]`, `/svedectvi[/<svědek>]`, `/bitvy[/<bitva>]`, `/mapa[?misto=…|?kniha=II]`, `/mapa/3d`, `/proroctvi[/<kapitola-verš>]`, `/osa`, `/lexikon[/<heslo>|?q=…]`, `/u-stolu`, `/hymna`, `/dokument`, `/podekovani`. Staré kotvy (`#ch-…`, `#s-…`, `#svedectvi/<id>` …) se přesměrují (`legacy()`), odkazy s kotvami v obsahu přepíše router. Pomocníci pro nové odkazy: `chPath`, `sesPath`, `bookPath`, `witPath`, `battlePath`, `versePath`, `lexPath`, `charPath`, `placePath`.
+- **Stránka** = `register(id, () => import(...), data)` v `src/main.js`; modul exportuje vykreslení, volitelně `enter(route, ctx)` (parametry z adresy, `ctx.gesture` = přechod kliknutím), `leave()` a `meta(route)` (drobečky, titulek, „Dál“). Události `page:change`, `page:shown`, `route` na `window`.
+- **Dokument** je adresa `/dokument` (`src/lib/filmhook.js` načte `sections/film.js` až při otevření).
+- **Hlas proroctví**: `python3 scripts/build-proroctvi.py` (zdroj `SRC_PROROCTVI`, výchozí `/home/claude/proroctvi`: `kap1–3.mp3` + `timing.json`) → `assets/proroctvi/kapN.mp3` (mono 64 kb/s), `data/proroctvi-timing.json`, `public/data/proroctvi-audio.json`. Časy veršů: `SRC_PROROCTVI=… python3 scripts/proroctvi-timing.py medium` (faster-whisper, cs, zarovnání na trojverší a dvojverší). Přehrávač je v `src/sections/prophecy.js`, ladicí `window.__prophecy.player.state()`.
+- **Jeden zvuk najednou**: `claim(název, přiPřevzetí)` a `fadeOut()` v `src/lib/audio.js`.
+- Testy: `scripts/nav8.py` (pomůcky `go`, `open_`, `ready`), nový `scripts/test-it8.py`; ostatní testy jsou upravené na adresy.
+
 ## Struktura
 
 ```
@@ -100,13 +109,14 @@ assets/voices, assets/video, assets/hymna   hlasy, videa a hymna (generuje scrip
 public/mapa3d/           samostatná 3D mapa Faerûnu
 public/data/             generovaná data webu
 public/img/              generované obrázky (ilu = malby, port = portréty, nove = podklady PJ, foto = fotky od stolu, map, osa)
-src/main.js              načtení dat, navigace, spuštění oddílů
+src/main.js              registrace stránek (dynamický import), start routeru
+src/lib/router.js        adresy, staré kotvy, přechody, drobečky, „Dál“
 src/lib/                 data, obrázky (srcset), odhalování, částice, lightbox/šuplík
 src/sections/            hero, story, map, witness, party, battles, prophecy, timeline, lexikon, table, hymna, podekovani
 src/styles/              base.css (barvy, písmo, prvky), sections.css (oddíly)
 ```
 
-Oddíly: Úvod · Příběh · Mapa (Leaflet + vstup do 3D mapy) · Svědectví · Družina · Bitvy · Proroctví · Časová osa · Lexikon · U stolu · Hymna · Poděkování.
+Stránky (pořadí menu a přechodu „Dál“): Úvod · Příběh · Družina · Svědectví · Bitvy · Mapa (+ 3D mapa) · Proroctví · Časová osa · Lexikon · U stolu · Hymna · Dokument · Poděkování.
 
 ## Obsahová pravidla
 

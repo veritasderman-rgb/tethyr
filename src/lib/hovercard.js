@@ -4,7 +4,7 @@
 import { need, D } from './data.js';
 import { $, esc } from './util.js';
 import { small } from './img.js';
-import { emit } from './sections.js';
+import { emit } from './router.js';
 
 const SEL = '.chap-body a.lk-x, .chap-body a.lk-w, .chap-body a.lk-c, .chap-body a.lk-m';
 let card, cur = null, hideT = 0, showT = 0, lastPointer = 'mouse', wasOpen = false;
@@ -34,7 +34,7 @@ function html(e) {
   return `<div class="hc-pic${e.img ? '' : ' none'}">${pic}</div><div class="hc-b">
     <p class="hc-k">${meta}</p><p class="hc-n">${esc(e.n)}</p>${stavLabel(e)}
     <p class="hc-s">${esc(e.s || '')}</p>
-    <p class="hc-a"><a href="#lx/${esc(e.id)}">V Lexikonu ▸</a>${e.wit ? `<button type="button" data-wit="${esc(e.wit)}">▶ Svědectví</button>` : ''}${e.m2 ? `<button type="button" data-place="${esc(e.m2)}">Na mapě</button>` : ''}</p></div>`;
+    <p class="hc-a"><a href="/lexikon/${esc(e.id)}">V Lexikonu ▸</a>${e.wit ? `<button type="button" data-wit="${esc(e.wit)}">▶ Svědectví</button>` : ''}${e.m2 ? `<button type="button" data-place="${esc(e.m2)}">Na mapě</button>` : ''}</p></div>`;
 }
 
 function place(a) {
@@ -90,8 +90,6 @@ export function initHoverCards() {
     const a = e.target.closest(SEL);
     // dotyk: první klepnutí na jméno (x:) otevře kartu, ne Lexikon
     if (a && a.classList.contains('lk-x') && lastPointer === 'touch' && !wasOpen) { e.preventDefault(); e.stopPropagation(); show(a); return; }
-    const lx = e.target.closest('#hoverCard a[href^="#lx/"]');
-    if (lx) { e.preventDefault(); const h = lx.getAttribute('href'); if (location.hash === h) window.dispatchEvent(new HashChangeEvent('hashchange')); else location.hash = h; }
     const w = e.target.closest('#hoverCard [data-wit]');
     if (w) { e.preventDefault(); emit('witness:open', { id: w.dataset.wit }); }
     const p = e.target.closest('#hoverCard [data-place]');

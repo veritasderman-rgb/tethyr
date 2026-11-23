@@ -10,7 +10,7 @@ import HY from '../../data/hymna.json';
 import { D, need } from '../lib/data.js';
 import { img } from '../lib/img.js';
 import { routeSvg } from '../lib/minimap.js';
-import { voice, load as loadVoice, stop as stopVoice, unlock, getVolume, setVolume, isMuted, setMuted, onVolume } from '../lib/audio.js';
+import { voice, load as loadVoice, stop as stopVoice, unlock, claim, getVolume, setVolume, isMuted, setMuted, onVolume } from '../lib/audio.js';
 import { createStage, grain, STAGE_HTML, sideLabel, subMode, setSubMode, SUB_LABEL } from '../lib/wstage.js';
 import { $, $$, esc, reduced } from '../lib/util.js';
 
@@ -26,18 +26,10 @@ const ROMAN_NAME = { I: 'první', II: 'druhá', III: 'třetí', IV: 'čtvrtá', 
 
 let root = null, api = null, built = false, loading = null;
 
-/** Zaregistruje otevírání filmu (událost film:open, odkaz #dokument, tlačítka [data-film]). */
-export function initFilm() {
-  window.addEventListener('film:open', (e) => open(e.detail || {}));
-  document.addEventListener('click', (e) => {
-    const b = e.target.closest('[data-film]');
-    if (b) { e.preventDefault(); open({ autostart: true, opener: b }); }
-  });
-  const fromHash = () => { if (location.hash === '#dokument') open({ autostart: false }); };
-  window.addEventListener('hashchange', fromHash);
-  setTimeout(fromHash, 0);
-}
-
+/** Otevře film (volá ho router při vstupu na adresu /dokument, viz lib/filmhook.js). */
+export function openFilm(opts = {}) { return open(opts); }
+/** Zavře film bez zásahu do adresy (router odchází jinam). */
+export function closeFilm() { api?.close('', true); }
 async function open(opts = {}) {
   unlock();
   if (!api) {
@@ -422,11 +414,9 @@ function create(timing) {
   function open({ autostart = false, opener: op } = {}) {
     if (!root.hidden) { if (autostart && !started) go(); return; }
     opener = op || document.activeElement;
-    prevHash = location.hash;
     root.hidden = false; document.documentElement.classList.add('film-open');
     window.dispatchEvent(new CustomEvent('film:opened'));
     root.focus({ preventScroll: true });
-    history.replaceState(null, '', '#dokument');
     $s('#fStart').hidden = false; root.classList.remove('is-done'); $s('#fDone').hidden = true;
     started = false; idx = -1; finished = false; lastTl = -1;
     syncVol(); poke();
@@ -435,18 +425,20 @@ function create(timing) {
   async function go() {
     unlock();
     started = true; $s('#fStart').hidden = true;
+    claim('dokument', () => { if (playing) setPlaying(false); });
     try { if (!document.fullscreenElement && root.requestFullscreen) await root.requestFullscreen({ navigationUI: 'hide' }); } catch { /* nevadí */ }
     playing = true; ui_();
     await enter(0, 0);
     started = true;
   }
-  function close(href) {
+  function close(href, silent = false) {
+    if (root.hidden) return;
     tok++; cancelAnimationFrame(raf); playing = false; busy = false;
     teardown(); stage.clear(); setGrain(false);
     if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
     root.hidden = true; document.documentElement.classList.remove('film-open');
     root.classList.remove('need-tap', 'is-done', 'cut');
-    if (!href) history.replaceState(null, '', prevHash && prevHash !== '#dokument' ? prevHash : location.pathname + location.search);
+    if (!silent) window.dispatchEvent(new CustomEvent('film:closed', { detail: { href } }));
     try { opener?.focus?.({ preventScroll: true }); } catch { /* nic */ }
   }
   function again() { $s('#fDone').hidden = true; finished = false; playing = true; enter(0, 0); }
@@ -485,7 +477,7 @@ function create(timing) {
     const b = e.target.closest('[data-a]');
     const a = b?.dataset.a;
     if (a) {
-      if (a === 'close') { close(b.getAttribute('href') || ''); if (b.getAttribute('href')) location.hash = b.getAttribute('href'); return; }
+      if (a === 'close') { e.preventDefault(); close(b.getAttribute('href') || ''); return; }
       if (a === 'go') go();
       else if (a === 'play') toggle();
       else if (a === 'prev') prev();

@@ -2,8 +2,10 @@
 """Iterace 7: hlavní menu (panel), globální hledání, Lexikon, hover karty, předěly knih, hlasy svědků v textu,
 „Co se změnilo“, upřesnění autora v datech. Snímky do /home/claude/webshots/it7/ (desktop 1440×900, mobil 390×844).
 Spuštění po `npm run build` a `npx vite preview --port 4173`."""
-import os, json
+import os, sys, json
 from playwright.sync_api import sync_playwright
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from nav8 import go, open_, ready, here
 URL = os.environ.get('SHOT_URL', 'http://127.0.0.1:4173/')
 OUT = '/home/claude/webshots/it7'
 os.makedirs(OUT, exist_ok=True)
@@ -11,9 +13,6 @@ fails, errs = [], []
 def ok(c, msg, extra=''):
     print(('OK   ' if c else 'FAIL ') + msg, extra if (extra and not c) or os.environ.get('V') else '')
     if not c: fails.append(msg)
-def go(pg, sec, ms=900):
-    for _ in range(2):
-        pg.evaluate(f"document.getElementById('{sec}').scrollIntoView({{behavior:'instant',block:'start'}})"); pg.wait_for_timeout(ms)
 def shot(pg, name):
     pg.screenshot(path=f'{OUT}/{name}.png')
 
@@ -62,7 +61,7 @@ with sync_playwright() as p:
         ok(cur == 'bitvy', T + 'po přechodu je v menu zvýrazněný oddíl Bitvy', cur)
         pg.keyboard.press('Escape'); pg.wait_for_timeout(400)
         # ------------------------------------------------------------ hledání
-        if M: pg.click('#searchBtn')
+        if M: pg.click('#bottomNav [data-search]')
         else: pg.keyboard.press('/')
         pg.wait_for_timeout(400)
         ok(pg.evaluate("!document.getElementById('searchBox').hidden && document.activeElement.id === 'srchQ'"), T + 'hledání se otevře (' + ('tlačítko' if M else 'klávesa /') + ')')
@@ -76,13 +75,13 @@ with sync_playwright() as p:
             ok(pg.evaluate("!document.getElementById('searchBox').hidden"), T + 'Ctrl+K otevře hledání')
             pg.keyboard.type('Pyramida času'); pg.wait_for_timeout(500)
         else:
-            pg.click('#searchBtn'); pg.wait_for_timeout(300); pg.keyboard.type('Pyramida času'); pg.wait_for_timeout(600)
+            pg.click('#bottomNav [data-search]'); pg.wait_for_timeout(300); pg.keyboard.type('Pyramida času'); pg.wait_for_timeout(600)
         n = pg.evaluate("document.querySelectorAll('.srch-i').length")
         ok(n >= 3, T + 'hledání „Pyramida času“ má výsledky', n)
         pg.evaluate("document.getElementById('srchQ').value=''"); pg.keyboard.type('Elminster'); pg.wait_for_timeout(500)
-        pg.evaluate("[...document.querySelectorAll('.srch-i')].find(a => a.getAttribute('href').startsWith('#lx/')).click()"); pg.wait_for_timeout(3000)
-        lx = pg.evaluate("({h: location.hash, det: document.getElementById('lxDetH')?.textContent, box: document.getElementById('searchBox').hidden})")
-        ok(lx['box'] and lx['det'] and 'Elminster' in lx['det'], T + 'výsledek osoby otevře heslo v Lexikonu', lx)
+        pg.evaluate("[...document.querySelectorAll('.srch-i')].find(a => a.getAttribute('href').startsWith('/lexikon/')).click()"); pg.wait_for_timeout(3000)
+        lx = pg.evaluate("({h: location.pathname, det: document.getElementById('lxDetH')?.textContent, box: document.getElementById('searchBox').hidden})")
+        ok(lx['box'] and lx['det'] and 'Elminster' in lx['det'] and lx['h'].startswith('/lexikon/'), T + 'výsledek osoby otevře heslo v Lexikonu (/lexikon/<heslo>)', lx)
         # ------------------------------------------------------------ lexikon
         go(pg, 'lexikon', 1200)
         L = pg.evaluate("""() => ({n: document.querySelectorAll('.lx-i').length, abc: document.querySelectorAll('.lx-abc button').length, count: document.getElementById('lxCount').textContent})""")
@@ -106,10 +105,18 @@ with sync_playwright() as p:
         if M: pg.evaluate("document.querySelector('.lx-x')?.click()"); pg.wait_for_timeout(300)
         go(pg, 'lexikon', 600); shot(pg, f'{name}-lexikon')
         # ------------------------------------------------------------ příběh: předěl knihy, kapitoly, hlasy, citace, změny
+        # od it8: kniha = stránka s předělem, každá kapitola = vlastní stránka; součty přes všech 5 knih a 36 kapitol
         go(pg, 'kniha-I', 1500); shot(pg, f'{name}-kniha-predel')
-        bk = pg.evaluate("""() => ({num: document.querySelectorAll('.book-num').length, perex: document.querySelectorAll('.book-perex').length, who: document.querySelectorAll('.book-who').length,
-            map: document.querySelectorAll('.book-map svg').length, chg: document.querySelectorAll('.book-chg').length, tr: document.querySelectorAll('.chap-tr').length,
-            vc: document.querySelectorAll('.chap-body .vc').length, vq: document.querySelectorAll('.vq .vq-k').length, x: document.querySelectorAll('.chap-body a.lk-x').length})""")
+        bk = {k: 0 for k in ('num', 'perex', 'who', 'map', 'chg', 'tr', 'vc', 'vq', 'x')}
+        chs = pg.evaluate("[...document.querySelectorAll('#toc [data-toc]')].map(a => a.dataset.toc)")
+        for key in ('I', 'II', 'III', 'IV', 'V'):
+            go(pg, 'kniha-' + key, 300)
+            r = pg.evaluate("({num: document.querySelectorAll('#stView .book-num').length, perex: document.querySelectorAll('#stView .book-perex').length, who: document.querySelectorAll('#stView .book-who').length, map: document.querySelectorAll('#stView .book-map svg').length})")
+            for k, v in r.items(): bk[k] += v
+        for cid in chs:
+            go(pg, cid, 150)
+            r = pg.evaluate("({chg: document.querySelectorAll('#stView .book-chg').length, tr: document.querySelectorAll('#stView .chap-tr').length, vc: document.querySelectorAll('#stView .chap-body .vc').length, vq: document.querySelectorAll('#stView .vq .vq-k').length, x: document.querySelectorAll('#stView .chap-body a.lk-x').length})")
+            for k, v in r.items(): bk[k] += v
         ok(bk['num'] == 5 and bk['perex'] == 5 and bk['who'] == 5 and bk['map'] == 5, T + 'pět předělů knih (číslo, perex, kdo hrál, mini-mapa)', bk)
         ok(bk['chg'] == 5, T + 'na konci každé knihy „Co se změnilo“', bk)
         ok(bk['tr'] == 36, T + 'přechody kapitol (36)', bk)
@@ -126,14 +133,14 @@ with sync_playwright() as p:
         if M: pg.tap(sel)
         else: pg.hover(sel)
         pg.wait_for_timeout(1200)
-        hc = pg.evaluate("(() => { const c = document.getElementById('hoverCard'); return {vis: !c.hidden && c.classList.contains('on'), n: c.querySelector('.hc-n')?.textContent, link: c.querySelector('a[href^=\"#lx/\"]')?.getAttribute('href')} })()")
+        hc = pg.evaluate("(() => { const c = document.getElementById('hoverCard'); return {vis: !c.hidden && c.classList.contains('on'), n: c.querySelector('.hc-n')?.textContent, link: c.querySelector('a[href^=\"/lexikon/\"]')?.getAttribute('href')} })()")
         ok(hc['vis'] and hc['n'] and hc['link'], T + 'hover karta u jména (portrét/věta/odkaz do Lexikonu)', hc)
         shot(pg, f'{name}-hover-karta')
         go(pg, 'ch-thultanthar-a-pyramida-casu', 1400)
         fin = pg.evaluate("document.getElementById('ch-thultanthar-a-pyramida-casu').innerText.replace(/\\u00a0/g, ' ')")
         ok('bitvě o Anauroch' in fin and 'Rauko mezitím na vrcholu Pyramidy času' in fin, T + 'finále: souboje v bitvě o Anauroch, Rauko na Pyramidě (upřesnění autora)')
-        go(pg, 'kniha-V', 1200)
-        pg.evaluate("document.querySelector('#kniha-V .book-chg').scrollIntoView({block:'center'})"); pg.wait_for_timeout(1200)
+        go(pg, 'ch-nova-generace', 1200)  # „Co se změnilo“ je od it8 na konci poslední kapitoly knihy
+        pg.evaluate("document.querySelector('#stView .book-chg').scrollIntoView({block:'center'})"); pg.wait_for_timeout(1200)
         shot(pg, f'{name}-co-se-zmenilo')
         # ------------------------------------------------------------ anglický dabing: 3 náhodní svědci, nový zvuk a české titulky podle času
         if not M:

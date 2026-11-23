@@ -4,7 +4,6 @@ import { D } from '../lib/data.js';
 import { img } from '../lib/img.js';
 import { $, $$, esc, reduced, fmt } from '../lib/util.js';
 import { ash } from '../lib/ash.js';
-import { emit } from '../lib/sections.js';
 
 const letters = (w, from) => [...w].map((c, i) => `<i style="--i:${from + i}">${esc(c)}</i>`).join('');
 
@@ -65,10 +64,10 @@ export function renderHero() {
         ${door('#svedectvi', '<circle cx="12" cy="9" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/>', 'Svědectví', 'hlasy přátel i nepřátel')}
         ${door('#hymna', '<path d="M9 18V6l10-2v12"/><circle cx="7" cy="18" r="2.5"/><circle cx="17" cy="16" r="2.5"/>', 'Hymna', 'Rauko, videoklip')}
       </nav>
-      <p class="hero-more"><a href="#mapa3d">3D mapa Faerûnu</a><i>✦</i><a href="#podekovani">Poděkování Pánu jeskyně</a>${pos?.ch && pos.n > 1 ? `<i>✦</i><a href="#${esc(pos.ch)}">Pokračovat: kapitola ${+pos.n}, ${esc(pos.title || '')}</a>` : ''}</p>
+      <p class="hero-more"><a href="#mapa3d">3D mapa Faerûnu</a><i>✦</i><a href="#podekovani">Poděkování Pánu jeskyně</a>${pos?.ch && pos.n > 1 ? `<i>✦</i><a href="#${esc(pos.ch)}" data-cont>Pokračovat: kapitola ${+pos.n}, ${esc(pos.title || '')}</a>` : ''}</p>
     </div>
     <dl class="hero-stats">${stats.map(([n, l]) => `<div><dt data-n="${n}">${reduced() ? fmt(n) : '0'}</dt><dd>${l}</dd></div>`).join('')}</dl>
-    <a class="hero-down" href="#pribeh" aria-label="Dolů na příběh"><span></span></a>`;
+    <a class="hero-down" href="#nextPage" aria-label="Dolů"><span></span></a>`;
   ash(el, { count: 46, sparks: 16, dust: 22 });
   parallax(el);
   // počítadla spustit, až doběhne nástup
@@ -86,6 +85,4 @@ export function renderHero() {
     }, { threshold: 0.2 });
     io.observe($('.hero-stats', el));
   }
-  // svědectví: po doskrolování zaostřit přehrávač
-  $('.door[href="#svedectvi"]', el).addEventListener('click', () => setTimeout(() => emit('witness:focus'), 600));
 }

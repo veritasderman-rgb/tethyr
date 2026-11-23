@@ -13,7 +13,7 @@ export function renderPodekovani() {
   const sign = paras.pop();         // „Všichni vděční hráči“
   const to = paras.shift();         // „Zdeňku,“
   const last = paras.pop();         // „Tahle kronika je tvoje stejně jako naše.“
-  el.innerHTML = `<header class="sec-head"><p class="kicker">Na závěr</p><h2 id="podekovani-h">${esc(title)}</h2><div class="orn">✦</div></header>
+  el.innerHTML = `<header class="sec-head"><p class="kicker">Na závěr</p><h1 id="podekovani-h" tabindex="-1">${esc(title)}</h1><div class="orn">✦</div></header>
     <div class="pd-letter">
       <p class="pd-to rv">${esc(to)}</p>
       ${paras.map((p, i) => `<p class="rv d${i % 3}">${esc(p)}</p>`).join('')}

@@ -38,7 +38,7 @@ export function renderTable() {
   const desk = D.gallery.nove.filter((g) => ['stul', 'mapa'].includes(g.kind)).map((g) => ({ key: `nove/n${pad(g.n, 2)}`, cap: g.cap, n: g.n }));
   const all = [...items, ...desk];
   const feat = [5, 7, 14, 16].map((n) => items.find((i) => i.n === n)).filter(Boolean);
-  el.innerHTML = `<header class="sec-head"><p class="kicker">U stolu</p><h2 id="stul-h">Jak se hrálo</h2>
+  el.innerHTML = `<header class="sec-head"><p class="kicker">U stolu</p><h1 id="stul-h" tabindex="-1">Jak se hrálo</h1>
     <p class="lead">Hra začala roku 2003 s tužkou a papírem v garáži v Lázních Kynžvartě. Skončila po třiadvaceti letech na ručně malované hexové ploše s figurkami z 3D tiskárny.</p><div class="orn">✦</div></header>
     <div class="wrap st-feat">${feat.map((f, i) => `<figure class="st-f f${i} rv d${i % 3}" data-i="${all.indexOf(f)}"><div class="pic">${img(f.key, { alt: f.cap, sizes: '(max-width:760px) 100vw, 50vw' })}</div><figcaption>${esc(f.cap)}</figcaption></figure>`).join('')}</div>
     <div class="wrap-text st-text">

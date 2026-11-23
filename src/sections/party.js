@@ -2,7 +2,7 @@
 import { D } from '../lib/data.js';
 import { img, small } from '../lib/img.js';
 import { $, esc, nb } from '../lib/util.js';
-import { emit } from '../lib/sections.js';
+import { emit, charPath, syncMeta } from '../lib/router.js';
 import { openDrawer } from '../lib/lightbox.js';
 
 const yrs = (s) => (String(s || '').match(/\d{4}/g) || []).map(Number);
@@ -75,7 +75,7 @@ export function renderParty() {
     return `<tr><th scope="row">${esc(p)}${p === 'Zdeněk T.' ? '<small>Pán jeskyně</small>' : ''}</th><td>${cs.map((c) => `<a href="#druzina" data-c="${esc(c.id)}">${esc(c.name)}</a>`).join(', ')}</td><td class="pl-bar"><div>${bars}</div></td></tr>`;
   }).join('');
 
-  el.innerHTML = `<header class="sec-head"><p class="kicker">Družina</p><h2 id="druzina-h">Kdo šel s nimi</h2>
+  el.innerHTML = `<header class="sec-head"><p class="kicker">Družina</p><h1 id="druzina-h" tabindex="-1">Kdo šel s nimi</h1>
     <p class="lead">Za třiadvacet let prošlo družinou osm hráčů a přes dvacet postav, hru vedl jeden Pán jeskyně. Celou hru, od první hry po epilog, odehrál jen Rauko. Každá postava má dva životopisy: jeden ve hře a jeden u stolu.</p><div class="orn">✦</div></header>
     <div class="cards wrap">${main.map((c, i) => `<button class="pc rv d${i % 3}" data-c="${esc(c.id)}" aria-label="${esc(c.full_name || c.name)}: otevřít životopis">
       <span class="pc-i" data-n="${String(i + 1).padStart(2, '0')}">${portraitHtml(c)}</span>
@@ -92,15 +92,19 @@ export function renderParty() {
     const b = e.target.closest('[data-c]'); if (!b) return;
     e.preventDefault();
     const c = D.charById[b.dataset.c]; if (!c) return;
+    if (document.body.dataset.page === 'druzina') history.replaceState(history.state, '', charPath(c.id)); syncMeta();
     openDrawer(detail(c), (panel) => {
       panel.addEventListener('click', (ev) => {
         const w = ev.target.closest('[data-wit]');
         if (w) { $('.dr-close', panel).click(); emit('witness:open', { id: w.dataset.wit }); }
         if (ev.target.closest('[data-close]')) $('.dr-close', panel).click();
       });
-    });
+    }, () => { if (location.pathname.startsWith('/druzina/')) history.replaceState(history.state, '', '/druzina'); syncMeta(); });
   });
   // otevření postavy odjinud (časová osa, příběh)
   window.addEventListener('party:open', (e) => { const b = $(`[data-c="${e.detail.id}"]`, el); if (b) b.click(); });
   void small;
 }
+
+/** /druzina/<postava>: otevřít kartu postavy. */
+export function enter(r) { if (r.sub) window.dispatchEvent(new CustomEvent('party:open', { detail: { id: r.sub } })); }

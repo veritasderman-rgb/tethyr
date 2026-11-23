@@ -2,6 +2,8 @@
 """Iterace 6: úvod (vstupy, nástup), jednotný systém, Družina, Bitvy, Proroctví, osa na mobilu, metadata, 404, tisk, reduced motion, klávesnice."""
 import os, sys, json, urllib.request
 from playwright.sync_api import sync_playwright
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from nav8 import go, open_, ready, here
 URL = os.environ.get('SHOT_URL', 'http://127.0.0.1:4173/')
 fails = []
 def ok(c, msg, extra=''):
@@ -9,9 +11,6 @@ def ok(c, msg, extra=''):
     if not c: fails.append(msg)
 def jclick(pg, sel):
     pg.evaluate('(s) => document.querySelector(s).click()', sel)
-def go(pg, sec, ms=900):
-    for _ in range(2):
-        pg.evaluate(f"document.getElementById('{sec}').scrollIntoView({{behavior:'instant',block:'start'}})"); pg.wait_for_timeout(ms)
 errs = []
 with sync_playwright() as p:
     b = p.chromium.launch(args=['--mute-audio'])
@@ -50,12 +49,12 @@ with sync_playwright() as p:
         tr2 = pg.evaluate("getComputedStyle(document.querySelector('.hero-bg')).transform")
         ok(tr2 != tr, T + 'paralaxa reaguje na rolování')
         # ------------------------------------------------------------ jednotný systém
-        go(pg, 'mapa')
-        heads = pg.evaluate("[...document.querySelectorAll('main > section .sh-no span')].map(s => s.textContent.replace(/\\s+/g,' ').trim())")
-        ok(len(heads) >= 1, T + 'nadpisy oddílů mají číslování', heads)
-        for s in ('svedectvi', 'druzina', 'bitvy', 'proroctvi', 'osa', 'lexikon', 'stul', 'hymna', 'podekovani', 'pribeh'): go(pg, s, 500)
-        heads = pg.evaluate("[...document.querySelectorAll('main > section .sh-no span')].map(s => s.textContent.replace(/\\s+/g,' ').trim())")
-        ok(heads == ['Oddíl I', 'Oddíl II', 'Oddíl III', 'Oddíl IV', 'Oddíl V', 'Oddíl VI', 'Oddíl VII', 'Oddíl VIII', 'Oddíl IX', 'Oddíl X', 'Oddíl XI'] or len(heads) == 11, T + 'oddíly číslované I–XI', heads)
+        # od it8: každá stránka má jeden nadpis h1 a pod obsahem jediný přechod „Dál“ (číslování oddílů I–XI zrušeno)
+        hs = []
+        for s in ('mapa', 'svedectvi', 'druzina', 'bitvy', 'proroctvi', 'osa', 'lexikon', 'stul', 'hymna', 'podekovani', 'pribeh'):
+            go(pg, s, 400)
+            hs.append(pg.evaluate("[document.querySelectorAll('main > section:not([hidden]) h1').length, document.querySelectorAll('#nextPage:not([hidden]) .nextp-a').length]"))
+        ok(all(h == [1, 1] for h in hs), T + 'každá stránka: jeden h1 a jeden přechod Dál', hs)
         go(pg, 'mapa', 1200)
         ok('Mapa' in pg.title() and 'Západní draci' in pg.title(), T + 'titulek stránky podle oddílu', pg.title())
         go(pg, 'bitvy', 1200)
@@ -85,13 +84,13 @@ with sync_playwright() as p:
         ok(bt['forces'] >= 13, T + 'depeše mají strany a velitele', bt['forces'])
         ok(len(bt['mapBtn']) >= 8 and bt['wit'] >= 10, T + 'depeše mají proklik na mapu a svědky', {'map': len(bt['mapBtn']), 'wit': bt['wit']})
         bid = 'b-bitva-o-rudou-pevnost'
-        pg.evaluate(f"document.getElementById('{bid}').scrollIntoView({{behavior:'instant',block:'center'}})"); pg.wait_for_timeout(3000)
+        go(pg, bid, 3000)
         inn = pg.evaluate(f"(() => {{ const a = document.getElementById('{bid}'); return {{in: a.classList.contains('in'), paperOp: +getComputedStyle(a.querySelector('.dp-paper')).opacity, resOp: +getComputedStyle(a.querySelector('.dp-res')).opacity}} }})()")
         ok(inn['in'] and inn['paperOp'] == 1 and inn['resOp'] == 1, T + 'animovaný nástup depeše doběhl', inn)
         jclick(pg, f'#{bid} .dp-links [data-place]'); pg.wait_for_timeout(3500)
         mp = pg.evaluate("({ui: (() => { const r = document.querySelector('#mapa .map-ui').getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0 })(), title: (document.querySelector('#mpPanel h3')||{}).textContent})")
         ok(mp['ui'] and mp['title'] and 'Pevnost' in mp['title'], T + 'Na mapě: ukáže mapu a kartu místa bitvy', mp)
-        go(pg, 'bitvy', 600)
+        go(pg, bid, 600)
         pg.evaluate(f"document.querySelector('#{bid} .dp-links [data-wit]').scrollIntoView({{block:'center'}})"); pg.wait_for_timeout(300)
         jclick(pg, f'#{bid} .dp-links [data-wit]'); pg.wait_for_timeout(1500)
         ok(pg.evaluate("!!document.querySelector('#wStage')") and pg.evaluate("document.getElementById('svedectvi').getBoundingClientRect().top < innerHeight"), T + 'proklik na svědka otevře svědectví')
@@ -100,7 +99,7 @@ with sync_playwright() as p:
         pr = pg.evaluate("""() => ({ful: [...document.querySelectorAll('.pr-v.ful')].map(v => v.id), fulLinks: [...document.querySelectorAll('.pr-link a.ful')].map(a => a.getAttribute('href') + ' | ' + a.textContent.trim()),
             mention: [...document.querySelectorAll('.pr-link a:not(.ful)')].map(a => a.getAttribute('href')), lines: document.querySelectorAll('.pr-v .vl').length, prog: document.querySelectorAll('.pr-prog span').length})""")
         ok(pr['ful'] == ['pv-3-6', 'pv-3-7', 'pv-3-12'], T + 'proroctví: naplněné verše', pr['ful'])
-        ok(all('b-bitva-v-anaurochu' in x for x in pr['fulLinks']) and len(pr['fulLinks']) == 3, T + 'naplněné verše odkazují na bitvu v Anaurochu, kde se souboje dohrály (upřesnění autora, it7)', pr['fulLinks'])
+        ok(all('bitva-v-anaurochu' in x for x in pr['fulLinks']) and len(pr['fulLinks']) == 3, T + 'naplněné verše odkazují na bitvu v Anaurochu, kde se souboje dohrály (upřesnění autora, it7)', pr['fulLinks'])
         ok(len(pr['mention']) >= 4, T + 'další verše odkazují na kapitoly, kde se o nich píše', pr['mention'])
         ok(pr['lines'] > 100 and pr['prog'] == 3, T + 'verše po řádcích, ukazatel kapitol I–III', pr)
         pg.evaluate("document.getElementById('pv-3-7').scrollIntoView({behavior:'instant',block:'center'})"); pg.wait_for_timeout(1800)
@@ -108,8 +107,8 @@ with sync_playwright() as p:
         ok(lit['lit'] and lit['in'] and lit['op'] == 1, T + 'čtený verš se rozsvítí a řádky se odhalí', lit)
         pg.evaluate("document.querySelector('#pv-3-7 .pr-link a.ful').scrollIntoView({behavior:'instant',block:'center'})"); pg.wait_for_timeout(300)
         jclick(pg, '#pv-3-7 .pr-link a.ful'); pg.wait_for_timeout(3500)
-        yy = pg.evaluate("(() => { const e = document.getElementById('b-bitva-v-anaurochu'); const r = e.getBoundingClientRect(); return {top: r.top, h: innerHeight, hash: location.hash} })()")
-        ok(-50 < yy['top'] < yy['h'] * 0.6 and 'anauroch' in yy['hash'], T + 'klik na naplnění doskroluje na bitvu v Anaurochu', yy)
+        yy = pg.evaluate("(() => { const e = document.getElementById('b-bitva-v-anaurochu'); const r = e.getBoundingClientRect(); return {top: r.top, h: innerHeight, hash: location.pathname, vis: !e.hidden} })()")
+        ok(yy['vis'] and yy['top'] < yy['h'] and 'anauroch' in yy['hash'], T + 'klik na naplnění otevře hlášení bitvy v Anaurochu (vlastní adresa)', yy)
         # ------------------------------------------------------------ časová osa
         go(pg, 'osa', 1200)
         tl = pg.evaluate("""() => { const m = document.getElementById('tlMob'); const cs = [...m.querySelectorAll('.tl-y')]; const vis = getComputedStyle(m).display !== 'none';
@@ -134,7 +133,7 @@ with sync_playwright() as p:
         pg.keyboard.press('Tab'); pg.keyboard.press('Tab')
         foc = pg.evaluate("({tag: document.activeElement.tagName, txt: document.activeElement.textContent.trim().slice(0,30), ol: getComputedStyle(document.activeElement).outlineStyle + ' ' + getComputedStyle(document.activeElement).outlineWidth})")
         ok('none' not in foc['ol'], T + 'fokus je viditelný (outline)', foc)
-        ok(pg.evaluate("document.querySelector('.skip')") is not None, T + 'odkaz „Přeskočit na příběh“')
+        ok(pg.evaluate("document.querySelector('.skip')") is not None, T + 'odkaz „Přeskočit na obsah“')
         ctx.close()
     # ---------------------------------------------------------------- reduced motion
     ctx = b.new_context(viewport={'width': 1440, 'height': 900}, reduced_motion='reduce'); pg = ctx.new_page()
@@ -149,7 +148,7 @@ with sync_playwright() as p:
     # ---------------------------------------------------------------- tisk kapitoly
     ctx = b.new_context(viewport={'width': 1200, 'height': 900}); pg = ctx.new_page()
     pg.goto(URL, wait_until='networkidle'); pg.wait_for_selector('#loading', state='detached', timeout=15000); pg.wait_for_timeout(500)
-    pg.evaluate("document.getElementById('ch-anauroch').scrollIntoView({behavior:'instant'})"); pg.wait_for_timeout(1000)
+    go(pg, 'ch-anauroch', 1000)
     ok(pg.evaluate("!!document.querySelector('#ch-anauroch .chap-print')"), 'tisk: tlačítko „Vytisknout kapitolu“')
     pg.evaluate("window.print = () => {}")
     pg.click('#ch-anauroch .chap-print'); pg.wait_for_timeout(300)

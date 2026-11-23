@@ -16,138 +16,64 @@ import '@fontsource/fira-sans/latin-400.css';
 import '@fontsource/fira-sans/latin-ext-400.css';
 import '@fontsource/fira-sans/latin-500.css';
 import '@fontsource/fira-sans/latin-ext-500.css';
-import 'leaflet/dist/leaflet.css';
 import './styles/base.css';
 import './styles/sections.css';
 import './styles/system.css';
 import './styles/scenes.css';
 import './styles/it7.css';
+import './styles/it8.css';
 
 import { need } from './lib/data.js';
-import { register, ensure, sections, emit } from './lib/sections.js';
-import { $, $$, settleScroll } from './lib/util.js';
-import { renderHero } from './sections/hero.js';
-import { renderStory } from './sections/story.js';
-import { renderMap } from './sections/map.js';
-import { renderWitness } from './sections/witness.js';
-import { renderParty } from './sections/party.js';
-import { renderBattles } from './sections/battles.js';
-import { renderProphecy } from './sections/prophecy.js';
-import { renderTimeline } from './sections/timeline.js';
-import { renderLexikon } from './sections/lexikon.js';
-import { initMenu, setCurrent } from './lib/menu.js';
+import { register } from './lib/sections.js';
+import { startRouter } from './lib/router.js';
+import { $ } from './lib/util.js';
+import { initMenu } from './lib/menu.js';
 import { initSearch } from './lib/search.js';
 import { initHoverCards } from './lib/hovercard.js';
-import { renderTable } from './sections/table.js';
-import { renderHymna } from './sections/hymna.js';
-import { renderPodekovani } from './sections/podekovani.js';
-import { initFilm } from './sections/film.js';
-import { SECTION_LABEL } from './lib/chrome.js';
+import { filmHooks } from './lib/filmhook.js';
 import './lib/audio.js';
+import { closeDrawer, close as closeLightbox } from './lib/lightbox.js';
 
-// Oddíly a data, která potřebují (načítají se až při přiblížení k oddílu).
-register('uvod', renderHero, ['images', 'stats']);
-register('pribeh', renderStory, ['images', 'books', 'sessions', 'svedectvi', 'world', 'map', 'vypraveni']);
-register('mapa', renderMap, ['images', 'map', 'sessions', 'npcs', 'books', 'svedectvi', 'world']);
-register('svedectvi', renderWitness, ['images', 'svedectvi', 'books', 'map', 'sessions', 'world']);
-register('druzina', renderParty, ['images', 'characters', 'sessions', 'svedectvi']);
-register('bitvy', renderBattles, ['images', 'world', 'sessions', 'svedectvi', 'map']);
-register('proroctvi', renderProphecy, ['images', 'prophecy', 'books', 'vypraveni']);
-register('osa', renderTimeline, ['images', 'timeline', 'characters']);
-register('lexikon', renderLexikon, ['lexikon', 'sessions', 'images']);
-register('stul', renderTable, ['images', 'gallery', 'sessions']);
-register('hymna', renderHymna, ['images']);
-register('podekovani', renderPodekovani, ['images']);
-
-const BASE_TITLE = document.title;
-function nav() {
-  const bar = $('#topbar');
-  initMenu(); initSearch(); initHoverCards();
-  const onScroll = () => bar.classList.toggle('solid', window.scrollY > window.innerHeight * 0.6);
-  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
-  // zvýraznění aktivního oddílu
-  const links = [...$$('a', $('#bottomNav'))];
-  const io = new IntersectionObserver((ents) => {
-    for (const e of ents) if (e.isIntersecting) {
-      links.forEach((a) => a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id));
-      setCurrent(e.target.id);
-      // titulek karty podle toho, kde čtenář je (u kapitol příběhu titulek nastavuje story.js)
-      const id = e.target.id, lab = SECTION_LABEL[id];
-      if (lab) document.title = id === 'uvod' ? BASE_TITLE : id === 'pribeh' && window.__chTitle ? `${window.__chTitle} · Příběh · Západní draci` : `${lab} · Západní draci`;
-    }
-  }, { rootMargin: '-45% 0px -50% 0px' });
-  $$('main > section').forEach((s) => io.observe(s));
-}
-
-// kotva → oddíl, ve kterém leží
-function sectionOf(hash) {
-  const [sec] = hash.split('/');
-  if (/^(s|ch|kniha)-/.test(sec)) return 'pribeh';
-  if (/^b-/.test(sec)) return 'bitvy';
-  if (/^pv-/.test(sec)) return 'proroctvi';
-  if (sec === 'mapa3d') return 'mapa';
-  if (sec === 'lx' || sec === 'rejstrik') return 'lexikon';
-  return sec;
-}
+// Stránky: kód (dynamický import) a data, která potřebují. Načítají se až při prvním vstupu na stránku.
+const S = (load, fn) => () => load().then((m) => ({ ...m, render: m[fn] }));
+register('uvod', S(() => import('./sections/hero.js'), 'renderHero'), ['images', 'stats']);
+register('pribeh', S(() => import('./sections/story.js'), 'renderStory'), ['images', 'books', 'sessions', 'svedectvi', 'world', 'map', 'vypraveni']);
+register('mapa', S(() => import('./sections/map.js'), 'renderMap'), ['images', 'map', 'sessions', 'npcs', 'books', 'svedectvi', 'world']);
+register('m3d', S(() => import('./sections/map3d.js'), 'renderMap3d'), []);
+register('svedectvi', S(() => import('./sections/witness.js'), 'renderWitness'), ['images', 'svedectvi', 'books', 'map', 'sessions', 'world']);
+register('druzina', S(() => import('./sections/party.js'), 'renderParty'), ['images', 'characters', 'sessions', 'svedectvi']);
+register('bitvy', S(() => import('./sections/battles.js'), 'renderBattles'), ['images', 'world', 'sessions', 'svedectvi', 'map']);
+register('proroctvi', S(() => import('./sections/prophecy.js'), 'renderProphecy'), ['images', 'prophecy', 'proroctvi-audio', 'books', 'vypraveni']);
+register('osa', S(() => import('./sections/timeline.js'), 'renderTimeline'), ['images', 'timeline', 'characters']);
+register('lexikon', S(() => import('./sections/lexikon.js'), 'renderLexikon'), ['lexikon', 'sessions', 'images']);
+register('stul', S(() => import('./sections/table.js'), 'renderTable'), ['images', 'gallery', 'sessions']);
+register('hymna', S(() => import('./sections/hymna.js'), 'renderHymna'), ['images']);
+register('podekovani', S(() => import('./sections/podekovani.js'), 'renderPodekovani'), ['images']);
 
 async function boot() {
-  nav();
-  initFilm();
+  initMenu(); initSearch(); initHoverCards();
+  const bar = $('#topbar');
+  const onScroll = () => bar.classList.toggle('solid', window.scrollY > 40 || document.body.dataset.page !== 'uvod');
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('page:change', onScroll);
+  // přechod na jinou adresu zavře šuplík a lightbox (otevřené z předchozí stránky)
+  let lastPath = location.pathname;
+  window.addEventListener('route', () => {
+    if (location.pathname === lastPath) return;
+    lastPath = location.pathname;
+    if (!document.getElementById('drawer').hidden) closeDrawer();
+    if (!document.getElementById('lightbox').hidden) closeLightbox();
+  });
   try {
-    await need('images', 'stats');
-    await ensure('uvod');
+    // books.json je malý a router z něj skládá adresy kapitol a sezení (i ze starých kotev)
+    await need('images', 'books');
   } catch (e) {
-    $('#loading span').textContent = 'Data se nepodařilo načíst. Spusťte nejdřív npm run data.';
+    $('#loading span').textContent = 'Data se nepodařilo načíst. Zkuste stránku obnovit.';
     console.error(e); return;
   }
+  await startRouter({ film: filmHooks });
+  onScroll();
   $('#loading').classList.add('done');
   setTimeout(() => $('#loading')?.remove(), 1200);
-  // ostatní oddíly: vykreslit, když se k nim čtenář přiblíží (zhruba dvě obrazovky předem)
-  // příběh se čte hned po úvodu: vykreslí se hned, ostatní oddíly až při přiblížení
-  const io = new IntersectionObserver((ents) => {
-    for (const e of ents) if (e.isIntersecting) { io.unobserve(e.target); ensure(e.target.id); }
-  }, { rootMargin: '150% 0px 150% 0px' });
-  ensure('pribeh').finally(() => {
-    for (const id of sections()) if (id !== 'uvod' && id !== 'pribeh') io.observe(document.getElementById(id));
-  });
-  // hluboké odkazy: #svedectvi/<id>, #s-… (sezení), #ch-… (kapitola), #b-… (bitva), #pv-… (verš), #mapa, #hymna…
-  route(true);
-  window.addEventListener('hashchange', () => route(false));
-  // odkazy na oddíly (menu, úvod, patička): vykreslit cíl a po doskrolování dorovnat polohu
-  document.addEventListener('click', (e) => {
-    if (e.defaultPrevented) return;
-    const a = e.target.closest('a[href^="#"]'); if (!a) return;
-    const id = decodeURIComponent(a.getAttribute('href').slice(1));
-    if (!id || id.includes('/')) return;
-    ensure(sectionOf(id)).then(() => {
-      const el = document.getElementById(id);
-      if (el) settleScroll(el, { now: true, key: () => location.hash === a.getAttribute('href') });
-    });
-  });
-}
-
-/** Přejde na kotvu z adresy. Vykreslí oddíl, otevře rozbalené podrobnosti, doskroluje a polohu dorovná. */
-async function route(first) {
-  const hash = decodeURIComponent(location.hash.slice(1));
-  if (!hash) return;
-  const [sec, sub] = hash.split('/');
-  if (sec === 'lx' && sub) {
-    await ensure('lexikon');
-    window.dispatchEvent(new CustomEvent('lexikon:open', { detail: { id: sub } }));
-    return;
-  }
-  if (sec === 'rejstrik') { await ensure('lexikon'); settleScroll(document.getElementById('lexikon')); return; }
-  if (sec === 'svedectvi' && sub) {
-    emit('witness:open', { id: sub, autoplay: false });
-    return;
-  }
-  const owner = sectionOf(hash);
-  await ensure(owner);
-  const el = document.getElementById(sec);
-  if (!el) return;
-  if (!first && !/^(s|b|ch|pv)-/.test(sec)) return; // běžné kotvy oddílů vyřídí odkaz výše
-  for (let d = el.closest('details'); d; d = d.parentElement?.closest('details')) d.open = true;
-  if (/^pv-/.test(sec)) emit('prophecy:verse', { id: sec, scroll: false });
-  settleScroll(el, { key: () => decodeURIComponent(location.hash.slice(1)).split('/')[0] === sec });
 }
 boot();

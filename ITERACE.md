@@ -181,3 +181,78 @@ Snímky: `/home/claude/webshots/it7/` (desktop 1440×900 a mobil 390×844: menu,
 3. **Hlasy svědků jsou anglicky, ale videa (kromě Elminstera) jsou šestisekundové smyčky** bez pohybu úst; vsazené hlasy v Příběhu hrají video jen na desktopu.
 4. **Netestováno v Safari/iOS, Firefoxu a na skutečném telefonu** (menu, scroll-driven animace, dorovnání videa podle zvuku).
 5. **3D mapa má vlastní přehrávač svědectví** bez přepínače titulků (ukazuje české titulky) a bez synchronizace Elminsterova plného videa.
+
+## Iterace 8 – podstránky, hlas proroctví, UX audit (23. 11. 2026)
+
+Snímky: `/home/claude/webshots/it8/` (desktop 1440×900 a mobil 390×844: každá stránka, přechod Dál, menu v kapitole, proroctví při přehrávání i po přímém vstupu, audit před/po).
+
+### A) Rozdělení na podstránky
+- **Skutečné adresy přes History API** (`src/lib/router.js`), `vercel.json` přepisuje cesty stránek na `index.html`, ostatní adresy dostanou `404.html`. `<base href="/">` drží relativní cesty k datům a obrázkům i na vnořených adresách. Zvoleno místo hash-routingu: čisté adresy pro sdílení, kotva (`#s-…`) zůstává volná pro místo uvnitř stránky, staré kotvy jdou jednoznačně rozpoznat a přesměrovat.
+- Adresy: `/` · `/pribeh` (rozcestník pěti knih) · `/pribeh/kniha-1…5` (předěl knihy, perex, obsah kapitol) · `/pribeh/kniha-N/<kapitola>` (každá z 36 kapitol je samostatná stránka; `#s-…` = sezení v kronice kapitoly, rozbalí se a doroluje) · `/druzina[/<postava>]` · `/svedectvi[/<svědek>]` · `/bitvy` (přehled hlášení) · `/bitvy/<bitva>` (jedno hlášení) · `/mapa[?misto=…|?kniha=II]` · `/mapa/3d` · `/proroctvi[/<kapitola-verš>]` · `/osa` · `/lexikon[/<heslo>|?q=…]` · `/u-stolu` · `/hymna` · `/dokument` · `/podekovani`; neznámá adresa → stránka „Tahle stránka v kronice není“.
+- **Načítá se jen kód a data dané stránky**: každý oddíl je dynamický import (`src/main.js` `register`), data přes `need` až při vstupu; Leaflet a jeho CSS jen na Mapě, film až při otevření Dokumentu (`src/lib/filmhook.js`). Úvodní načtení **0,61 MB** desktop / 0,56 MB mobil (dřív 1,17 / 0,98).
+- Při přechodu: nahoru, fokus na `h1` (u vnořených adres i po hledání ne – tam se roluje na místo), titulek a `description`/`og:*`/`canonical`, zavře se šuplík a lightbox z předchozí stránky. Zpět/vpřed obnoví polohu (poloha v `history.state`). Načítání stránky má skeleton, chyba „Zkusit znovu“.
+- **Na konci každé stránky jediný přechod „Dál: …“** (pořadí menu; v Příběhu Rozcestník → Kniha I → kapitoly 1–5 → Kniha II … → kapitola 36 → Družina; u hlášení další hlášení; Hymna → Dokument; Poděkování → „Znovu: Úvod“). Pod ním už jen patička.
+- **Drobečky** u vnořených stránek (Příběh › Kniha II › Kapitola 7: …, Bitvy › …, Svědectví › …, Lexikon › …, Mapa › 3D mapa, Proroctví › verš). Menu zvýrazní stránku i kapitolu podle adresy, v Příběhu má každá kniha „Úvod knihy“.
+- **Zpětná kompatibilita**: všechny staré kotvy (`#pribeh`, `#kniha-II`, `#ch-…`, `#s-…`, `#b-…`, `#pv-…`, `#lx/…`, `#rejstrik`, `#svedectvi/<id>`, `#mapa`, `#mapa3d`, `#dokument`, `#hymna`, `#stul` …) se při vstupu i při ruční změně kotvy přesměrují (`legacy()`), odkazy s `#…` v obsahu se přepíší na nové adresy (MutationObserver), takže fungují i prokliky z vyprávění, Lexikonu, karet mapy, hover karet a hledání. 3D mapa odkazuje na `/#…` (router přesměruje) a „Zpět do kroniky“ vede na `/mapa`. Události mezi oddíly (`witness:open`, `map:place`, `map:era`, `prophecy:verse`, `party:open`, `lexikon:open`, `registry:search`) jsou navigace s parametrem (`emit` v routeru); stránka je přebírá v `enter(route, ctx)`.
+- „Pokračovat ve čtení“ vrátí na kapitolu i místo v ní; šipky ←/→ na stránce kapitoly přejdou na předchozí/další kapitolu; „přečteno“ se počítá po kapitolách. „Co se změnilo“ je na konci poslední kapitoly knihy.
+- **Dokument** je adresa `/dokument` (přímý vstup = úvodní karta filmu nad Úvodem; Esc/Zavřít = zpět v historii nebo na Úvod; odkudkoli tlačítkem nebo odkazem).
+- 2D mapa už nezačíná velkým 3D blokem: 3D mapa má vlastní stránku `/mapa/3d` (iframe po klepnutí, při odchodu se vyloží), na Mapě je pod ní odkaz s náhledem.
+
+### B) Hlas proroctví
+- `scripts/proroctvi-timing.py` (kopie `/home/claude/proroctvi/make_timing.py`): faster-whisper **medium**, jazyk cs, word timestamps, zarovnání na úvodní trojverší a jednotlivá dvojverší (difflib), chybějící úměrně podle délky textu. Přiřazeno 173/184, 547/575 a 419/433 slov, všechny jednotky z rozpoznání (metoda `align`). Časy v `data/proroctvi-timing.json`.
+- `scripts/build-proroctvi.py`: mp3 → `assets/proroctvi/kap1–3.mp3` (mono 64 kb/s, 6,6 MB), `public/data/proroctvi-audio.json` (soubor, délka, začátky jednotek). Kapitola 3 končí veršem „V sobě hledej pravdu…“ (je v datech jako poslední dvojverší).
+- Stránka Proroctví: přichází-li čtenář kliknutím (menu, Dál, odkaz z kapitoly, zpět po kliknutí), hlas **hned hraje**; při přímém otevření adresy nebo zablokovaném přehrávání je pod úvodem jedno výrazné tlačítko „▶ Vyslechnout proroctví“ (u adresy verše začne od něj). Kapitoly jdou plynule I → II → III, zvučící verš se rozsvítí (ostatní ztlumené) a stránka k němu jemně doroluje; kolečko/dotyk/klávesy rolování pozastaví na 6 s (tlačítko „K verši“). Klik na verš nebo ▶ u verše = skok hlasu. Přichycené ovládání dole (na mobilu nad spodní lištou): pauza, ztlumení, hlasitost, kapitola I/II/III, průběh kapitoly s časem, právě čtený verš. Odchod ze stránky = ztišení (fade 0,7 s), návrat po kliknutí pokračuje.
+- **Jeden zvuk najednou** (`src/lib/audio.js`): sdílený `<audio>` (Svědectví, Proroctví, Dokument) má vlastníka (`claim`), který se při převzetí dozví, že má přepnout do pauzy; jakýkoli zvučný prvek (hymna, klip) pozastaví ostatní. Svědectví, Hymna a Mapa se při odchodu ze stránky zastaví.
+- Hlasy svědků překódované na mono 64 kb/s (z originálů v `/home/claude/voices3`, `build-media.py` má nový výchozí datový tok), aby se repo vešlo pod 150 MB i s nahrávkami proroctví. Klip hymny beze změny.
+
+### C) UX audit (nový návštěvník, desktop 1440×900 a mobil 390×844)
+Seřazeno podle dopadu. **V** = vysoký, **S** = střední; všechny V a S jsou opravené v této iteraci.
+
+| # | Dopad | Oblast | Problém | Oprava |
+|---|---|---|---|---|
+| 1 | V | orientace | Jedna stránka přes 130 000 px: nebylo jasné, kde čtenář je a kolik zbývá; kotvy a dorovnávání polohy byly křehké | podstránky, drobečky, Dál, titulky stránek |
+| 2 | V | přehrávače | Svědectví a hymna hrály dál po odskrolování/odchodu, dva zvuky mohly hrát přes sebe | zastavení při odchodu, `claim` + pravidlo jednoho zvuku |
+| 3 | V | přístupnost | Po přechodu zůstával fokus na odkazu v jiném oddílu, čtečka neoznámila novou stránku | fokus na h1, nový titulek, `aria-current` v menu a drobečcích |
+| 4 | V | slepé uličky | Neznámá adresa = prázdná stránka, chyba načtení dat = nekonečné „Kronika se otevírá“ | stránka 404 s odkazy, chybový stav s „Zkusit znovu“, Vercel 404 mimo stránky |
+| 5 | V | rychlost | Úvod stahoval 1,17 MB (Leaflet, všechny oddíly); oddíl bez dat zůstal prázdný 100vh | dynamický import po stránkách (0,61 MB), skeleton při načítání |
+| 6 | V | navigace | Zpět/vpřed nevracely polohu, sdílený odkaz na kapitolu byl kotva v obří stránce | History API, poloha v historii, adresa každé kapitoly a sezení |
+| 7 | V | Mapa | Stránka Mapa začínala velkým 3D blokem, 2D mapa až pod ním | 3D na vlastní stránce, odkaz s náhledem pod 2D mapou |
+| 8 | V | Bitvy | 14 dlouhých depeší za sebou, hlášení se nedalo sdílet | přehled karet s obrazem, jedno hlášení na stránku, předchozí/další |
+| 9 | V | Bitvy | Na stránce hlášení byl název dvakrát (hlavička + obraz) | hlavička jen pro čtečky |
+| 10 | V | mobil | V kapitole začínal text až pod okrajem (pás s číslem 220 px, tlačítko tisku nahoře) | nižší pás, tisk na konci kapitoly (na mobilu skrytý) |
+| 11 | S | konzistence | „Oddíl I–XI“ neodpovídal pořadí menu a na samostatných stránkách nedával smysl | číslování odstraněno |
+| 12 | S | mobil | Hledání bylo nahoře mimo dosah palce a zároveň dvakrát (lišta + menu); Dokument ve spodní liště zabíral místo | spodní lišta Příběh/Mapa/Svědectví/Hledat/Menu, horní lupa na mobilu skrytá (Dokument v menu a na úvodu) |
+| 13 | S | hledání | Výsledek „v textu kapitol“ vedl na začátek kapitoly, ne na odstavec | doroluje na odstavec a zvýrazní ho |
+| 14 | S | přístupnost | „Přeskočit na příběh“ vedl jinam než na obsah aktuální stránky | „Přeskočit na obsah“ (`#obsah`) |
+| 15 | S | přístupnost | Lightbox bez `role=dialog` a popisku | `role=dialog`, `aria-modal`, `aria-label` |
+| 16 | S | Proroctví | Verš šlo spustit jen myší, ne klávesnicí | tlačítko ▶ u každého verše a trojverší |
+| 17 | S | mobil | Přichycené ovládání proroctví mělo na 390 px zmáčknutý popisek | dvouřádkové rozložení, cíle 44 px |
+| 18 | S | Příběh | Obsah kapitol (levý panel) překrýval drobečky na 1280–1500 px | drobečky odsazené vedle panelu |
+| 19 | S | Družina | Šuplík s kartou postavy zůstal otevřený po prokliku na sezení | zavření při změně adresy, adresa `/druzina/<postava>` |
+| 20 | S | Příběh | Perex knihy III na rozcestníku byl tři slova | dvě věty, když je první krátká |
+| 21 | S | titulky | „3D mapa · 3D mapa“ v titulku karty | opraveno |
+| 22 | S | úvod | Šipka dolů na úvodu vedla na Příběh (jiná stránka bez ohlášení) | šipka sjede k přechodu „Dál: Příběh“ |
+| 23 | S | horní lišta | Lišta byla průhledná i na stránkách bez úvodní malby | plná lišta mimo úvod |
+
+**Nízký dopad (zapsáno, neopraveno):**
+- Znak v horní liště je drobný a barevně splývá; na mobilu by stačil text.
+- Délka čtení u krátkých kapitol „1 min“ působí nepřesně (zaokrouhlení v datech).
+- Leaflet má ve zdroji odkazy `href="#"` u tlačítek přiblížení (knihovna, funkčně v pořádku).
+- Na mobilu je úvodní text Svědectví dlouhý, přehrávač začíná až pod okrajem.
+- Sdílený náhled (`og:*`) je pro crawlery u všech adres stejný (statický `index.html`, titulky se mění až v prohlížeči).
+- `404.html` (mimo stránky webu) dál bez vlastních písem.
+- Přehrávač svědků uvnitř 3D mapy (iframe) nezná pravidlo jednoho zvuku webu.
+- „Hlavní místa“ a „Protivníci“ na stránce knihy nejsou odkazy do Lexikonu.
+- Přechod „Dál“ nemá protějšek „Zpět“ (předchozí stránka je jen v kapitolách a hlášeních).
+- Dokument zmizel ze spodní lišty na mobilu (je v menu, na úvodu a u Hymny jako Dál).
+- Časová osa na desktopu je široké SVG bez nápovědy, že jde posouvat do stran.
+
+### Ověření
+`npm run build` projde i z čistého klonu (`npm ci && npm run build`). Testy po buildu a `npx vite preview --port 4173`, všechny upravené na nové směrování (`scripts/nav8.py` – `go()`, `open_()`, `ready()`): `test-it4-audio` (proklik z kapitoly hraje, adresy hlášení a svědka), `test-it4-witness`, `test-it4-film` (adresa `/dokument`, přímý vstup, Esc vrátí na `/`), `test-it5-map` (karta místa přes `?misto=`, odkazy karty na nové adresy), `test-it5-3d`, `test-it6` (každá stránka 1× h1 a 1× Dál, hlášení s vlastní adresou), `test-it6-a11y` (axe nad 19 adresami na desktopu i mobilu: **0 porušení**), `test-it7` (Příběh přes 5 knih a 36 kapitol), `test-players`. Nový `scripts/test-it8.py` (desktop + mobil): každá stránka přímý vstup, titulek, h1, drobečky, Dál, reload, bez starých kotev a přetékání; celý řetěz Dál od Úvodu po Poděkování (54 stránek) a zpět/vpřed; 22 starých kotev + `index.html#…` z 3D mapy + alias svědka; kotva sezení; menu podle adresy; fokus na h1; ←/→; Pokračovat ve čtení; proroctví po kliknutí z menu hraje a rozsvícený verš odpovídá času (i po 13 s), klik na verš, pauza, ztlumení, kapitola III, plynulý přechod I → II, pozastavení dorolování, fade při odchodu, návrat zpět, jeden zvuk (hymna × svědectví × proroctví), přímý vstup na verš s tlačítkem; hráčské postavy bez svědectví; konzole bez chyb. Pracovní strom **145,7 MB**.
+
+### 5 největších zbývajících slabin
+1. **Netestováno v Safari/iOS a Firefoxu ani na skutečném telefonu**: hlavně automatické spuštění proroctví po kliknutí (Safari bere gesto přísněji; záchranou je tlačítko „Vyslechnout proroctví“) a `<base href="/">` s odkazy v SVG.
+2. **Sdílené náhledy a vyhledávače vidí jeden statický `index.html`**: titulek a popis se mění až v prohlížeči; pro každou adresu vlastní `og:*` by chtělo předgenerované HTML (prerender) při buildu.
+3. **Časy veršů jsou ze strojového rozpoznání** (zarovnání 94–97 % slov); u veršů s přeslechy může zvýraznění přeskočit o zlomek sekundy dřív nebo později, ruční kontrola poslechem neproběhla.
+4. **Repo je pod limitem jen o 4 MB** (145,7 MB) a historie gitu roste (hlasy svědků překódované na 64 kb/s se do historie přidaly znovu); další média se vejdou jen na úkor stávajících.
+5. **Přepis odkazů je dvojí**: část šablon dál generuje staré kotvy a na nové adresy je převádí router (MutationObserver); funguje to všude, kde se testovalo, ale nové kódy by měly psát rovnou nové adresy (`chPath`, `sesPath`, `witPath` … v `router.js`).

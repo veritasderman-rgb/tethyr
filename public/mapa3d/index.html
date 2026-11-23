@@ -27,7 +27,7 @@
     <p class="ld-m" id="ldMsg">Rozvinuji mapu…</p>
   </div>
 </div>
-<div id="err" hidden><div><h2>Mapu se nepodařilo spustit</h2><p id="errMsg">Prohlížeč nepodporuje WebGL, nebo se nenačetla data.</p><p><a href="../index.html#mapa" target="_top">Zpět na kroniku</a></p></div></div>
+<div id="err" hidden><div><h2>Mapu se nepodařilo spustit</h2><p id="errMsg">Prohlížeč nepodporuje WebGL, nebo se nenačetla data.</p><p><a href="../mapa" target="_top">Zpět na kroniku</a></p></div></div>
 
 <header class="top glass" id="top">
   <div class="title">
@@ -51,7 +51,7 @@
     <button class="btn ico" id="btnSound" title="Zvuk (Z)" aria-pressed="false"><span aria-hidden="true">♪</span><em>Zvuk</em></button>
     <button class="btn ico" id="btnLegend" title="Legenda a ovládání (?)"><span aria-hidden="true">?</span><em>Legenda</em></button>
     <button class="btn ico" id="btnFull" title="Celá obrazovka (F)"><span aria-hidden="true">⤢</span><em>Celá obrazovka</em></button>
-    <a class="btn ico back" id="btnBack" href="../index.html#mapa" target="_top" title="Zpět do kroniky"><span aria-hidden="true">←</span><em>Kronika</em></a>
+    <a class="btn ico back" id="btnBack" href="../mapa" target="_top" title="Zpět do kroniky"><span aria-hidden="true">←</span><em>Kronika</em></a>
   </div>
 </header>
 
@@ -159,7 +159,7 @@
   bar.style.visibility = 'hidden';
   m.innerHTML = 'Mapa stáhne asi 4 MB (terén a data) a další modely podle přiblížení. Na mobilních datech to chvíli potrvá.';
   var b = document.createElement('button'); b.className = 'btn ld-go'; b.id = 'ldGo'; b.textContent = 'Načíst 3D mapu';
-  var a = document.createElement('a'); a.className = 'ld-back'; a.href = '../index.html#mapa'; a.target = '_top'; a.textContent = 'Zpět na 2D mapu kroniky';
+  var a = document.createElement('a'); a.className = 'ld-back'; a.href = '../mapa'; a.target = '_top'; a.textContent = 'Zpět na 2D mapu kroniky';
   m.after(b); b.after(a);
   b.onclick = function () { b.remove(); a.remove(); bar.style.visibility = ''; m.textContent = 'Rozvinuji mapu…'; go(); };
 })();

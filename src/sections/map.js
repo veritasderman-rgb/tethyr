@@ -3,8 +3,9 @@
 import L from 'leaflet';
 import { D } from '../lib/data.js';
 import { img } from '../lib/img.js';
+import 'leaflet/dist/leaflet.css';
 import { $, $$, esc, reduced, settleScroll } from '../lib/util.js';
-import { emit } from '../lib/sections.js';
+import { emit } from '../lib/router.js';
 
 const W = 2576, H = 884;
 const ERAS = ['I', 'II', 'III', 'IV', 'V', 'epilog'];
@@ -32,22 +33,8 @@ export function renderMap() {
   const stopsAt = {};
   R.forEach((r, i) => { const p = placeByName[r.place]; if (p) (stopsAt[p.id] ||= []).push(i); });
 
-  el.innerHTML = `<header class="sec-head"><p class="kicker">Mapa</p><h2 id="mapa-h">Cesta po Torilu</h2>
+  el.innerHTML = `<header class="sec-head"><p class="kicker">Mapa</p><h1 id="mapa-h" tabindex="-1">Cesta po Torilu</h1>
     <p class="lead">Kudy družina šla, kapitola po kapitole. Přehrajte cestu v čase, nebo klepněte na místo: ukáže, co se tam stalo, která sezení, bitvy a svědci k němu patří.</p><div class="orn">✦</div></header>
-    <div class="m3d wrap" id="mapa3d">
-      <div class="m3d-in">
-        <div class="m3d-txt">
-          <p class="m3d-k">3D</p>
-          <h3>Faerûn ve třech rozměrech</h3>
-          <p>Faerûn a Kara-Tur z výšky: hory, lesy a moře podle mapy, města a hrady z modelů, létající Thultanthar nad Anaurochem, deset sfér nad Bezstopým mořem, bitvy s vojsky a přelet tažením, kde kamera projde kapitolu po kapitole s titulky.</p>
-          <div class="m3d-b"><a class="btn red" href="mapa3d/index.html" target="_blank" rel="noopener">⤢ Otevřít 3D mapu na celou obrazovku</a><button class="btn" id="m3dLoad" aria-controls="m3dView">Načíst 3D mapu sem</button></div>
-          <p class="small" id="m3dNote">Načítá se až po klepnutí (asi 4 MB a další modely podle přiblížení). Na telefonu se zapne lehčí kvalita, zvuk a hlasy jen po klepnutí.</p>
-        </div>
-        <div class="m3d-view" id="m3dView" role="button" tabindex="0" aria-label="Načíst 3D mapu">
-          <img src="img/misc/mapa3d-poster.webp" alt="Náhled 3D mapy Faerûnu a Kara-Turu s místy kampaně" loading="lazy" decoding="async" width="1400" height="875">
-        </div>
-      </div>
-    </div>
     <div class="map-ui wrap" id="mapUi">
       <div class="mu-row">
         <div class="mu-grp" role="group" aria-label="Pohled">
@@ -94,20 +81,8 @@ export function renderMap() {
         <aside class="map-panel" id="mpPanel" aria-live="polite"><p class="mp-empty">Klepněte na místo, bitvu nebo sféru. Nebo spusťte <b>▶ Přehrát</b> a sledujte cestu družiny od roku 2003.</p></aside>
       </div>
       <p class="map-keys small">Klávesy na mapě: <kbd>mezerník</kbd> přehrát · <kbd>,</kbd> <kbd>.</kbd> krok · <kbd>[</kbd> <kbd>]</kbd> kapitola · <kbd>1</kbd>–<kbd>6</kbd> kniha, <kbd>0</kbd> vše · <kbd>+</kbd> <kbd>−</kbd> přiblížení · <kbd>Esc</kbd> zavřít kartu</p>
-    </div>`;
-
-  // ------------------------------------------------------------------ 3D mapa: načte se až na požádání
-  const load3d = () => {
-    const view = $('#m3dView', el);
-    if (view.classList.contains('live')) return;
-    view.innerHTML = '<iframe id="m3dFrame" src="mapa3d/index.html?embed=1" title="3D mapa Faerûnu" allow="fullscreen; autoplay" allowfullscreen></iframe>';
-    view.classList.add('live'); view.removeAttribute('role'); view.removeAttribute('tabindex');
-    view.closest('.m3d-in').classList.add('live');
-    $('#m3dLoad', el).hidden = true;
-  };
-  $('#m3dLoad', el).addEventListener('click', load3d);
-  $('#m3dView', el).addEventListener('click', load3d);
-  $('#m3dView', el).addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); load3d(); } });
+    </div>
+    <a class="m3d-link wrap" href="/mapa/3d"><img src="img/misc/mapa3d-poster.webp" alt="" loading="lazy" decoding="async" width="1400" height="875"><span><small>Vlastní stránka</small><b>3D mapa Faerûnu</b><i>Hory, města, létající Thultanthar a přelet tažením kapitolu po kapitole</i></span></a>`;
 
   // ------------------------------------------------------------------ stav
   let map, routeLayer, casingLayer, head, placeLayer, battleLayer, sphereLayer, clusterLayer;
@@ -461,7 +436,7 @@ export function renderMap() {
     const v = e.target.closest('[data-view]'); if (v) setView(v.dataset.view);
     const l = e.target.closest('[data-lay]');
     if (l) { const k = l.dataset.lay; lay[k] = !lay[k]; l.setAttribute('aria-pressed', String(lay[k])); if (k === 'route' && lay.route) head.addTo(map); applyFilters(); }
-    const n = e.target.closest('[data-npc]'); if (n) emit('registry:search', { q: n.dataset.npc });
+    const n = e.target.closest('[data-npc]'); if (n) { e.preventDefault(); emit('registry:search', { q: n.dataset.npc }); return; }
     const g = e.target.closest('[data-stop]');
     if (g) { stop(); const i = pts.findIndex((p) => p.i === +g.dataset.stop); if (i < 0) setEra('all', false); pos = Math.max(0, pts.findIndex((p) => p.i === +g.dataset.stop)); render(); map.panTo(head.getLatLng()); }
     if (e.target.closest('.mp-x')) { panelEl.innerHTML = '<p class="mp-empty">Klepněte na místo, bitvu nebo sféru.</p>'; Object.values(markers).forEach((o) => o.m.getElement()?.classList.remove('sel')); }
@@ -489,6 +464,11 @@ export function renderMap() {
     else return;
   });
   // odkaz na místo (z vyprávění v Příběhu): mapa se ukáže, přiblíží místo a otevře jeho kartu
+  // stránka skrytá / znovu ukázaná: zastavit přehrávání, po návratu přepočítat velikost mapy
+  window.addEventListener('page:change', (e) => {
+    if (e.detail.from === 'mapa') stop();
+    if (e.detail.to === 'mapa' && map) requestAnimationFrame(() => map.invalidateSize());
+  });
   window.addEventListener('map:place', (e) => {
     const p = placeById[e.detail.id];
     settleScroll($('.map-ui', el));
@@ -508,4 +488,10 @@ export function renderMap() {
   });
   // ladicí rozhraní pro testy
   window.__map2d = { get pos() { return pos; }, get n() { return pts.length; }, get playing() { return playing; }, play, stop, step, chStep, setEra, setView, get map() { return map; }, labels: () => $$('.leaf .lab-r, .leaf .lab-l', el).length, clusters: () => $$('.leaf .mcl', el).length };
+}
+
+/** /mapa?misto=<id> otevře kartu místa, /mapa?kniha=II přehraje trasu knihy. */
+export function enter(r) {
+  if (r.query.misto) window.dispatchEvent(new CustomEvent('map:place', { detail: { id: r.query.misto } }));
+  else if (r.query.kniha) window.dispatchEvent(new CustomEvent('map:era', { detail: { era: r.query.kniha } }));
 }
