@@ -27,4 +27,4 @@ def launch(p, args=None):
 def noise(m):
     """Známé neškodné zprávy: Firefox opravuje bbox glyfů v písmu Cardo (OTS), headless prohlížeč nemá zvukové zařízení."""
     t = m.text or ''
-    return 'downloadable font: glyf' in t or 'could not be decoded' in t or 'OnMediaSinkAudioErr' in t or 'NS_ERROR_DOM_MEDIA' in t or 'GPU stall due to ReadPixels' in t or 'GL Driver Message' in t or 'Skipping unsupported feature name' in t or 'Failed to create WebGL context' in t or 'WebGL creation failed' in t
+    return 'downloadable font: glyf' in t or 'could not be decoded' in t or 'OnMediaSinkAudioErr' in t or 'NS_ERROR_DOM_MEDIA' in t or 'GPU stall due to ReadPixels' in t or 'GL Driver Message' in t or 'Skipping unsupported feature name' in t or 'Failed to create WebGL context' in t or 'Autoplay is only allowed' in t or 'scroll-linked positioning' in t or 'WebGL creation failed' in t
