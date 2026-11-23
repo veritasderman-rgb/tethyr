@@ -30,7 +30,8 @@ function mediaPlugin() {
       const timings = ls('assets/voices', /\.json$/i);
       const hymna = ls('assets/hymna', MEDIA.hymna);
       const klip = ls('public/hymna', /\.mp4$/i); // videoklip hymny (public/hymna/rauko_klip.mp4)
-      return `export default ${JSON.stringify({ voices, video, timings, hymna, klip })};`;
+      const voicesCs = ls('assets/voices_cs', /\.mp3$/i); // české znění svědectví (iterace 10)
+      return `export default ${JSON.stringify({ voices, video, timings, hymna, klip, voicesCs })};`;
     },
     configureServer(server) {
       const re = /assets[\\/](voices|video|hymna)[\\/]/;
@@ -45,7 +46,7 @@ function mediaPlugin() {
       server.watcher.on('unlink', bump);
     },
     closeBundle() {
-      for (const [dir, re] of [['voices', MEDIA.voices], ['video', MEDIA.video], ['voices', /\.json$/i], ['hymna', MEDIA.hymna], ['proroctvi', MEDIA.proroctvi]]) {
+      for (const [dir, re] of [['voices', MEDIA.voices], ['video', MEDIA.video], ['voices', /\.json$/i], ['hymna', MEDIA.hymna], ['proroctvi', MEDIA.proroctvi], ['voices_cs', /\.(mp3|json)$/i]]) {
         const src = path.resolve('assets', dir);
         const dst = path.resolve('dist/assets', dir);
         for (const f of ls(src, re)) {

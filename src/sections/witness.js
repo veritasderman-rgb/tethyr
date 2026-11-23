@@ -7,7 +7,7 @@ import { D } from '../lib/data.js';
 import { small } from '../lib/img.js';
 import { navigate, witPath, syncMeta, H } from '../lib/router.js';
 import { voice, load as loadVoice, stop as stopVoice, unlock, claim, getVolume, setVolume, isMuted, setMuted, onVolume } from '../lib/audio.js';
-import { createStage, grain, STAGE_HTML, sideLabel, isFoe, isPast, stavShort, stavTitle, stavInfo, groupOf, subsCs, subMode, setSubMode, SUB_LABEL } from '../lib/wstage.js';
+import { createStage, grain, STAGE_HTML, sideLabel, isFoe, isPast, stavShort, stavTitle, stavInfo, groupOf, subsCs, subMode, setSubMode, SUB_LABEL, voiceLang, setVoiceLang } from '../lib/wstage.js';
 import { $, $$, esc, reduced, plural, settleScroll } from '../lib/util.js';
 
 const baseOf = (f) => f.replace(/\.[^.]+$/, '');
@@ -16,6 +16,10 @@ const HAS_VIDEO = Object.fromEntries(media.video.map((f) => [baseOf(f), f]));
 // video v celé délce se synchronizovanými ústy (assets/video/<id>_plne.mp4, příznak `video_plne` v datech svědka)
 const FULL_VIDEO = Object.fromEntries(media.video.filter((f) => /_plne\.[^.]+$/.test(f)).map((f) => [baseOf(f).replace(/_plne$/, ''), f]));
 const HAS_TIMING = media.timings.includes('timing.json');
+// české znění (iterace 10): assets/voices_cs/<id>.mp3 + timing.json, stahuje se až při volbě CZ
+const VOICE_CS = new Set((media.voicesCs || []).map(baseOf));
+let timingCs = null, timingCsP = null;
+const loadTimingCs = () => (timingCsP ||= fetch('assets/voices_cs/timing.json').then((r) => { if (!r.ok) throw new Error('voices_cs/timing.json: ' + r.status); return r.json(); }).then((t) => { timingCs = t; return t; }).catch((e) => { timingCsP = null; console.error(e); return null; }));
 const mmss = (t) => `${Math.floor(t / 60)}:${String(Math.round(t % 60)).padStart(2, '0')}`;
 
 // starší odkazy (např. z 3D mapy) na přejmenovaná id
@@ -70,7 +74,8 @@ export function renderWitness() {
       </div>
       <div class="w-ctl-c">
         <button class="btn sm red" data-act="doc" id="wDoc">▶ Celý dokument</button>
-        <span class="w-cc" role="group" aria-label="Titulky (hlas je anglicky)"><span class="w-cc-l" aria-hidden="true">Titulky</span>${['cs', 'en', 'off'].map((m) => `<button class="btn sm ghost" data-cc="${m}" aria-pressed="${subMode() === m}">${SUB_LABEL[m]}</button>`).join('')}</span>
+        ${VOICE_CS.size ? `<span class="w-lang" role="group" aria-label="Znění svědectví"><span class="w-cc-l" aria-hidden="true">Znění</span>${['en', 'cs'].map((l) => `<button class="btn sm ghost" data-lang="${l}" aria-pressed="${voiceLang() === l}" aria-label="${l === 'en' ? 'Anglické znění s českými titulky' : 'České znění'}">${l === 'en' ? 'EN' : 'CZ'}</button>`).join('')}</span>` : ''}
+        <span class="w-cc" role="group" aria-label="Titulky"><span class="w-cc-l" aria-hidden="true">Titulky</span>${['cs', 'en', 'off'].map((m) => `<button class="btn sm ghost" data-cc="${m}" aria-pressed="${subMode() === m}">${SUB_LABEL[m]}</button>`).join('')}</span>
         <button class="btn sm ghost" data-act="trans" aria-expanded="false" aria-controls="wTrans">Přepis</button>
       </div>
     </div>
@@ -91,6 +96,7 @@ export function renderWitness() {
   let acc = 0, t0 = 0, total = 0, starts = [], raf = 0, nextTimer = 0, nextTick = 0;
   let timing = null;
   let loadToken = 0;
+  let curLang = 'en';
 
   const timingP = HAS_TIMING ? fetch('assets/voices/timing.json').then((r) => r.json()).then((t) => { timing = t; renderGal(); }).catch(() => {}) : Promise.resolve();
 
@@ -176,16 +182,25 @@ export function renderWitness() {
     const ix = list.findIndex((x) => x.id === w.id); cur = ix;
     $('#wStart', el).classList.add('gone');
     $('#wTap', el).hidden = true;
-    const fullV = w.video_plne && FULL_VIDEO[w.id];
+    const cz = voiceLang() === 'cs' && VOICE_CS.has(w.id);
+    // lip-sync video je namluvené anglicky: v českém znění běží běžná šestisekundová smyčka
+    const fullV = !cz && w.video_plne && FULL_VIDEO[w.id];
     const m = stage.setWitness(w, { useVideo: true, video: fullV ? `assets/video/${fullV}` : HAS_VIDEO[w.id] ? `assets/video/${HAS_VIDEO[w.id]}` : '', full: !!fullV });
     $('#wProg', el).style.transform = 'scaleX(0)';
     markOn(); count(); info(w); trans(w); ui();
     let dur = 0;
     await timingP;
     if (tok !== loadToken) return;
-    if (VOICE_FILE[w.id]) { dur = await loadVoice(`assets/voices/${VOICE_FILE[w.id]}`); hasAudio = dur > 0; }
+    let csT = null;
+    if (cz) { await loadTimingCs(); csT = timingCs?.[w.id] || null; if (tok !== loadToken) return; }
+    stage.setCs(csT ? csT.lines.map((l) => l.cs) : null);
+    curLang = csT ? 'cs' : 'en';
+    trans(w);
+    if (csT) { dur = await loadVoice(`assets/voices_cs/${w.id}.mp3`); hasAudio = dur > 0; }
+    else if (VOICE_FILE[w.id]) { dur = await loadVoice(`assets/voices/${VOICE_FILE[w.id]}`); hasAudio = dur > 0; }
     if (tok !== loadToken) return; // mezitím přepnuto
-    const c = computeStarts(w, dur); starts = c.st; total = c.tot;
+    if (csT) { starts = csT.starts.slice(); total = dur || csT.duration; }
+    else { const c = computeStarts(w, dur); starts = c.st; total = c.tot; }
     if (!m.video) stage.ken(m.img, total, w.fokus);
     acc = 0; state = 'pause';
     if (autoplay) play();
@@ -259,7 +274,7 @@ export function renderWitness() {
     const box = $('#wTrans', el);
     if (!w) { box.innerHTML = ''; return; }
     box.innerHTML = `<h3>${esc(w.jmeno)}</h3><p class="w-tr-role">${esc(w.role)} · ${sideLabel(w)}${isPast(w) ? ` · ${esc(stavTitle(w))}` : ''}</p>
-      ${subsCs(w).map((t) => `<p>${esc(t)}</p>`).join('')}
+      ${curLang === 'cs' && timingCs?.[w.id] ? timingCs[w.id].lines.map((l) => `<p>${esc(l.cs)}</p>`).join('') : subsCs(w).map((t) => `<p>${esc(t)}</p>`).join('')}
       ${w.jazyk === 'en' ? `<details class="w-tr-en"><summary>Anglický originál (namluvené znění)</summary>${w.text.map((t) => `<p lang="en">${esc(t)}</p>`).join('')}</details>` : ''}`;
   }
 
@@ -313,6 +328,8 @@ export function renderWitness() {
   el.addEventListener('click', (e) => {
     const cc = e.target.closest('[data-cc]');
     if (cc) { setSubMode(cc.dataset.cc); return; }
+    const lg = e.target.closest('[data-lang]');
+    if (lg) { if (lg.dataset.lang !== voiceLang()) setVoiceLang(lg.dataset.lang); return; }
     const a = e.target.closest('[data-act]')?.dataset.act;
     if (a === 'play') toggle();
     else if (a === 'prev') step(-1);
@@ -355,6 +372,15 @@ export function renderWitness() {
     setTimeout(() => loadW(w, { autoplay: auto0 }), auto0 ? 350 : 450);
   });
   window.addEventListener('submode', (e) => $$('[data-cc]', el).forEach((b) => b.setAttribute('aria-pressed', b.dataset.cc === e.detail)));
+  // přepnutí znění EN/CZ: tlačítka, a když je svědek načtený, zastavit a začít nové znění od začátku
+  window.addEventListener('voicelang', (e) => {
+    $$('[data-lang]', el).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === e.detail)));
+    const w = curW();
+    if (!w || state === 'idle') return;
+    const was = state === 'play';
+    pause(); stopVoice();
+    loadW(w, { autoplay: was });
+  });
   window.addEventListener('witness:focus', () => stageEl.focus({ preventScroll: true }));
 
   renderGal(); count(); ui();
@@ -365,7 +391,7 @@ export function renderWitness() {
   $('#wInfo', el).innerHTML = '';
   // odchod na jinou stránku: zastavit (skrytý přehrávač by jinak hrál dál)
   window.addEventListener('page:change', (e) => { if (e.detail.from === 'svedectvi') { pause(); cancelNext(); } });
-  window.__wit = { get state() { return state; }, get cur() { return curId; }, voice };
+  window.__wit = { get state() { return state; }, get cur() { return curId; }, get lang() { return curLang; }, get starts() { return starts; }, get total() { return total; }, get fullVideo() { return !!(stage.video && /_plne/.test(stage.video.currentSrc || stage.video.src || '')); }, voice };
 }
 
 /** Vstup na stránku /svedectvi/<id>: otevřít svědka. Po kliknutí (gesto) hned hraje, při přímém otevření adresy čeká na klepnutí. */

@@ -196,3 +196,8 @@ body[data-page="proroctvi"] .nextp { margin-bottom: 110px; }
 @media (max-width: 760px) { #svedectvi .sec-head .lead .lead-more { display: none; } }
 .lx-note { list-style: none; grid-column: 1 / -1; padding: 12px 14px; font: 400 .9rem/1.4 var(--f-ui); color: var(--parch-dim); border: 1px dashed rgba(201, 165, 74, .4); }
 .lx-note .btn { margin-left: 8px; }
+/* iterace 10: přepínač znění svědectví EN | CZ */
+.w-lang, .w-cc { display: inline-flex; align-items: center; gap: 4px; }
+.w-lang { padding-right: 8px; margin-right: 4px; border-right: 1px solid rgba(201, 165, 74, .3); }
+.w-lang .btn[aria-pressed="true"], .w-cc .btn[aria-pressed="true"] { border-color: var(--gold2, #c9a54a); color: #ffe3a0; background: rgba(139, 30, 30, .45); }
+.w-cc-l { font: 500 .68rem/1 var(--f-ui); letter-spacing: .18em; text-transform: uppercase; color: var(--parch-dim); margin-right: 4px; }

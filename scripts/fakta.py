@@ -364,6 +364,22 @@ if os.path.exists(SRC_V3):
     except Exception as ex:  # noqa: BLE001
         print(f'varování: titulky se nepodařilo porovnat se zdrojem ({ex})')
 
+# ------------------------------------------------------------------ 7) české znění svědectví (iterace 10): jen vedlejší postavy, text přesně podle schváleného zdroje
+TCS = 'assets/voices_cs/timing.json'
+if os.path.exists(TCS):
+    tcs = load(TCS)
+    ids = {w['id'] for w in sv}
+    check(set(tcs) <= ids, 'české znění: jen svědci ze svedectvi.json (žádná hráčská postava)')
+    for wid, t in tcs.items():
+        check(len(t.get('starts', [])) == len(t.get('lines', [])) and all(l.get('cs') for l in t.get('lines', [])), f'{wid}: české znění – počet časů = počet titulků, žádný prázdný')
+        check(os.path.exists(f'assets/voices_cs/{wid}.mp3'), f'{wid}: český zvuk assets/voices_cs/{wid}.mp3 existuje')
+    SRC_CS = os.environ.get('SRC_VOICES_CS', '/home/claude/voices4') + '/timing.json'
+    if os.path.exists(SRC_CS):
+        src = load(SRC_CS)
+        for wid, t in tcs.items():
+            if wid in src:
+                check([l['cs'] for l in t['lines']] == [l['cs'] for l in src[wid]['lines']], f'{wid}: české titulky se liší od schváleného zdroje {SRC_CS} (nic se nepřepisuje)')
+
 # ------------------------------------------------------------------ výsledek
 if errors:
     print(f'FAKTA: {len(errors)} porušení invariantů ({checks} kontrol)')

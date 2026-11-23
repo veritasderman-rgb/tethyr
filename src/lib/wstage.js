@@ -14,6 +14,15 @@ export function setSubMode(m) {
   window.dispatchEvent(new CustomEvent('submode', { detail: mode }));
 }
 export const SUB_LABEL = { cs: 'CZ', en: 'EN', off: 'vyp' };
+// Znění svědectví (iterace 10): 'en' = anglický dabing (výchozí, primární jazyk) s českými titulky, 'cs' = české namluvené znění.
+const LANGKEY = 'zd-zneni';
+let vlang = (() => { try { return localStorage.getItem(LANGKEY) === 'cs' ? 'cs' : 'en'; } catch { return 'en'; } })();
+export const voiceLang = () => vlang;
+export function setVoiceLang(l) {
+  vlang = l === 'cs' ? 'cs' : 'en';
+  try { localStorage.setItem(LANGKEY, vlang); } catch { /* soukromé okno */ }
+  window.dispatchEvent(new CustomEvent('voicelang', { detail: vlang }));
+}
 /** České titulky (pole `titulky`), pokud sedí počet vět; jinak mluvený text. Pro karty a přepis. */
 export function subsCs(w) {
   return Array.isArray(w?.titulky) && w.titulky.length === w.text.length ? w.titulky : w.text;
@@ -53,7 +62,7 @@ export function createStage(root) {
   const layers = [...root.querySelectorAll('.w-layer')];
   const lower = $('.w-lower', root);
   const subP = $('.w-sub p', root);
-  let front = 0, kb = null, lastSent = -9, video = null, token = 0, full = false;
+  let front = 0, kb = null, lastSent = -9, video = null, token = 0, full = false, csLines = null;
 
   function layerHtml(w, withVideo) {
     const pos = w.fokus || '50% 30%';
@@ -109,7 +118,7 @@ export function createStage(root) {
   function setSub(i, w) {
     if (i === lastSent) return; lastSent = i; subW = w;
     subP.classList.remove('in');
-    setTimeout(() => { if (lastSent !== i) return; const off = mode === 'off'; subP.textContent = i >= 0 && w && !off ? subs(w)[i] : ''; subP.lang = mode === 'en' ? 'en' : 'cs'; if (i >= 0 && !off) subP.classList.add('in'); }, i <= 0 ? 0 : 240);
+    setTimeout(() => { if (lastSent !== i) return; const off = mode === 'off'; subP.textContent = i >= 0 && w && !off ? (csLines ? csLines[i] || '' : subs(w)[i]) : ''; subP.lang = mode === 'en' && !csLines ? 'en' : 'cs'; if (i >= 0 && !off) subP.classList.add('in'); }, i <= 0 ? 0 : 240);
   }
   window.addEventListener('submode', () => { const i = lastSent; lastSent = -9; if (i >= 0 && subW) setSub(i, subW); else clearSub(); })
   function clearSub() { lastSent = -9; subP.textContent = ''; subP.classList.remove('in'); }
@@ -130,7 +139,9 @@ export function createStage(root) {
     else if (!video.paused) video.pause();
   }
   function clear() { cleanup(); layers.forEach((l) => { l.className = 'w-layer'; l.innerHTML = ''; }); lower.classList.remove('in'); clearSub(); }
-  return { setWitness, ken, setSub, clearSub, freeze, playVideo, sync, clear, lower, get video() { return video; }, get token() { return token; } };
+  /** České znění: titulky = řádky českého timingu (pole cs); null = anglický dabing (titulky podle režimu). */
+  function setCs(lines) { csLines = lines || null; lastSent = -9; }
+  return { setWitness, ken, setSub, clearSub, setCs, freeze, playVideo, sync, clear, lower, get video() { return video; }, get token() { return token; } };
 }
 
 /** Zrno (canvas) v kořenu scény; `active()` říká, jestli se má animovat. Vrací funkci pro zapnutí/vypnutí. */

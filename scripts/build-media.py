@@ -18,6 +18,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VOICES = os.environ.get('SRC_VOICES', '/home/claude/voices3')  # od iterace 7 anglický dabing (dřív voices2, česky)
 VID = os.environ.get('SRC_VID', '/home/claude/vid')
 HYMNA = os.environ.get('SRC_HYMNA', '/home/claude/hymna')
+# iterace 10: české znění svědectví (texty schválené autorem, beze změn) → assets/voices_cs/ (mono 64 kb/s, načítá se až při volbě CZ)
+VOICES_CS = os.environ.get('SRC_VOICES_CS', '/home/claude/voices4')
 FORCE = '--force' in sys.argv
 FADE = 0.8  # s, délka prolnutí konce do začátku
 
@@ -112,6 +114,20 @@ def main():
         for f in os.listdir(d):
             if f.endswith(ext) and f[:-len(ext)].removesuffix('_plne') not in ids:
                 os.remove(d + f); print('  odstraněno:', f)
+    # české znění svědectví: <id>.mp3 + timing.json ({id: {duration, starts[], lines[{start, end, cs}]}}); jiné soubory se ignorují
+    if os.path.exists(VOICES_CS + '/timing.json'):
+        ac = ROOT + '/assets/voices_cs/'; os.makedirs(ac, exist_ok=True)
+        tcs = json.load(open(VOICES_CS + '/timing.json', encoding='utf-8'))
+        ncs = 0
+        for i in ids:
+            src = f'{VOICES_CS}/{i}.mp3'
+            if i in tcs and os.path.exists(src) and newer(src, ac + i + '.mp3'):
+                mp3(src, ac + i + '.mp3', 64, mono=True); ncs += 1
+        out = {i: {'duration': tcs[i]['duration'], 'starts': tcs[i]['starts'], 'lines': [{'start': l['start'], 'end': l['end'], 'cs': l['cs']} for l in tcs[i]['lines']]} for i in ids if i in tcs}
+        open(ac + 'timing.json', 'w', encoding='utf-8').write(json.dumps(out, ensure_ascii=False, separators=(',', ':')))
+        for f in os.listdir(ac):
+            if f.endswith('.mp3') and f[:-4] not in out: os.remove(ac + f); print('  odstraněno (cs):', f)
+        print(f'  české znění: {len(out)} svědků, {ncs} nově překódovaných')
     # hymna
     ah = ROOT + '/assets/hymna/'
     os.makedirs(ah, exist_ok=True)
