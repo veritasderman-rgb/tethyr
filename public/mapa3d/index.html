@@ -6,8 +6,6 @@
 <title>Faerûn – 3D mapa Západních draků</title>
 <meta name="description" content="Interaktivní 3D mapa Faerûnu a Kara-Turu s trasou Tethyrské královské družiny 2003–2026 (1372–1385 DR).">
 <meta name="theme-color" content="#12100d">
-<link rel="preload" href="assets/terrain/height.bin" as="fetch" crossorigin>
-<link rel="preload" href="data/campaign.json" as="fetch" crossorigin>
 <link rel="stylesheet" href="css/map.css">
 <script type="importmap">
 { "imports": {
@@ -77,6 +75,8 @@
       <button class="btn ico" id="tlNext" title="Další zastávka (.)" aria-label="Další zastávka">›</button>
       <button class="btn ico" id="tlDiary" title="Deník výpravy" aria-pressed="true" aria-label="Deník výpravy">❦</button>
       <button class="btn sm" id="tlScale" title="Přepnout měřítko časové osy" aria-label="Přepnout měřítko časové osy">u stolu</button>
+      <button class="btn sm" id="tlSpeed" title="Rychlost přehrávání" aria-label="Rychlost přehrávání">1×</button>
+      <button class="btn tour" id="tlTour" title="Přelet tažením: kamera projde kapitolu po kapitole s titulky (T)" aria-pressed="false"><span aria-hidden="true">✈</span> Přelet tažením</button>
     </div>
   </div>
   <div class="tl-slider">
@@ -90,6 +90,8 @@
 <div id="scale"><span id="scaleTxt"></span><i id="scaleBar"></i></div>
 <div id="mstat" aria-hidden="true"></div>
 <div id="sphereVeil" aria-hidden="true"></div>
+<div id="chapT" aria-live="polite"></div>
+<button class="btn" id="tourExit" title="Ukončit přelet (Esc)">✕ Ukončit přelet</button>
 
 <div id="legend" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="legH">
   <div class="sheet glass">
@@ -144,6 +146,23 @@
 
 <div id="lightbox" class="modal" hidden role="dialog" aria-modal="true" aria-label="Obraz"><figure><img id="lbImg" alt=""><figcaption id="lbCap"></figcaption></figure><button class="close" id="lbClose" aria-label="Zavřít">×</button></div>
 
-<script type="module" src="js/main.js"></script>
+<script>
+// Na telefonu, při úsporném režimu dat nebo pomalém připojení se mapa (asi 4 MB a další modely) nenačte sama:
+// nejdřív tlačítko „Načíst 3D mapu“. Z webu kroniky (?embed=1, uživatel už klepl) nebo s ?load=1 se načte hned.
+(function () {
+  var q = new URLSearchParams(location.search), c = navigator.connection || {};
+  var coarse = window.matchMedia && matchMedia('(pointer:coarse)').matches;
+  var gate = !q.has('embed') && !q.has('load') && (coarse || c.saveData || /(^|[^4])[23]g/.test(c.effectiveType || '') || Math.min(innerWidth, innerHeight) < 600);
+  function go() { var s = document.createElement('script'); s.type = 'module'; s.src = 'js/main.js'; document.body.appendChild(s); }
+  if (!gate) { go(); return; }
+  var m = document.getElementById('ldMsg'), bar = document.querySelector('.ld-bar');
+  bar.style.visibility = 'hidden';
+  m.innerHTML = 'Mapa stáhne asi 4 MB (terén a data) a další modely podle přiblížení. Na mobilních datech to chvíli potrvá.';
+  var b = document.createElement('button'); b.className = 'btn ld-go'; b.id = 'ldGo'; b.textContent = 'Načíst 3D mapu';
+  var a = document.createElement('a'); a.className = 'ld-back'; a.href = '../index.html#mapa'; a.target = '_top'; a.textContent = 'Zpět na 2D mapu kroniky';
+  m.after(b); b.after(a);
+  b.onclick = function () { b.remove(); a.remove(); bar.style.visibility = ''; m.textContent = 'Rozvinuji mapu…'; go(); };
+})();
+</script>
 </body>
 </html>

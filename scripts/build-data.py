@@ -143,7 +143,7 @@ def job(src, dst, widths, q=74):
 
 
 def ilu(file, w=(640, 1280)):
-    return job(BUILD + '/ilu2/' + file, 'ilu/' + file.rsplit('.', 1)[0], w)
+    return job(BUILD + '/ilu2/' + file, 'ilu/' + file.rsplit('.', 1)[0], w, 68)
 
 
 ILU_DONE = set()
@@ -162,10 +162,10 @@ for m in MAN:
 for g in GAL:
     p = BUILD + '/nove/n%02d.jpg' % g['n']
     if os.path.exists(p):
-        job(p, 'nove/n%02d' % g['n'], (480, 1200))
+        job(p, 'nove/n%02d' % g['n'], (480, 1200), 68)
 FOTO = sorted(int(os.path.basename(p)[:-4]) for p in glob.glob(BUILD + '/foto/*.jpg'))
 for n in FOTO:
-    job(BUILD + '/foto/%03d.jpg' % n, 'foto/%03d' % n, (480, 1280))
+    job(BUILD + '/foto/%03d.jpg' % n, 'foto/%03d' % n, (480, 1280), 68)
 PORTS = sorted(os.path.basename(p)[:-4] for p in glob.glob(PORT + '/*.png'))
 for k in PORTS:
     job(PORT + '/' + k + '.png', 'port/' + k, (480, 1280), 78)
@@ -351,8 +351,29 @@ for p in MP['places']:
 for p in MP['places'] + MP['off']:
     p['id'] = slug(p['name'])
 PL = {p['name']: p for p in MP['places']}
+# Pořadí zastávek podle chronologie sezení (v map.json jsou některé úseky klikaté a čáry se kříží).
+# Uvnitř jednoho sezení (např. s-2006 = celé tažení po Shou Lungu) data pořadí neurčují: drží se pořadí
+# ze shrnutí sezení (Kuo Te' Lung → T'u Lung → … Tuigan → Balanzie) a zbytek tak, aby se trasa nekřížila.
+# Klíč = indexy v map.json, hodnota = nové pořadí týchž indexů.
+ROUTE_REORDER = {
+    (7, 8, 9, 10, 11, 12, 13, 14, 15): (7, 8, 9, 14, 15, 10, 11, 12, 13),  # Shou Lung (s-2006)
+    (16, 17, 18, 19, 20, 21, 22): (17, 21, 22, 16, 18, 19, 20),            # s-2006-12 → s-2007-02 → Maztica (s-2007)
+    (23, 24, 25, 26, 27, 28, 29): (23, 24, 25, 27, 26, 28, 29),            # Štíty Apokalypsy (s-2008, s-2009)
+    (46, 47, 48): (47, 48, 46),                                            # 5/2014: Chult, Chondalský les, Khôltar
+}
+ORDER = list(range(len(MP['route'])))
+for k, v in ROUTE_REORDER.items():
+    for a, b in zip(k, v): ORDER[a] = b
+NEWIDX = {old: new for new, old in enumerate(ORDER)}
+for k in CH_ROUTE:
+    CH_ROUTE[k] = [NEWIDX[i] for i in CH_ROUTE[k]]
+for k in ('ch-shou-lung-a-velke-tazeni', 'ch-navrat-tyruv-chram-a-sigil', 'ch-stity-apokalypsy', 'ch-kholtar-chult-a-hoova-mala'):
+    CH_ROUTE[k] = sorted(CH_ROUTE[k])   # kapitoly z přeskládaných úseků: body v novém pořadí
+for b in books:
+    for ch in b['chapters']:
+        ch['route'] = CH_ROUTE.get(ch['id'], [])
 route = []
-for r in MP['route']:
+for r in (MP['route'][i] for i in ORDER):
     p = PL.get(r['place'])
     route.append(dict(r, x=p['x'] if p else None, y=p['y'] if p else None))
 place_ses = {}
@@ -363,7 +384,59 @@ place_npc = {}
 for p in MP['places'] + MP['off']:
     k = norm(p['name'])
     place_npc[p['name']] = [n['i'] for n in npcs if k in norm(n.get('when', '') + ' ' + n.get('who', '') + ' ' + n.get('region', ''))][:40]
-mapdata = {'size': [2576, 884], 'places': [dict(p, sessions=place_ses[p['name']], npcs=place_npc[p['name']]) for p in MP['places']],
+# zastávky trasy: rok (pro posuvník let), sezení z téže doby, kapitola Příběhu
+def ym(t):
+    """'8–12/2011' → (2011.58, 2011.99); '2007–2008' → (2007.0, 2008.99)"""
+    t = (t or '').replace('–', '-').replace(' ', '')
+    def one(q, end):
+        m = re.match(r'^(?:(\d{1,2})/)?(\d{4})$', q)
+        if not m: return None
+        y = int(m.group(2))
+        if m.group(1): return y + (int(m.group(1)) - 1) / 12 + (1 / 12 - 0.001 if end else 0)
+        return y + (0.999 if end else 0)
+    parts = t.split('-')
+    if len(parts) == 1: return one(parts[0], False), one(parts[0], True)
+    a, b = parts[0], parts[-1]
+    if re.match(r'^\d{1,2}$', a) and '/' in b:
+        y = int(b.split('/')[1]); return y + (int(a) - 1) / 12, one(b, True)
+    return one(a, False), one(b, True)
+
+
+def skey(s):
+    d = sdate(s); return d.year + (d.month - 1) / 12 + (d.day - 1) / 372
+
+
+SKEY = {s['id']: skey(s) for s in S}
+CH_OF_SES = {sid: ch['id'] for b in books for ch in b['chapters'] for sid in ch['sessions']}
+CH_OF_IDX = {}
+for k, v in CH_ROUTE.items():
+    for i in v: CH_OF_IDX.setdefault(i, k)
+for i, r in enumerate(route):
+    lo, hi = ym(r['real'])
+    ss = [x for x in place_ses.get(r['place'], []) if lo is not None and lo - 0.05 <= SKEY.get(x, 0) <= hi + 0.05]
+    if not ss and lo is not None:   # sezení z téže doby, která jmenují kraj v názvu
+        reg = (PL.get(r['place']) or {}).get('region', '')
+        ss = [x['id'] for x in S if lo - 0.05 <= SKEY[x['id']] <= hi + 0.05 and (norm(r['place']) in norm(x.get('title', '')) or (reg and norm(reg) in norm(x.get('title', ''))))][:3]
+    r['k'] = round(lo or 2003, 3)
+    if ss: r['s'] = sorted(ss, key=lambda x: SKEY[x])[:6]
+    r['ch'] = CH_OF_IDX.get(i) or next((CH_OF_SES[x] for x in r.get('s', []) if x in CH_OF_SES), None) or (route[i - 1].get('ch') if i else None)
+# bitvy a svědci u míst (vazby z 3D mapy, aby obě mapy ukazovaly totéž)
+try:
+    CAMP3D = json.load(open(ROOT + '/public/mapa3d/data/campaign.json', encoding='utf-8'))
+    P3 = {o['id']: o for o in CAMP3D['places'] + CAMP3D['spheres']}
+    B3 = [{'id': b['id'], 'name': b['name'], 'x': b.get('x'), 'y': b.get('z'), 'pl': b.get('pl'), 'era': b.get('era'), 'real': b.get('real'), 'dr': b.get('dr')}
+          for b in CAMP3D['battles'] if not b.get('bg')]
+except (OSError, KeyError, ValueError):
+    P3, B3 = {}, []
+for p in MP['places'] + MP['off']:
+    o = P3.get(p['id'], {})
+    if o.get('battles'): p['battles'] = o['battles']
+    if o.get('wit'): p['wit'] = o['wit']
+    if o.get('sphere') and o.get('icon'): p['icon'] = o['icon']
+PID = {p['id']: p for p in MP['places']}
+for b in B3:
+    if b['x'] is None and b['pl'] in PID: b['x'], b['y'] = PID[b['pl']]['x'], PID[b['pl']]['y']
+mapdata = {'size': [2576, 884], 'battles': [b for b in B3 if b['x'] is not None], 'places': [dict(p, sessions=place_ses[p['name']], npcs=place_npc[p['name']]) for p in MP['places']],
            'off': [dict(p, sessions=place_ses[p['name']], npcs=place_npc[p['name']]) for p in MP['off']], 'route': route}
 
 # ---------------------------------------------------------------- proroctví
@@ -529,7 +602,7 @@ def convert(j):
             if im.mode == 'RGBA': im = im.convert('RGB')
         ww = min(w, im.width)
         r = im if ww == im.width else im.resize((ww, round(im.height * ww / im.width)), Image.LANCZOS)
-        r.save(out, 'WEBP', quality=q, method=5)
+        r.save(out, 'WEBP', quality=q, method=6)
         done += 1
     return done
 

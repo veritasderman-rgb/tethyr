@@ -23,7 +23,7 @@ export function renderProphecy() {
           <div class="pr-terc rv">${c.tercet.map((l) => `<p>${esc(l)}</p>`).join('')}</div>
           <div class="pr-orn">✦</div>
           ${c.verses.map((v, j) => `<div class="pr-v rv${v.who ? ' known' : ''}" id="pv-${i + 1}-${j}">
-            <p>${v.t.map(esc).join('<br>')}</p>
+            <p>${v.t.map((l) => esc(l).replace(/\s*\|\s*/g, "<br>")).join("<br>")}</p>
             ${v.img ? `<button class="pr-thumb" data-lb="${esc(largest('ilu/' + v.img))}" data-cap="${esc(v.cap || '')}" aria-label="Obraz k verši: ${esc(v.cap || '')}"><img src="${small('ilu/' + v.img)}" alt="" loading="lazy" decoding="async"></button>` : ''}
             ${v.who ? `<button class="pr-who" aria-expanded="false" aria-controls="prw-${i}-${j}">✦ <span>Komu patří</span></button><p class="pr-ans" id="prw-${i}-${j}" hidden><b>${esc(v.who)}</b><small>${esc(v.src)}</small></p>` : ''}
           </div>`).join('')}

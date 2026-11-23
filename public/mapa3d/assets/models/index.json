@@ -1,47 +1,15 @@
 {
- "bear": {
-  "group": "extra",
-  "bytes": 60068
- },
- "cat": {
-  "group": "extra",
-  "bytes": 78584
- },
- "griffon": {
-  "group": "extra",
-  "bytes": 138256
- },
- "mammoth": {
-  "group": "extra",
-  "bytes": 172808
- },
  "mill": {
   "group": "extra",
   "bytes": 166220
- },
- "reindeer": {
-  "group": "extra",
-  "bytes": 68176
  },
  "remorhaz": {
   "group": "extra",
   "bytes": 142528
  },
- "sled": {
-  "group": "extra",
-  "bytes": 154028
- },
  "tent": {
   "group": "extra",
   "bytes": 142532
- },
- "wolf": {
-  "group": "extra",
-  "bytes": 87392
- },
- "yeti": {
-  "group": "extra",
-  "bytes": 99196
  },
  "house5_l": {
   "group": "hlite",
@@ -167,10 +135,6 @@
   "group": "lite",
   "bytes": 115548
  },
- "kelvin": {
-  "group": "marks",
-  "bytes": 185956
- },
  "crater": {
   "group": "marks",
   "bytes": 158416
@@ -234,10 +198,6 @@
  "trawler": {
   "group": "props",
   "bytes": 113300
- },
- "iceboats": {
-  "group": "props",
-  "bytes": 86344
  },
  "citytower": {
   "group": "props",

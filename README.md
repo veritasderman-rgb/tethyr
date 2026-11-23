@@ -53,9 +53,22 @@ Zdroje: `SRC_SVEDECTVI`, `SRC_VOICES`, `SRC_VID`, `SRC_HYMNA` (proměnné prost�
 
 Hymna „Rauko“: hlavním přehrávačem je videoklip `public/hymna/rauko_klip.mp4` (1280×720, H.264 crf 31, faststart, ~39 MB) s plakátem `rauko_klip.jpg`; pod ním se zvýrazňuje text podle videa. Záložní hudební přehrávač: `assets/hymna/rauko.mp3`, text a časy řádků v `data/hymna.json` (z `/home/claude/hymna/rauko.txt`; časy z `timing.json` ve zdrojové složce (`sekce[].radky[].start`, případně pole 47 čísel), jinak z `data/hymna-timing.json` (odhad z automatického přepisu)). Přehrávač má play/pauzu, posuv, hlasitost, zvýraznění řádku a sloky, klik na řádek skočí na řádek; vizuál reaguje na hlasitost (WebAudio analyser). Když ve složce hymny existuje `rauko_klip.mp4`, po `build-media.py` se nabídne „Videoklip“. Poděkování je `data/podekovani.txt` beze změn.
 
+## 2D mapa tažení
+
+`src/sections/map.js` (Leaflet). Přehrávání cesty v čase: ▶ / pauza, krok, skok po kapitolách, rychlost 0,5–4×, posuvník s léty u stolu nebo DR, trasa se kreslí postupně (dlouhé přesuny obloukem), barva podle knihy, úseky aktuální kapitoly svítí, aktuální místo pulzuje, při vstupu do kapitoly se ukáže její titulek a mapa se na ni přiblíží. Karta místa: co se tam stalo (s odkazem „na trase“), kapitoly Příběhu (`#ch-…`), bitvy (`#b-…`), svědci (`#svedectvi/<id>`), sezení, kdo tam žije, odkaz do 3D mapy (`mapa3d/index.html#p=<id>`). Filtry knih, vrstvy (trasa, sídla, bitvy, plány existence, popisky), pohledy Celek / Faerûn / Kara-Tur / Sféry (sféry jsou sloupec za západním okrajem mapy), shlukování blízkých míst a popisky bez překryvu (hladově podle důležitosti, vpravo/vlevo/skrýt). Klávesy na mapě: mezerník, `,` `.`, `[` `]`, `1`–`6`, `0`, `Esc`. Ladicí API `window.__map2d`, test `scripts/test-it5-map.py`.
+
+Data zastávek (`public/data/map.json` `route[]`) mají `k` (rok), `s` (sezení z téže doby), `ch` (kapitola). Pořadí zastávek skládá `build-data.py` podle chronologie sezení (`ROUTE_REORDER`, např. Shou Lung), `CH_ROUTE` se přepočítá; bitvy a svědci u míst se berou z dat 3D mapy, aby obě mapy ukazovaly totéž.
+
+## Váha a média
+
+- Obrázky WebP ve dvou šířkách (`srcset`), malby, podklady PJ a fotky kvalita 68 (method 6), portréty 78–80. Mapka kapitoly v Příběhu stahuje podklad až při přiblížení (`lazyMaps` v `src/lib/minimap.js`).
+- Hlasy svědků mono 96 kb/s, hymna 128 kb/s (`build-media.py` překóduje sám), videa svědků 1280×720 crf 27 bez zvuku, klip hymny H.264 crf 31 + AAC 128 kb/s, `preload="metadata"`/`none`.
+- 3D mapa nemá vlastní kopie médií: obrázky bere z `../img`, videa a hlasy svědků z `../assets` (Vite je kopíruje do `dist/assets`).
+- Kontrola: `python3 scripts/weight.py` (první načtení úvodní stránky a velikost repa), `python3 public/mapa3d/tools/perf.py` (doba načtení, draw calls a trojúhelníky 3D mapy v headless Chromiu).
+
 ## 3D mapa a kotvy
 
-`public/mapa3d/` je samostatná složka (viz její README). V oddílu Mapa je vstup s odkazem na celou obrazovku a s iframem, který se načte až po kliknutí. Kotvy, které mapa očekává: `#s-…` (sezení), `#b-…` (bitvy), `#svedectvi/<id>` (otevře svědectví), `#mapa`, `#pribeh`; zpracovává je router v `src/main.js` (otevře rozbalené podrobnosti a dorovná polohu, než se dočtou lazy obrázky). Polohy míst v `build-data.py` (`MAP_FIX`) jsou opravené stejně jako v 3D mapě.
+`public/mapa3d/` je samostatná složka (viz její README). V oddílu Mapa je vstup s odkazem na celou obrazovku a s iframem (`?embed=1`), který se načte až po kliknutí. Otevřená samostatně na telefonu, při úsporném režimu dat nebo pomalém připojení nejdřív ukáže tlačítko „Načíst 3D mapu“. Kotvy, které mapa očekává: `#s-…` (sezení), `#b-…` (bitvy), `#svedectvi/<id>` (otevře svědectví), `#mapa`, `#pribeh`; zpracovává je router v `src/main.js` (otevře rozbalené podrobnosti a dorovná polohu, než se dočtou lazy obrázky). Polohy míst v `build-data.py` (`MAP_FIX`) jsou opravené stejně jako v 3D mapě.
 
 ## Příběh (vyprávění)
 

@@ -86,6 +86,7 @@ WNPC = load(WEB + '/data/npcs.json')
 BOOKS = load(WEB + '/data/books.json')
 CHARS = load(WEB + '/data/characters.json')
 WIT = load(VOI + '/svedectvi_v2.json')
+WSV = {w['id']: w for w in load(WEB + '/data/svedectvi.json')}
 TIMING = load(VOI2 + '/timing.json') if os.path.exists(VOI2 + '/timing.json') else {}
 SESS = {s['id']: s for s in SES}
 for sid, s in WSES.items():              # zpracovaná verze má malby a hráče
@@ -118,7 +119,7 @@ def img(key, want=640):
         return None
     cands.sort()
     pick = next((c for c in cands if c[0] >= want), cands[-1])
-    rel = f'media/{d}/{pick[1]}'
+    rel = f'../img/{d}/{pick[1]}'          # obrázky webu kroniky (public/img), nekopírují se
     USED_IMG[rel] = os.path.join(folder, pick[1])
     return rel
 
@@ -135,14 +136,14 @@ MODEL = {
     'Stříbroluní': ('elftower', 'elf', 1.3), 'Vysoký les': ('oak', None, 1.4), 'Proskur': ('town', 'town', 0.9),
     'Labyrint Maxe Fredinia': ('bubble', None, 1), 'Sothasil': ('bubble', None, 1.3), 'Tvář vědění': ('tooth', None, 1.3),
     'Tempat Larang': ('pagoda', 'monastery', 1.2), 'Chrám Západního úsvitu': ('pagoda', 'shou', 1.4), 'Dračí let': ('manor', None, 1.1),
-    'Pevnost Rudé rytířky': ('castle', None, 1.4), 'Knihovna Arenkae': ('tower', None, 1), 'Trpasličí doly pod Rudou pevností': ('mine', None, 0.9),
+    'Pevnost Rudé rytířky': ('castle', None, 1.4), 'Knihovna Arenkae': ('tower', None, 1), 'Trpasličí doly pod Rudou pevností': ('mine', 'dwarf', 0.9),
     'Wolfburg': ('citytower', 'town', 1), 'Ascore': ('xinlenal', None, 1.2), 'Khôltar': ('town', 'town', 1.1),
     'Chult': ('oak', None, 1.2), 'Chondalský les': ('oak', None, 1.1), 'Reghedský ledovec': ('icecave', None, 1.1),
     'Zakhara': ('tent', None, 1), 'Moře padlých hvězd': ('ship', None, 1.2), 'Evermeet': ('elftower', 'elf', 1.2),
-    'Podtemno': ('mine', 'under', 1), 'Shoonach': ('cragmaw', None, 1.1), 'Mechový kámen': ('house', None, 0.8),
+    'Podtemno': ('mine', 'under', 1), 'Shoonach': ('cragmaw', None, 1.1), 'Mechový kámen': ('house', 'farm', 0.8),
     'Semberholm': ('elfhouse', None, 0.9), 'Halruaa': ('wizard', 'elf', 1.2), 'Anauroch': (None, None, 1),
     'Sundabar': ('citygate', 'town', 1.1), 'Dungeon s remorhazem': ('remorhaz', None, 1), 'Základna Nest': ('gobcamp', None, 1),
-    'Sossal': ('tent', None, 1), 'Turmish': ('town', 'town', 1.1), 'Ironfang Deep': ('mine', None, 1),
+    'Sossal': ('tent', None, 1), 'Turmish': ('town', 'town', 1.1), 'Ironfang Deep': ('mine', 'dwarf', 1),
     'Velká trhlina': ('crater', None, 2.4), 'Mount Talath': ('temple', None, 1), 'Cham Fau': ('pagoda', 'shou', 1.2),
     'Mořské věže': ('lighthouse', None, 1.2), 'Dashadjen': ('tooth', None, 1), 'Hlubina': ('citytower', 'city', 1.5),
     'Oryndoll': ('cragmaw', 'under', 1), 'Anchorome': ('oak', None, 1), 'Selûnarra': ('xinlenal', None, 1.1),
@@ -245,8 +246,9 @@ for p in MAP['off']:
 
 # ---------------------------------------------------------------- trasa (místa na mapě + vložené cesty do sfér)
 route = []
-for r in MAP['route']:
-    route.append({'p': pid[r['place']]['id'], 'real': r['real'], 'dr': r['dr'], 'what': r['what'], 'era': r['era'], 'walk': r.get('walk', False)})
+for r in WMAP['route']:   # pořadí z webu: build-data.py ho skládá podle chronologie sezení (ROUTE_REORDER)
+    route.append({'p': pid[r['place']]['id'], 'real': r['real'], 'dr': r['dr'], 'what': r['what'], 'era': r['era'], 'walk': r.get('walk', False),
+                  'ch': r.get('ch')})
 for sp in spheres:
     for v in sp['visits']:
         lo = ym(v['real'])[0] or 0
@@ -258,6 +260,7 @@ for sp in spheres:
                     ins = i + 1
         route.insert(ins, {'p': sp['id'], 'real': v['real'], 'dr': v['dr'], 'what': v['what'], 'era': v['era'], 'walk': False, 'sphere': True})
 byid = {o['id']: o for o in places + spheres}
+CH_OF_SES = {sid: ch['id'] for b in BOOKS for ch in b['chapters'] for sid in ch['sessions']}
 for r in route:
     o = byid[r['p']]
     lo, hi = ym(r['real'])
@@ -273,8 +276,18 @@ for r in route:
             ss = [near]
     r['s'] = ss[:6]
     r['k'] = round(lo or 0, 3)
+    if not r.get('ch'):
+        r['ch'] = next((CH_OF_SES[x] for x in r['s'] if x in CH_OF_SES), None)
     if not r.get('f'):
         o['sessions'] = sorted(set(o['sessions']) | set(ss), key=lambda x: SESS[x]['_k'])
+
+prev = None
+for r in route:
+    r['ch'] = r.get('ch') or prev
+    prev = r['ch']
+    if not r['ch']: r.pop('ch')
+chapters = {ch['id']: {'t': ch['title'], 'era': b['key'], 'real': ch.get('real', ''), 'dr': ch.get('drs', '')}
+            for b in BOOKS for ch in b['chapters'] if any(r.get('ch') == ch['id'] for r in route)}
 
 # ---------------------------------------------------------------- bitvy
 battles = []
@@ -308,9 +321,10 @@ for w in WIT:
         if not P.get('sphere'):
             o['x'], o['z'] = P['x'], P['z']
         P['wit'].append(w['id'])
-    o['vid'] = f'media/vid/{w["id"]}.mp4' if os.path.exists(f'{VID}/{w["id"]}.mp4') else None
-    o['poster'] = f'media/vid/{w["id"]}.jpg' if os.path.exists(f'{VID}/{w["id"]}.jpg') else None
-    o['audio'] = f'media/voices/{w["id"]}.mp3' if os.path.exists(f'{VOI2}/{w["id"]}.mp3') else None
+    # média svědků sdílí s webem (assets/video 1280×720 smyčka, assets/voices mono 96 kb/s, portrét public/img/wit)
+    o['vid'] = f'../assets/video/{w["id"]}.mp4' if os.path.exists(f'{WEB}/../assets/video/{w["id"]}.mp4') else None
+    o['poster'] = img(WSV.get(w['id'], {}).get('portret'), 640)
+    o['audio'] = f'../assets/voices/{w["id"]}.mp3' if os.path.exists(f'{WEB}/../assets/voices/{w["id"]}.mp3') else None
     wits.append(o)
 
 # ---------------------------------------------------------------- sezení (jen použitá) s malbami
@@ -349,7 +363,7 @@ for c in CHARS:
 
 out = san({'meta': {'title': 'Faerûn – 3D mapa Západních draků', 'src': 'toril-east-west.jpg', 'size': WMAP.get('size', [2576, 884]),
                     'milesPerUnit': 2.6, 'built': True},
-           'eras': eras, 'places': places, 'spheres': spheres, 'route': route, 'battles': battles, 'witnesses': wits,
+           'eras': eras, 'chapters': chapters, 'places': places, 'spheres': spheres, 'route': route, 'battles': battles, 'witnesses': wits,
            'sessions': sessions, 'party': party})
 print('opravené polohy:', *FIXED, sep='\n  ')
 txt = json.dumps(out, ensure_ascii=False, separators=(',', ':'))
@@ -362,27 +376,7 @@ print('campaign.json', len(txt) // 1024, 'kB;', len(places), 'míst,', len(spher
       len(wits), 'svědků,', len(sessions), 'sezení,', len(USED_IMG), 'obrázků')
 
 # ---------------------------------------------------------------- média
-if NO_MEDIA:
-    sys.exit()
-for rel, src in USED_IMG.items():
-    dst = os.path.join(ROOT, rel)
-    os.makedirs(os.path.dirname(dst), exist_ok=True)
-    if not os.path.exists(dst) or os.path.getmtime(dst) < os.path.getmtime(src):
-        shutil.copy2(src, dst)
-os.makedirs(MEDIA + '/vid', exist_ok=True); os.makedirs(MEDIA + '/voices', exist_ok=True)
-for w in wits:
-    i = w['id']
-    if w['vid']:
-        dst = f'{MEDIA}/vid/{i}.mp4'
-        if not os.path.exists(dst):   # živý portrét: 640×360, bez zvuku, smyčka
-            subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', f'{VID}/{i}.mp4', '-vf', 'scale=640:-2', '-an', '-c:v', 'libx264',
-                            '-crf', '27', '-preset', 'slow', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', dst], check=True)
-    if w['poster']:
-        dst = f'{MEDIA}/vid/{i}.jpg'
-        if not os.path.exists(dst):
-            subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', f'{VID}/{i}.jpg', '-vf', 'scale=480:-2', '-q:v', '4', dst], check=True)
-    if w['audio']:
-        dst = f'{MEDIA}/voices/{i}.mp3'
-        if not os.path.exists(dst):   # řeč: mono 64 kb/s stačí
-            subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', f'{VOI2}/{i}.mp3', '-ac', '1', '-b:a', '64k', dst], check=True)
-print('média hotová')
+# Obrázky, videa a hlasy se berou přímo z webu kroniky (../img, ../assets), do mapy se nic nekopíruje.
+missing = [rel for rel, src in USED_IMG.items() if not os.path.exists(src)]
+if missing:
+    print('!! chybí obrázky', missing[:5])

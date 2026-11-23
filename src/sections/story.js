@@ -6,7 +6,7 @@ import { $, $$, esc, nb, plural, reduced, settleScroll } from '../lib/util.js';
 import { ash } from '../lib/ash.js';
 import { openLightbox } from '../lib/lightbox.js';
 import { emit } from '../lib/sections.js';
-import { routeSvg } from '../lib/minimap.js';
+import { routeSvg, lazyMaps } from '../lib/minimap.js';
 
 const KEY_POS = 'zd-cteni', KEY_DONE = 'zd-precteno';
 const store = {
@@ -75,7 +75,7 @@ function witnessCut(sids, skip) {
     </div></aside>`;
 }
 function chapMap(c, book) {
-  const r = routeSvg(c.route, { cls: 'mc' });
+  const r = routeSvg(c.route, { cls: 'mc', lazy: true });
   if (!r) return '';
   const first = D.map.route[c.route[0]];
   const pid = D.map.places.find((p) => p.name === first.place)?.id;
@@ -194,6 +194,7 @@ export function renderStory() {
     </nav>
     <button class="toc-btn" id="tocBtn" aria-controls="toc" aria-expanded="false"><span>☰ Obsah</span><b id="tocBtnCh"></b></button>`;
   el.innerHTML = html;
+  lazyMaps(el);
   $$('.book-open', el).forEach((b) => ash(b, { count: 26 }));
 
   wireClicks(el);

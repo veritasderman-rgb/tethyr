@@ -18,6 +18,8 @@ Přes `file://` mapa nepoběží (načítá data přes `fetch`). Do webu se vlo�
 
 - V iframu se tlačítko „Kronika“ změní na „Samostatně“ (otevře mapu v novém okně). Odkazy do kroniky mají `target="_top"`, takže z iframu přepnou celou stránku.
 - Kvalita: `?q=high` / `?q=low` (jinak automaticky: PC plná, dotyková zařízení a malé obrazovky lehká; volba se pamatuje v `localStorage`).
+- Načtení na požádání: na dotykovém zařízení, malé obrazovce, při `saveData` nebo pomalém připojení se nejdřív ukáže tlačítko „Načíst 3D mapu“ (do té doby se nestáhne ani three.js, ani terén). `?embed=1` (iframe z kroniky, uživatel už klepl) a `?load=1` bránu přeskočí.
+- Média: mapa nemá vlastní kopie obrázků, videí ani hlasů. Bere je z webu kroniky: `../img/…` (malby, portréty), `../assets/video/<id>.mp4` a `../assets/voices/<id>.mp3` (svědci). Samostatně (mimo web) proto poběží bez obrázků a médií svědků.
 
 ### Odkazy z mapy do kroniky (očekávané kotvy v `../index.html`)
 
@@ -30,7 +32,7 @@ Přes `file://` mapa nepoběží (načítá data přes `fetch`). Do webu se vlo�
 
 ### Odkazy do mapy (hash)
 
-`#p=castle-tethyr` (místo), `#b=b-bitva-v-anaurochu` (bitva), `#w=finian` (svědek), `#s=s-2011-06-21` (zastávka/místo s tímto sezením), `#krok=97` (zastávka výpravy, od 1), `#era=V` (filtr knihy). Holé `#s-…` a `#b-…` fungují také, takže web může použít stejné kotvy jako u sebe.
+`#p=castle-tethyr` (místo), `#b=b-bitva-v-anaurochu` (bitva), `#w=finian` (svědek), `#s=s-2011-06-21` (zastávka/místo s tímto sezením), `#krok=97` (zastávka výpravy, od 1), `#ch=ch-shou-lung-a-velke-tazeni` (první zastávka kapitoly), `#prelet` (spustí přelet tažením), `#era=V` (filtr knihy). Holé `#s-…` a `#b-…` fungují také, takže web může použít stejné kotvy jako u sebe.
 
 ## Co mapa umí
 
@@ -45,6 +47,13 @@ Přes `file://` mapa nepoběží (načítá data přes `fetch`). Do webu se vlo�
 - **Drobnosti z kroniky**: draci Aliance nad Anaurochem (11 draků), létací džunka Shou Lungu, elfské létací lodě Zlatý sokol a Endarleaf, královnina létající loď nad Castle Tethyr, lodě na Moři padlých hvězd a piráti z Nelantheru, Austiův odchod na Evermeet (loď mizí na západě), kraken z Jezera páry, runodraci nad Shoonachem, modrá dračice Iryklathagra, kovová loď u Dračího letu, loď v Reghedském ledovci. Každá má kartu s textem z kroniky a odkazem.
 - Měření vzdálenosti (místa ze seznamu, klepnutím na popisky nebo dva body v mapě; míle, km, dny pěšky / na koni / lodí / létající lodí), sonda výšky a krajiny po klepnutí, hledání (místa, bitvy, svědci, sezení, drobnosti; bez diakritiky), legenda, myš/dotyk/klávesnice, zvuk, celá obrazovka, načítací obrazovka, `prefers-reduced-motion` (bez průletů a animace trasy), adaptivní rozlišení podle FPS.
 
+## Přelet tažením a výkon (iterace 5)
+
+- **Přelet tažením** (tlačítko ✈, klávesa `T`, odkaz `#prelet`): autopilot po zastávkách, kamera letí za praporem družiny, při vstupu do kapitoly velký titulek (kniha, léta u stolu a DR, název kapitoly, místo), filmové pruhy, skryté ovládání; `Esc` nebo ✕ přelet ukončí. Rychlost 0,5–4× (tlačítko vedle měřítka). Zastávky mají kapitolu Příběhu (`campaign.json` `route[].ch`, `chapters`), deník i karta místa odkazují na kapitolu v kronice (`../index.html#ch-…`).
+- **Pořadí trasy** se bere z webu (`public/data/map.json`, přeskládané podle chronologie sezení), sféry se vkládají podle let.
+- **Výkon:** statické skupiny tvarů (pagody, pyramidy, meče, džunky, věže Thultantharu) se „pečou“ do jedné geometrie s barvami ve vrcholech, vojska u bitev jsou `InstancedMesh` (jedna geometrie na stranu, pohyb přes matice instancí), terén má dvě úrovně detailu (z dálky každý druhý vrchol, všechny dlaždice najednou, takže bez švů), meče bitev zmizí z velké dálky, modely se dál nahrávají líně podle přiblížení, stromy jsou instance s počtem podle vzdálenosti. Města a přístavy dostaly další modely z Desetiměstí (domy, krčma, kovárna, studna, stánky, sýpka, strážnice, jeřáb, sušák ryb, loďky, trpasličí domy u Ironfang Deep a dolů pod Rudou pevností, mlýn u Mechového kamene); severské zvíře a ledové modely, které do této kampaně nepatří, jsou pryč.
+- Měření: `python3 tools/perf.py` (headless Chromium + SwiftShader). Iterace 5: celkový pohled na PC 533 → 205 draw calls a 1,24 M → 0,38 M trojúhelníků, Anauroch zblízka na telefonu až 1171 → 73 draw calls; načtení na PC (bez GPU) ~4 MB.
+
 ## Struktura
 
 ```
@@ -57,23 +66,21 @@ assets/terrain/            map.jpg (textura), height.bin (Uint16 1288×442), mas
 assets/models/*.glb        3D modely (z Desetiměstí), index.json
 assets/sounds/*.mp3        zvukové smyčky (z Desetiměstí)
 assets/fonts/              Cardo, Crimson Text, Fira Sans, Cinzel (woff2, latin + latin-ext)
-media/ilu, media/port, …   malby a portréty (WebP z webu kroniky)
-media/vid/<id>.mp4|jpg     živé portréty svědků (640×360, bez zvuku)
-media/voices/<id>.mp3      hlasy svědků (mono 64 kb/s)
 tools/build_terrain.py     podklad → výšky a masky
-tools/build_data.py        data kroniky → campaign.json + kopie médií
+tools/build_data.py        data kroniky → campaign.json (média se nekopírují, odkazuje na ../img a ../assets)
+tools/perf.py              měření načtení, draw calls a trojúhelníků
 tools/extract_assets.py    modely a zvuky z repozitáře desetimesti
 tools/shots.py             Playwright snímky (SwiftShader) do /home/claude/webshots/mapa3d/
 tools/gallery.html         náhled všech modelů (vývojová pomůcka)
 ```
 
-Velikost složky ~36 MB (média 21 MB, modely 8 MB, zvuky 3 MB). Modely a zvuky se stahují až když jsou potřeba.
+Velikost složky ~14 MB (modely 6,8 MB, zvuky 3 MB, terén 1,9 MB). Modely a zvuky se stahují až když jsou potřeba.
 
 Přegenerování: `python3 tools/build_terrain.py && python3 tools/build_data.py` (zdroje se jen čtou; cesty jdou změnit proměnnými `SRC_WORK`, `SRC_WEB`, `SRC_VOICES`, `SRC_VOICES2`, `SRC_VID`). Kontrola: spustit server a `python3 tools/shots.py`.
 
 ## Co je převzato z desetimesti
 
-Z repozitáře `desetimesti` (desetimesti.vercel.app): struktura engine (šum, terén v dlaždicích s ořezem mimo záběr, nebe se shaderem a hvězdami, kamera s průlety, ovládání myší/dotykem/klávesnicí WASD-QE-RF, DOM popisky podle vzdálenosti, měření, sonda po klepnutí, škálování rozlišení podle FPS, adaptivní kvalita PC/telefon, režim filmu → teď přehrávání výpravy, deník družiny s pergamenovou kartou a listováním), jednoduché tvary (`humanoid`, `flyer`, `ship`), loader GLB s nahrazením zástupného tvaru, všech 63 modelů (v `models_*.js` jako base64, tady rozbalené do `.glb`) a zvukové smyčky ze `sounds.js`. Nahrazeno: zimní sever (sníh, led, počasí d20, kalendář), deník jiné družiny, písně a videa k zimním bestiím (nejsou v datech této kampaně – nepoužité), CDN (three.js i písma jsou lokálně).
+Z repozitáře `desetimesti` (desetimesti.vercel.app): struktura engine (šum, terén v dlaždicích s ořezem mimo záběr, nebe se shaderem a hvězdami, kamera s průlety, ovládání myší/dotykem/klávesnicí WASD-QE-RF, DOM popisky podle vzdálenosti, měření, sonda po klepnutí, škálování rozlišení podle FPS, adaptivní kvalita PC/telefon, režim filmu → teď přehrávání výpravy, deník družiny s pergamenovou kartou a listováním), jednoduché tvary (`humanoid`, `flyer`, `ship`), loader GLB s nahrazením zástupného tvaru, modely (v `models_*.js` jako base64, tady rozbalené do `.glb`; 51 z 63, bez zimní fauny a ledových modelů) a zvukové smyčky ze `sounds.js`. Nahrazeno: zimní sever (sníh, led, počasí d20, kalendář), deník jiné družiny, písně a videa k zimním bestiím (nejsou v datech této kampaně – nepoužité), CDN (three.js i písma jsou lokálně).
 
 ## Opravy poloh (georeference)
 

@@ -195,7 +195,7 @@ function create(timing) {
     }
     if (s.type === 'map') {
       const asp = innerWidth / innerHeight;
-      const r = routeSvg(s.chap.route, { cls: 'wi', aspect: Math.min(2.4, Math.max(1, asp)), pad: 90, minW: 700, dim: 0.5 });
+      const r = routeSvg(s.chap.route, { cls: 'wi', aspect: Math.min(2.4, Math.max(1, asp)), pad: 90, padTop: 170, minW: 700, dim: 0.5 });
       // na výšku (telefon): když se trasa vejde do středního výřezu, mapa vyplní celou obrazovku, jinak se zobrazí celá s okraji
       if (r && asp < 1 && r.box.rw * 1.2 <= r.box.h * asp) r.svg = r.svg.replace('xMidYMid meet', 'xMidYMid slice');
       return `<div class="fs fs-map">${r ? r.svg : ''}<div class="fs-cap"><p class="fs-k">${esc(s.b.kap)} · ${esc(s.chap.drs || s.b.dr)} · u stolu ${esc(s.chap.real)}</p><h3>${esc(s.chap.title)}</h3>${r ? `<span class="fs-pl">${esc(r.names.slice(0, 7).join(' · '))}</span>` : ''}</div></div>`;

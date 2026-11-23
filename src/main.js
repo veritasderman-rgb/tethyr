@@ -41,7 +41,7 @@ import './lib/audio.js';
 // Oddíly a data, která potřebují (načítají se až při přiblížení k oddílu).
 register('uvod', renderHero, ['images', 'stats']);
 register('pribeh', renderStory, ['images', 'books', 'sessions', 'svedectvi', 'world', 'map', 'vypraveni']);
-register('mapa', renderMap, ['images', 'map', 'sessions', 'npcs']);
+register('mapa', renderMap, ['images', 'map', 'sessions', 'npcs', 'books', 'svedectvi', 'world']);
 register('svedectvi', renderWitness, ['images', 'svedectvi', 'books', 'map', 'sessions', 'world']);
 register('druzina', renderParty, ['images', 'characters', 'sessions', 'svedectvi']);
 register('bitvy', renderBattles, ['images', 'world', 'sessions', 'svedectvi']);

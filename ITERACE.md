@@ -80,3 +80,32 @@
 3. **Těžké soubory:** klip hymny (39 MB) a 3D mapa; film klip předčítá i na mobilních datech, repo je dál nad 180 MB.
 4. **Časová osa na mobilu:** linky postav mají neviditelnou dotykovou plochu 44 px, ale sousední linky se překrývají, takže zásah je přesný jen přibližně; popisky mají 18 px.
 5. **Ořez tváře na výšku závisí na ručním `fokus`** v datech; u nových svědků je nutné ho nastavit. Drobnost: horní popisek „Trasa:“ se na mobilu může překrýt s názvem místa na mapě; stará CSS `.w-inter`/`.wi-card` je nepoužitá.
+
+## Iterace 5 – mapa tažení, 3D Faerûn a váha webu (23. 11. 2026)
+
+### Hotovo
+- **2D mapa tažení (přepsaná):** přehrávání cesty v čase (▶/pauza, krok, skok po kapitolách, rychlost 0,5–4×), posuvník let s popisky u stolu 2003–2026 nebo DR a barevným pruhem knih, trasa se kreslí postupně a plynule (dlouhé přesuny obloukem, aby se cesty tam a zpět nepřekrývaly), barva podle knihy, úseky aktuální kapitoly svítí a starší ustoupí, aktuální místo pulzuje, při vstupu do kapitoly titulek a přiblížení na celou kapitolu. Karta místa: co se tam stalo (s odkazem „na trase“), kapitoly Příběhu, bitvy, svědci s portréty, sezení, kdo tam žije, odkaz do 3D mapy; karta bitvy (strany, velitelé, výsledek, svědci, bojové hlášení). Filtry knih, vrstvy (trasa, sídla a místa, bitvy, plány existence, popisky), pohledy Celek / Faerûn / Kara-Tur / Sféry (deset sfér jako sloupec za západním okrajem mapy), shlukování blízkých míst a popisky bez překryvu, klávesnice (mezerník, `,` `.`, `[` `]`, `1`–`6`, `0`, `Esc`).
+- **Pořadí trasy podle chronologie sezení** (`ROUTE_REORDER` v `build-data.py`, kapitoly se přepočítají): Shou Lung bez překřížení (Kuo Te' Lung → T'u Lung → Wu Pi Te Shao → Ohňové hory → Tuigan → Khazari → Balanzie → Port; pořadí ze shrnutí s-2006, zbytek tak, aby se čáry nekřížily), návrat 2006–2007 (Údolí a Chrám ze s-2006-12, pak Tyrův chrám a Subotami, pak Maztica), Štíty Apokalypsy, Khôltar/Chult. Překřížení v kapitolách: Shou Lung 2 → 0, Khôltar 1 → 0, Štíty 2 → 1, návrat 1 → 1 (data víc neurčují). Totéž pořadí převzala 3D mapa.
+- **Ořez severu v režimu Dokument opravený:** výřez mapy kapitoly se smí rozšířit za okraj podkladu (tmavé pozadí), takže Pevnost Rudé rytířky a Reghedský ledovec (10 px od horního okraje) už nejsou uříznuté; ve filmu je nahoře víc místa pro horní lištu.
+- **3D mapa Faerûnu:** **přelet tažením** (✈, `T`, `#prelet`) – autopilot po zastávkách s kamerou za praporem, velké titulky kapitol (kniha, léta, DR, název, místo), filmové pruhy, `Esc` ukončí; rychlost 0,5–4×. Zastávky znají kapitolu, deník i karta místa odkazují zpět do Příběhu (`#ch-…`), nové kotvy `#ch=…`. **Výkon:** pečení statických tvarů do jedné geometrie, vojska jako `InstancedMesh`, dvě úrovně detailu terénu, meče bitev jen do rozumné vzdálenosti (celkový pohled na PC 533 → 205 draw calls, 1,24 M → 0,38 M trojúhelníků; Anauroch zblízka na telefonu až 1171 → 73 draw calls). Další modely z Desetiměstí ve městech, přístavech a trpasličích sídlech (domy, krčma, kovárna, studna, stánky, sýpka, strážnice, jeřáb, sušák ryb, loďky, mlýn). **Načtení na požádání:** na telefonu, při úsporném režimu dat nebo pomalém připojení tlačítko „Načíst 3D mapu“, do té doby se nestáhne ani three.js ani terén (ověřeno v Playwrightu); iframe z kroniky (`?embed=1`) se načte rovnou po klepnutí. Média svědků a obrázky bere z webu (`../assets`, `../img`), žádné kopie.
+- **Váha** (`scripts/weight.py`, headless Chromium, bez scrollování; velikost `du -sb` bez node_modules, dist, .git):
+
+  | | před | po |
+  |---|---|---|
+  | první načtení úvodní stránky (desktop i mobil) | 1,44 MB / 29 požadavků | **0,95 MB** / 28 požadavků |
+  | pracovní strom repa | 187,1 MB | **147,8 MB** |
+  | `public/mapa3d` | 36,1 MB | 13,9 MB (bez duplicitních médií, bez 10 nepoužitých modelů) |
+  | `assets` (hlasy, videa, hymna) | 51,7 MB | 41,4 MB (hlasy 128 → 96 kb/s mono, hymna 186 → 128 kb/s bez obalu) |
+  | `public/img` | 58,6 MB | 53,1 MB (malby, podklady, fotky WebP q 68, method 6) |
+  | `public/hymna` (klip) | 39,3 MB | 37,9 MB (zvuk AAC 128 kb/s, obraz beze změny) |
+  | 3D mapa do připravenosti (PC) | ~4,9 MB | ~4,0 MB |
+
+  Mapka kapitoly v Příběhu stahuje podklad (450 kB) až při přiblížení. Videa svědků zůstala 1280×720, crf 27, bez zvuku (odpovídá zadání). Modely GLB už byly komprimované meshopt a kvantizací.
+- Ověřeno v Playwrightu (desktop 1440×900, mobil 390×844, snímky `/home/claude/webshots/it5/`): `scripts/test-it5-map.py` (28 kontrol: přehrávání, kapitoly, karty, vrstvy, překryvy popisků 0, klávesnice), `scripts/test-it5-3d.py` (brána na mobilu, přelet, odkazy do Příběhu, video svědka z `../assets`, žádné HTTP chyby), `shots4.py` (všech 12 oddílů bez přetékání, konzole bez chyb), `test-it4-film.py`, `test-players.py`. `npm ci && npm run build` z čistého klonu projde.
+
+### Slabiny
+1. **Výkon 3D mapy je změřený jen v SwiftShaderu** (počty draw calls a trojúhelníků, ne skutečné fps); na skutečném notebooku a telefonu ani v Safari/Firefoxu netestovaná. Plná kvalita na PC stále kreslí 1,1 M trojúhelníků terénu zblízka.
+2. **Repo je pod 150 MB jen těsně** (147,8 MB) a historie gitu má dál ~136 MB (staré verze médií); zmenšit by šla jen přepsáním historie. Nejtěžší zůstává klip hymny (38 MB).
+3. **Pořadí zastávek uvnitř jednoho sezení** (Shou Lung, návrat 2006–2007) je odvozené ze shrnutí a z geometrie, data ho neurčují; kapitoly Štíty Apokalypsy a návrat mají dál po jednom překřížení.
+4. **3D mapa samostatně (mimo web)** už nemá obrázky ani média svědků, protože je bere z `../img` a `../assets`; zdrojová složka `/home/claude/mapa3d` je synchronizovaná, ale sama o sobě neúplná.
+5. 2D mapa: na úzkém displeji zabírají ovládací prvky výšku (tři řádky tlačítek nad mapou) a sféry jsou jen sloupec značek bez tras do nich; `test-anchors.py` z iterace 2 neprojde, protože záložní přehrávač hymny je od iterace 3 sbalený.

@@ -9,6 +9,7 @@ Vezme vše, co ve zdrojových složkách je, a jde spouštět opakovaně (dalš�
   videa:   SRC_VID    (/home/claude/vid)      <id>.mp4 (1280×720, 6 s, bez zvuku)  →  assets/video/<id>.mp4
            Video se při převodu upraví na plynulou smyčku (konec se prolne do začátku) a překóduje (crf 27).
   hymna:   SRC_HYMNA  (/home/claude/hymna)    rauko.mp3, rauko_klip.mp4 (pokud je), timing.json (pokud je) → assets/hymna/
+Hlasy se překódují na mono 96 kb/s (řeč, ~0,7 MB na svědka), hymna na 128 kb/s bez obrázku obalu.
 Hlasy a videa se berou jen pro id z data/svedectvi.json (hráčské postavy žádné nemají).
 """
 import json, os, shutil, subprocess, sys
@@ -28,6 +29,21 @@ def newer(src, dst):
 def duration(p):
     out = subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', p], capture_output=True, text=True)
     return float(out.stdout.strip())
+
+
+def bitrate(p):
+    out = subprocess.run(['ffprobe', '-v', 'error', '-select_streams', 'a:0', '-show_entries', 'stream=bit_rate', '-of', 'csv=p=0', p], capture_output=True, text=True)
+    try: return int(out.stdout.strip())
+    except ValueError: return 0
+
+
+def mp3(src, dst, kbps=96, mono=True):
+    """Řeč: mono 96 kb/s, bez metadat a obrázků (časy vět zůstanou, kodér přidá jen ~25 ms)."""
+    tmp = dst + '.tmp.mp3'
+    r = subprocess.run(['ffmpeg', '-y', '-v', 'error', '-i', src, '-map', '0:a:0', '-map_metadata', '-1'] + (['-ac', '1'] if mono else []) +
+                       ['-c:a', 'libmp3lame', '-b:a', f'{kbps}k', tmp])
+    if r.returncode: raise SystemExit('ffmpeg selhal pro ' + src)
+    os.replace(tmp, dst)
 
 
 def loopify(src, dst, crf=27):
@@ -54,7 +70,8 @@ def main():
     for i in ids:
         s = f'{VOICES}/{i}.mp3'
         if os.path.exists(s):
-            if newer(s, av + i + '.mp3'): shutil.copy(s, av + i + '.mp3'); nv += 1
+            d = av + i + '.mp3'
+            if newer(s, d) or bitrate(d) > 100000: mp3(s, d); nv += 1
         else:
             print('  chybí hlas:', i)
         s = f'{VID}/{i}.mp4'
@@ -79,7 +96,9 @@ def main():
     os.makedirs(ah, exist_ok=True)
     for name in ('rauko.mp3', 'rauko_klip.mp4', 'timing.json'):
         s = f'{HYMNA}/{name}'
-        if os.path.exists(s) and newer(s, ah + name):
+        if name == 'rauko.mp3' and os.path.exists(s) and (newer(s, ah + name) or bitrate(ah + name) > 140000):
+            mp3(s, ah + name, 128, mono=False); print('  hymna:', name, '128 kb/s')
+        elif os.path.exists(s) and newer(s, ah + name):
             shutil.copy(s, ah + name); print('  hymna:', name)
     tot = sum(os.path.getsize(os.path.join(dp, f)) for dp, _, fs in os.walk(ROOT + '/assets') for f in fs)
     print(f'hlasy: {nv} nových, videa: {nvid} nových, assets celkem {tot / 1e6:.1f} MB')

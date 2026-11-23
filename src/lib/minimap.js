@@ -6,18 +6,23 @@ import { esc } from './util.js';
 const MW = 2576, MH = 884;
 
 /** Vrátí { svg, names } nebo null, když úsek nemá body na mapě. opts: aspect, pad, minW, cls, dim, label */
-export function routeSvg(idx, { aspect = 2.2, pad = 70, minW = 520, cls = 'mc', dim = 0.42, label = true } = {}) {
+export function routeSvg(idx, { aspect = 2.2, pad = 70, padTop = pad, minW = 520, cls = 'mc', dim = 0.42, label = true, lazy = false } = {}) {
   const pts = (idx || []).map((i) => D.map.route[i]).filter((r) => r && r.x != null);
   if (!pts.length) return null;
   const xs = pts.map((p) => p.x), ys = pts.map((p) => p.y);
   let x0 = Math.min(...xs) - pad, x1 = Math.max(...xs) + pad;
-  let y0 = Math.min(...ys) - pad, y1 = Math.max(...ys) + pad;
+  let y0 = Math.min(...ys) - padTop, y1 = Math.max(...ys) + pad;
   let w = Math.max(minW, x1 - x0), h = y1 - y0;
   if (w / h < aspect) w = h * aspect; else h = w / aspect;
   if (w > MW) { w = MW; h = Math.min(MH, w / aspect); }
   if (h > MH) { h = MH; }
-  const cx = (Math.min(...xs) + Math.max(...xs)) / 2, cy = (Math.min(...ys) + Math.max(...ys)) / 2;
+  const cx = (Math.min(...xs) + Math.max(...xs)) / 2, cy = (Math.min(...ys) + Math.max(...ys) + pad - padTop) / 2;
+  // výřez se drží uvnitř mapy, jen pokud se tím neuřízne okraj trasy (sever: Pevnost Rudé rytířky leží 10 px od horního okraje)
   x0 = Math.max(0, Math.min(MW - w, cx - w / 2)); y0 = Math.max(0, Math.min(MH - h, cy - h / 2));
+  const yMin = Math.min(...ys) - Math.min(padTop, 40), yMax = Math.max(...ys) + Math.min(pad, 40);
+  const xMin = Math.min(...xs) - 40, xMax = Math.max(...xs) + 40;
+  if (yMin < y0) y0 = yMin; if (yMax > y0 + h) y0 = yMax - h;
+  if (xMin < x0) x0 = xMin; if (xMax > x0 + w) x0 = xMax - w;
   const sc = w / 1000;
   // úsek přes celý svět se do poměru stran nevejde: radši celý s okraji než oříznutý
   const par = Math.abs(w / h - aspect) > 0.05 ? 'xMidYMid meet' : 'xMidYMid slice';
@@ -29,11 +34,23 @@ export function routeSvg(idx, { aspect = 2.2, pad = 70, minW = 520, cls = 'mc', 
     return `<text x="${(p.x + (right ? 9 : -9) * sc).toFixed(1)}" y="${(p.y - 7 * sc).toFixed(1)}" text-anchor="${right ? 'start' : 'end'}" class="${cls}-lab" style="font-size:${(15 * sc).toFixed(1)}px;stroke-width:${(3.5 * sc).toFixed(1)}px">${esc(p.place)}</text>`;
   }).join('') : '';
   const svg = `<svg class="${cls}-svg" viewBox="${x0.toFixed(0)} ${y0.toFixed(0)} ${w.toFixed(0)} ${h.toFixed(0)}" preserveAspectRatio="${par}" role="img" aria-label="Trasa družiny: ${esc(names.join(', '))}">
-    <image href="img/map/toril-2576.webp" x="0" y="0" width="${MW}" height="${MH}"/>
+    <rect x="${(x0 - w).toFixed(0)}" y="${(y0 - h).toFixed(0)}" width="${(w * 3).toFixed(0)}" height="${(h * 3).toFixed(0)}" fill="#0d0b09"/>
+    <image ${lazy ? 'data-' : ''}href="img/map/toril-2576.webp" x="0" y="0" width="${MW}" height="${MH}"/>
     <rect x="0" y="0" width="${MW}" height="${MH}" fill="rgba(16,14,11,${dim})"/>
     ${pts.length > 1 ? `<path d="${d}" class="${cls}-route" pathLength="1" style="stroke-width:${(2.6 * sc).toFixed(1)}px"/>` : ''}
     ${pts.map((p, i) => `<circle cx="${p.x}" cy="${p.y}" r="${((i === 0 || i === pts.length - 1 ? 6 : 4) * sc).toFixed(1)}" class="${cls}-pt" style="animation-delay:${(0.3 + (i / pts.length) * 2.4).toFixed(2)}s"/>`).join('')}
     ${labels}
   </svg>`;
   return { svg, names, era: pts[0].era, box: { w, h, rw: Math.max(...xs) - Math.min(...xs), rh: Math.max(...ys) - Math.min(...ys) } };
+}
+
+// Líné mapky: podklad (450 kB) se stáhne, až když se mapka blíží k obrazovce.
+let lazyIO;
+export function lazyMaps(root) {
+  lazyIO ||= new IntersectionObserver((ents) => ents.forEach((e) => {
+    if (!e.isIntersecting) return;
+    lazyIO.unobserve(e.target);
+    e.target.querySelectorAll('image[data-href]').forEach((i) => { i.setAttribute('href', i.getAttribute('data-href')); i.removeAttribute('data-href'); });
+  }), { rootMargin: '600px 0px' });
+  root.querySelectorAll('svg').forEach((svg) => { if (svg.querySelector('image[data-href]')) lazyIO.observe(svg); });
 }
