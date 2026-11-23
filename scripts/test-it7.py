@@ -159,7 +159,7 @@ with sync_playwright() as p:
                 a = pg.evaluate("({src: (window.__voice.currentSrc||'').split('/').pop(), t: window.__voice.currentTime, paused: window.__voice.paused, dur: window.__voice.duration, sub: document.querySelector('#svedectvi .w-sub p')?.textContent || ''})")
                 exp_i = max(i for i, s in enumerate(st0) if s <= a['t'])
                 ok(a['src'] == f'{wid}.mp3' and not a['paused'] and abs(a['dur'] - TIM[wid]['duration']) < 1.5, T + f'{wid}: hraje nový (anglický) zvuk', a)
-                ok(a['sub'] == SV[wid]['titulky'][exp_i], T + f'{wid}: český titulek odpovídá času ({a["t"]:.1f} s → věta {exp_i})', (a['sub'][:60], SV[wid]['titulky'][exp_i][:60]))
+                ok(a['sub'].replace('\xa0', ' ') == SV[wid]['titulky'][exp_i].replace('\xa0', ' '), T + f'{wid}: český titulek odpovídá času ({a["t"]:.1f} s → věta {exp_i})', (a['sub'][:60], SV[wid]['titulky'][exp_i][:60]))
             pg.evaluate("document.querySelector('[data-cc=\"en\"]').click()"); pg.wait_for_timeout(900)
             en = pg.evaluate("document.querySelector('#svedectvi .w-sub p')?.textContent || ''")
             ok(en in SV[wid]['text'], T + 'přepínač titulků EN ukáže anglický originál', en[:60])

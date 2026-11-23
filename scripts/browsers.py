@@ -22,6 +22,7 @@ def launch(p, args=None):
     kw = {}
     if BROWSER == 'chromium' and args: kw['args'] = args
     if BROWSER == 'firefox': kw['firefox_user_prefs'] = {'media.autoplay.default': 5}  # běžná politika: blokovat
+    if os.environ.get('PW_PROXY'): kw['proxy'] = {'server': os.environ['PW_PROXY']}   # živá adresa přes proxy sandboxu (iterace 10)
     return _B(p, getattr(p, BROWSER).launch(**kw))
 
 def noise(m):

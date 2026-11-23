@@ -96,12 +96,30 @@ Text kapitol je v `data/vypraveni/1.md`–`4.md`: `## <id kapitoly>`, odstavce o
 - **Jeden zvuk najednou**: `claim(název, přiPřevzetí)` a `fadeOut()` v `src/lib/audio.js`.
 - Testy: `scripts/nav8.py` (pomůcky `go`, `open_`, `ready`), nový `scripts/test-it8.py`; ostatní testy jsou upravené na adresy.
 
+## Iterace 10: film proroctví, logo, nová hymna, finále, pojistka nasazení
+
+- **Film proroctví** `/proroctvi/film` (`src/sections/pfilm.js`, `src/styles/pfilm.css`, načítá se jen při otevření přes `pfilmHooks` v `src/lib/filmhook.js`): čas řídí recitace (`assets/proroctvi/kap1–3.mp3`, `public/data/proroctvi-audio.json`), obraz je slideshow maleb proroctví (verše s `P_xxx`, předěly `D_12–D_14`, `P_D1–P_D4`, naplněné verše 3-6/3-7/3-12 = malba bitvy v Anaurochu) s pomalou kamerou, prolínáním, vinětací a zrnem. Předěly kapitol jsou krátká videa bez textu `public/pfilm/{uvod,kap1,kap2,kap3}.mp4` (+ plakáty `.webp`, kap1 zkrácená na 0–4 s), přes ně hoří nadpis (SVG `feTurbulence` + `feDisplacementMap`, čelo plamene, jiskry na canvasu, rozpad). Verše nastupují uprostřed obrazu po slovech, úvodní trojverší větší, slova světla stříbrná, slova tmy fialově černá; záře Selûne × Shar podle verše, zatmění na začátku kapitoly II, v kapitole I se z jisker složí drak (silueta loga). Ovládání: mezerník, ←/→ verše, 1/2/3 kapitoly, ↑/↓ hlasitost, M, C (verše), F, Esc, časová lišta se značkami kapitol; závěrečná karta s poslední větou proroctví a odkazy. `prefers-reduced-motion` = bez částic, plamenů a pohybu kamery. Ladicí API `window.__pfilm.state()`.
+- **Logo** `src/assets/draci.svg`: heraldický drak se vztyčeným křídlem (favicon, lišta, menu, OG přes `build-icons.py`).
+- **Hymna**: klip `public/hymna/rauko_klip.mp4` z `SRC_HYMNA/web/` (verze bez opakování záběrů), časy řádků z `web/timing.json`; řádky textu, které v časování nejsou (vypravěčské intro), `build-hymna.py` vynechá, instrumentální části zůstávají. Záložní hudba 96 kb/s.
+- **Finále** (upřesnění autora 23. 11. 11:50, `scripts/upresneni.py`, invarianty v `scripts/fakta.py`): finále na Pyramidě času je součást bitvy o Anauroch; Rauko porazil Rivalena, Ho Wu Long s Arwin („Devátá“) zničil Clariburnuse; Yamoh po Hoově domluvě ustoupil, Elminster rozdrtil Sar Saratara.
+- **Stará záložka po nasazení** (`src/lib/stale.js`): chybějící chunk nebo data = jednou automatický reload (pojistka v `sessionStorage`), pak chybový stav s „Načíst stránku znovu“; `dist/version.json` (commit + čas) a kontrola verze při navigaci (1× za 5 min) → další přechod jako plné načtení; `vercel.json` hlavičky: hashované `/assets/*` immutable, HTML, `/data/*`, `/version.json` no-cache.
+- Testy: `scripts/test-it10.py` (film, reduced motion, jeden zvuk, hymna, chybějící chunk), `scripts/live-check.py` (živá adresa: `LIVE_URL=… PW_PROXY=… python3 scripts/live-check.py`; i ostatní testy jdou pustit proti živé adrese přes `SHOT_URL` a `PW_PROXY`).
+
+## Co web umí (stav po iteraci 10)
+
+Úvod s filmovým nástupem a počítadly · Příběh: 5 knih, 36 kapitol převyprávění s marginálií sezení, citacemi hráčů, vsazenými hlasy svědků, mapkami úseků, předěly knih a „Co se změnilo“ · Družina: karty postav, dvojí čas, úrovně, předměty, vztahy, hráči · Svědectví: 33 vedlejších postav, anglický hlas s českými titulky (CZ/EN/vyp), videa, Elminster v plné délce v synchronu, padlí a zmizelí · Dokument: 20minutový film ze svědectví, map, maleb a hymny · Bitvy: 14 bojových hlášení · Mapa 2D s přehráváním tažení a 3D mapa Faerûnu · Proroctví: verše s výkladem, hlas Alaunda se zvýrazňováním a **film proroctví** · Časová osa (dvojí čas, malovaná osa) · Lexikon 996 hesel s hover kartami · globální hledání · U stolu · Hymna s klipem a textem podle času · Poděkování Pánu jeskyně · vlastní adresy a náhledy pro sdílení, staré kotvy, 404, přístupnost (axe 0), mobil, `prefers-reduced-motion`, kontrola faktů a jazyka při buildu.
+
+## Co zbývá
+
+Viz konec `ITERACE.md` (5 největších slabin po iteraci 10).
+
 ## Struktura
 
 ```
 index.html               kostra stránky, 12 oddílů
 vite.config.js           base './', plugin pro audio/video svědectví
 scripts/build-data.py    zdroje → public/data/*.json + WebP obrázky
+src/sections/pfilm.js    film proroctví (/proroctvi/film), public/pfilm/ předěly kapitol
 scripts/shots.py         Playwright snímky desktop/mobil
 data/svedectvi.json      promluvy svědků (ručně psané, fakta z dat)
 data/vypraveni/*.md      převyprávění 36 kapitol (ručně psané, fakta z dat, citace z textů hráčů; formát a kontrola v scripts/vypraveni.py)
