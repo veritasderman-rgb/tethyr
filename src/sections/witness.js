@@ -97,6 +97,7 @@ export function renderWitness() {
   let timing = null;
   let loadToken = 0;
   let curLang = 'en';
+  let loading = false, wantPlay = false;
 
   const timingP = HAS_TIMING ? fetch('assets/voices/timing.json').then((r) => r.json()).then((t) => { timing = t; renderGal(); }).catch(() => {}) : Promise.resolve();
 
@@ -174,6 +175,7 @@ export function renderWitness() {
   // ---------- načtení svědka
   async function loadW(w, { autoplay = true } = {}) {
     const tok = ++loadToken;
+    loading = true; wantPlay = false;
     cancelNext();
     stopVoice(); hasAudio = false;
     cancelAnimationFrame(raf);
@@ -202,12 +204,14 @@ export function renderWitness() {
     if (csT) { starts = csT.starts.slice(); total = dur || csT.duration; }
     else { const c = computeStarts(w, dur); starts = c.st; total = c.tot; }
     if (!m.video) stage.ken(m.img, total, w.fokus);
-    acc = 0; state = 'pause';
-    if (autoplay) play();
+    acc = 0; state = 'pause'; loading = false;
+    // klik na ▶ během načítání (pomalá síť) se neztratí
+    if (autoplay || wantPlay) play();
     else { ui(); stage.freeze(true); $('#wTap', el).hidden = false; }
   }
 
   function play() {
+    if (loading) { wantPlay = true; return; }
     if (state === 'idle') { const w = list[Math.max(cur, 0)] || list[0]; if (w) loadW(w); return; }
     if (state === 'end') { const w = curW(); if (w) loadW(w); return; }
     cancelNext();
