@@ -140,7 +140,7 @@ with sync_playwright() as p:
         shot(pg, f'{name}-hover-karta')
         go(pg, 'ch-thultanthar-a-pyramida-casu', 1400)
         fin = pg.evaluate("document.getElementById('ch-thultanthar-a-pyramida-casu').innerText.replace(/\\u00a0/g, ' ')")
-        ok('bitvě o Anauroch' in fin and 'Rauko mezitím na vrcholu Pyramidy času' in fin, T + 'finále: souboje v bitvě o Anauroch, Rauko na Pyramidě (upřesnění autora)')
+        ok('bitvy o Anauroch' in fin and 'Na vrcholu Pyramidy času svedl Rauko' in fin and 'Ho bojoval po jeho boku' in fin and 'Clariburnuse' in fin, T + 'finále: součást bitvy o Anauroch, Rauko × Rivalen, Ho s Arwin × Clariburnus (upřesnění 23. 11. 11:50)')
         go(pg, 'ch-nova-generace', 1200)  # „Co se změnilo“ je od it8 na konci poslední kapitoly knihy
         pg.evaluate("document.querySelector('#stView .book-chg').scrollIntoView({block:'center'})"); pg.wait_for_timeout(1200)
         shot(pg, f'{name}-co-se-zmenilo')

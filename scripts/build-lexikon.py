@@ -248,7 +248,7 @@ for e in ENT.values():
 # ---------------------------------------------------------------- odkazy x: v textu kapitol (první výskyt v odstavci)
 LETTER = 'a-zA-ZáčďéěíňóřšťúůýžÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ'
 SUF = r'(?:a|e|u|i|y|o|ou|em|ovi|ův|ova|ovu|ovo|ovy|ově|ově|ům|ech|ami|ách|í|ím|ích|ího|ému|ěm|ích)?'
-STOP = {'port', 'chrám', 'sever', 'jih', 'údolí', 'hora', 'klec', 'dračí', 'stín', 'temní', 'pyramida', 'rada', 'osmička', 'zesion', 'lovci',
+STOP = {'devátá', 'port', 'chrám', 'sever', 'jih', 'údolí', 'hora', 'klec', 'dračí', 'stín', 'temní', 'pyramida', 'rada', 'osmička', 'zesion', 'lovci',
         'kniha', 'královna', 'král', 'lord', 'lady', 'mistr', 'pán', 'paní', 'velká', 'velký', 'bílý', 'černý', 'zelený', 'rudá', 'rudý', 'stříbrný',
         'druhá', 'první', 'nový', 'nová', 'staré', 'starý', 'smrt', 'bitva', 'arena', 'aréna', 'drak', 'draci', 'věž', 'brána', 'loď', 'město',
         'svatý', 'svatá', 'princ', 'princové', 'sedm', 'tři', 'dva', 'jeden', 'kapitán', 'generál', 'baron', 'sir', 'otec', 'matka', 'syn', 'dcera'}

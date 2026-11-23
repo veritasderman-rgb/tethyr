@@ -13,8 +13,8 @@ import { openLightbox } from '../lib/lightbox.js';
 const NAMES = ['první', 'druhá', 'třetí'];
 const ROM = ['I', 'II', 'III'];
 // Verše třetí kapitoly, které kronika výslovně označuje za naplněné ve finále 1. 8. 2026: Ho × Yamoh (3-6, 3-7)
-// a Elminster × Sar Saratar (3-12). Podle upřesnění autora se ty souboje dohrály v bitvě o Anauroch,
-// souběžně s finále na Pyramidě času (vyprávění je v kapitole „Thultanthar a Pyramida času“).
+// a Elminster × Sar Saratar (3-12). Podle upřesnění autora se ty souboje dohrály v bitvě o Anauroch, jejíž součástí
+// bylo i finále na Pyramidě času (vyprávění je v kapitole „Thultanthar a Pyramida času“).
 const FIN_CH = 'ch-thultanthar-a-pyramida-casu';
 const FUL = { '3-6': 'b-bitva-v-anaurochu', '3-7': 'b-bitva-v-anaurochu', '3-12': 'b-bitva-v-anaurochu' };
 const FUL_LABEL = 'Bitva v Anaurochu, 1. 8. 2026';
@@ -49,7 +49,7 @@ export function renderProphecy() {
     <div class="pr-grid wrap">
       <div class="pr-art" aria-hidden="true">${P.chapters.map((c, i) => `<div class="pr-pic${i === 0 ? ' on' : ''}" data-ch="${i}">${img('ilu/' + (c.img || P.img), { alt: '', sizes: '(max-width:900px) 100vw, 40vw', pos: '50% 30%' })}</div>`).join('')}<div class="pr-art-shade"></div><div class="pr-prog" aria-hidden="true">${ROM.map((r, i) => `<span class="${i === 0 ? 'on' : ''}" data-ch="${i}">${r}</span>`).join('')}</div></div>
       <div class="pr-text">
-        <p class="pr-sum"><span><b>Naplnění.</b> Třetí kapitola se podle kroniky naplnila ve finále 1. srpna 2026. Spárované souboje skončily v bitvě o Anauroch, souběžně s finále na Pyramidě času. Verše s doloženým výkladem odkazují na místo, kde se to stalo.</span><a href="${H(`#${FIN_CH}`)}">${esc(chTitle(FIN_CH))} ▸</a></p>
+        <p class="pr-sum"><span><b>Naplnění.</b> Třetí kapitola se podle kroniky naplnila ve finále 1. srpna 2026. Finále na Pyramidě času bylo součástí bitvy o Anauroch, v níž skončily i spárované souboje. Verše s doloženým výkladem odkazují na místo, kde se to stalo.</span><a href="${H(`#${FIN_CH}`)}">${esc(chTitle(FIN_CH))} ▸</a></p>
         <p class="pr-note ui">U ${known} dvojverší je z her známo, komu patří. Klepněte na <span class="pr-key">✦</span>.</p>
         ${P.chapters.map((c, i) => `<section class="pr-ch" data-ch="${i}" aria-label="Kapitola ${NAMES[i]}">
           <div class="pr-mobpic">${img('ilu/' + (c.img || P.img), { alt: '', sizes: '100vw', pos: '50% 30%' })}</div>

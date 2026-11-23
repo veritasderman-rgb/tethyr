@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Upřesnění autora (23. 11. 2026), která mají přednost před zdrojovými daty kroniky.
 
-(a) Ho s Yamohem Hokhrou a Elminster se Sar Saratarem dokončili své souboje v BITVĚ O ANAUROCH, souběžně
-    s finále družiny na Pyramidě času (ne na pyramidě samotné). Yamoh po Hoově domluvě ustoupil a v dračí
-    podobě zmizel i se svými lidmi, Sar Saratara Elminster rozdrtil. Rauko mezitím na vrcholu Pyramidy času
-    porazil Rivalena Tanthula a rozhodl o porážce Temných.
+(a) Bitva o Anauroch a finále (upřesnění 23. 11., opraveno v iteraci 10): finále na Pyramidě času je SOUČÁSTÍ
+    bitvy o Anauroch. Na vrcholu pyramidy porazil Rauko svého úhlavního soka Rivalena Tanthula a rozhodl o porážce
+    Temných; Ho Wu Long bojoval po jeho boku a s Arwin („Devátá“ z proroctví) systematicky ničil Clariburnuse.
+    V téže bitvě Yamoh Hokhra po Hoově domluvě ustoupil a v dračí podobě zmizel i se svými lidmi (čas a místo
+    rozhovoru se neupřesňují) a Sar Saratara rozdrtil Elminster. Iterace 9 mylně tvrdila, že Ho byl při finále
+    jinde; tady se to vrací (i v textech, které už iterace 9 přepsala, např. v 3D mapě).
 (b) Kung Lao zemřel ve Feng Asay. Věty, podle nichž šel Ho později „za Kung Laem“ jako za živým, se upravují
     nebo vypouštějí (nic se nedomýšlí).
 (c) Seung Mina byla osvobozena z Feng Asay a stala se Hoovou ženou; Khelben zmizel a nahradila ho dcera,
@@ -15,13 +17,24 @@ Použití: build-data.py volá apply_all(S, C, WD, MP) hned po načtení zdrojů
 """
 import json, os, sys
 
+FIN_NEW = ('Naplnila se třetí kapitola proroctví. V bitvě o Anauroch, jejíž součástí bylo i finále na Pyramidě času, dohráli své souboje Ho a Elminster: '
+           'Ho se se šamanem Yamohem Hokhrou nakonec nebil, přesvědčil ho, že boj je ztracen, a Yamoh v dračí podobě zmizel i se svými lidmi; Sar Saratara Elminster rozdrtil. '
+           'Na vrcholu Pyramidy času svedl Rauko finální boj s Rivalenem Tanthulem')
+PYR_NEW = ('Družina prošla Pyramidu času až pod vrchol. Finále na pyramidě bylo součástí bitvy o Anauroch, v níž se naplnila třetí kapitola Alaundova proroctví se svými '
+           'spárovanými souboji (svatý muž z východu proti šamanovi z plání, velký mág světla proti kostěji z cizího světa), viz Bitva v Anaurochu. Na vrcholu pyramidy svedl Rauko')
+# dovětek iterace 9 (nahrazuje se novým ANAUROCH_ADD)
+ANAUROCH_OLD = (' Souběžně s finále na Pyramidě času tu dokončili své souboje z třetí kapitoly Alaundova proroctví Ho a Elminster: '
+                'Ho se se šamanem z plání Yamohem Hokhrou nakonec nebil, přesvědčil ho, že boj je ztracen, a Yamoh v dračí podobě '
+                'zmizel i se svými lidmi; Sar Saratara, kostěje z cizího světa, Elminster rozdrtil.')
 # přesné náhrady podřetězců ve všech textových hodnotách (stará věta → nová věta)
 REPL = [
-    # Ho dokončoval souboj s Yamohem v Anaurochu, na vrcholu Pyramidy času stál Rauko
+    # (a) Ho byl na vrcholu Pyramidy času (iterace 10): zdrojové věty zůstávají, věty přepsané iterací 9 se vracejí
     ('Po vítězné bitvě v Anaurochu po nich Rauko a Ho šli ulicemi Města stínů až na vrchol Chronosovy pyramidy. S Rivalenem tam svedl finální boj Rauko',
-     'Po nich šel Rauko ulicemi Města stínů až na vrchol Chronosovy pyramidy, zatímco Ho v téže době dokončoval v bitvě o Anauroch svůj souboj. S Rivalenem na vrcholu svedl finální boj Rauko'),
-    ('z města začala honba za stínem, která skončila na vrcholu Chronosovy pyramidy.',
-     'z města začala honba za stínem. Na vrcholu Chronosovy pyramidy ji dokončil Rauko, Ho byl mezitím v bitvě o Anauroch.'),
+     'Po nich šli Rauko a Ho ulicemi Města stínů až na vrchol Chronosovy pyramidy, kde se dohrálo finále bitvy o Anauroch. S Rivalenem tam svedl finální boj Rauko'),
+    ('Po nich šel Rauko ulicemi Města stínů až na vrchol Chronosovy pyramidy, zatímco Ho v téže době dokončoval v bitvě o Anauroch svůj souboj. S Rivalenem na vrcholu svedl finální boj Rauko',
+     'Po nich šli Rauko a Ho ulicemi Města stínů až na vrchol Chronosovy pyramidy, kde se dohrálo finále bitvy o Anauroch. S Rivalenem tam svedl finální boj Rauko'),
+    ('z města začala honba za stínem. Na vrcholu Chronosovy pyramidy ji dokončil Rauko, Ho byl mezitím v bitvě o Anauroch.',
+     'z města začala honba za stínem, která skončila na vrcholu Chronosovy pyramidy.'),
     # Broskvová zahrada je vlastní jméno místa (upřesnění autora): i zmínka z roku 1382 DR (Hoův dotaz u Li-Longa) je totéž místo
     ('ptal na broskvovou zahradu', 'ptal na Broskvovou zahradu'),
     ('ptá se na broskvovou zahradu', 'ptá se na Broskvovou zahradu'),
@@ -33,21 +46,41 @@ REPL = [
     ('Ho se vrací do Tempat Larangu, mluví s Kung Laem a zjišťuje', 'Ho se vrací do Tempat Larangu, v Broskvové zahradě mluví s Kung Laem a zjišťuje'),
     ('rozhovor s Kung Laem a rozkol řádu', 'rozhovor s Kung Laem (Broskvová zahrada) a rozkol řádu'),
     ('Yamoh Hokhra, jeho duch pak s Hoem mluvil v Tempat Larangu', 'Yamoh Hokhra; jako šedý mnich přešel do Broskvové zahrady, kde s ním Ho mluvil a u něj přestupoval'),
-    # (a) souboje z třetí kapitoly proroctví skončily v bitvě o Anauroch
+    # (a) souboje z třetí kapitoly proroctví: v bitvě o Anauroch, jejíž součástí bylo i finále na pyramidě
     ('Naplnila se třetí kapitola proroctví. Ho se se šamanem Yamohem Hokhrou nakonec nebil: přesvědčil ho, že boj je ztracen, a Yamoh v dračí podobě zmizel i se svými lidmi. Sar Saratara rozdrtil Elminster. Na vrcholu Pyramidy času svedl Rauko finální boj s Rivalenem Tanthulem',
-     'Naplnila se třetí kapitola proroctví. Souběžně s finále na Pyramidě času dokončili v bitvě o Anauroch své souboje Ho a Elminster: Ho se se šamanem Yamohem Hokhrou nakonec nebil, přesvědčil ho, že boj je ztracen, a Yamoh v dračí podobě zmizel i se svými lidmi; Sar Saratara Elminster rozdrtil. Rauko mezitím na vrcholu Pyramidy času svedl finální boj s Rivalenem Tanthulem'),
+     FIN_NEW),
+    ('Naplnila se třetí kapitola proroctví. Souběžně s finále na Pyramidě času dokončili v bitvě o Anauroch své souboje Ho a Elminster: Ho se se šamanem Yamohem Hokhrou nakonec nebil, přesvědčil ho, že boj je ztracen, a Yamoh v dračí podobě zmizel i se svými lidmi; Sar Saratara Elminster rozdrtil. Rauko mezitím na vrcholu Pyramidy času svedl finální boj s Rivalenem Tanthulem',
+     FIN_NEW),
     ('Družina prošla Pyramidu času až pod vrchol a tam se naplnila třetí kapitola Alaundova proroctví se svými spárovanými souboji: svatý muž z východu proti šamanovi z plání, velký mág světla proti kostěji z cizího světa. Ho se se šamanem Yamohem Hokhrou nakonec nebil: přesvědčil ho, že boj je ztracen, a Yamoh v dračí podobě zmizel i se svými lidmi. Sar Saratara rozdrtil Elminster. Na vrcholu pyramidy svedl Rauko',
-     'Družina prošla Pyramidu času až pod vrchol. Souběžně s ní se v bitvě o Anauroch naplnila třetí kapitola Alaundova proroctví se svými spárovanými souboji (svatý muž z východu proti šamanovi z plání, velký mág světla proti kostěji z cizího světa), viz Bitva v Anaurochu. Na vrcholu pyramidy svedl Rauko'),
-    ('V závěru po něm šel Ho, ale nebil se s ním:', 'V závěru bitvy o Anauroch, souběžně s finále na Pyramidě času, po něm šel Ho, ale nebil se s ním:'),
+     PYR_NEW),
+    ('Družina prošla Pyramidu času až pod vrchol. Souběžně s ní se v bitvě o Anauroch naplnila třetí kapitola Alaundova proroctví se svými spárovanými souboji (svatý muž z východu proti šamanovi z plání, velký mág světla proti kostěji z cizího světa), viz Bitva v Anaurochu. Na vrcholu pyramidy svedl Rauko',
+     PYR_NEW),
+    ('Družina prošla Pyramidu času až pod vrchol a tam se naplnila třetí kapitola Alaundova proroctví. Její spárované souboje, svatý muž z východu proti šamanovi z plání a velký mág světla proti kostěji z cizího světa, se souběžně dohrály v bitvě o Anauroch:',
+     'Družina prošla Pyramidu času až pod vrchol. Finále na pyramidě bylo součástí bitvy o Anauroch, v níž se naplnila třetí kapitola Alaundova proroctví. Její spárované souboje, svatý muž z východu proti šamanovi z plání a velký mág světla proti kostěji z cizího světa, se v téže bitvě dohrály takto:'),
+    ('Na vrcholu pyramidy mezitím Rauko porazil Rivalena Tanthula a rozhodl o porážce Temných; padli princové Stínu Rivalen a Clariburnus',
+     'Na vrcholu pyramidy porazil Rauko svého úhlavního soka Rivalena Tanthula a rozhodl o porážce Temných, zatímco Ho po jeho boku s Arwin, „Devátou“ z proroctví, systematicky ničil Clariburnuse; padli oba princové Stínu'),
+    ('Rauko porazil Rivalena Tanthula a rozhodl o porážce Temných; padli princové Stínu Rivalen a Clariburnus',
+     'Rauko porazil Rivalena Tanthula a rozhodl o porážce Temných a Ho po jeho boku s Arwin zničil Clariburnuse; padli oba princové Stínu'),
+    ('Rivalena tam porazil Rauko a rozhodl o porážce Temných, zatímco v bitvě o Anauroch Yamoh',
+     'Rivalena tam porazil Rauko a rozhodl o porážce Temných, Clariburnuse zničil Ho s Arwin; v téže bitvě o Anauroch Yamoh'),
+    ('porazí Rauko Rivalena Tanthula a rozhodne o porážce Temných; padají princové Stínu Rivalen a Clariburnus.',
+     'porazí Rauko Rivalena Tanthula a rozhodne o porážce Temných, Ho s Arwin zničí Clariburnuse; padají oba princové Stínu.'),
+    ('V závěru bitvy o Anauroch, souběžně s finále na Pyramidě času, po něm šel Ho, ale nebil se s ním:', 'V bitvě o Anauroch po něm šel Ho, ale nebil se s ním:'),
+    ('V závěru po něm šel Ho, ale nebil se s ním:', 'V bitvě o Anauroch po něm šel Ho, ale nebil se s ním:'),
+    ('rozhodl tam o porážce Temných; padli princové Stínu Rivalen a Clariburnus',
+     'rozhodl tam o porážce Temných, zatímco Ho po jeho boku s Arwin systematicky ničil Clariburnuse; padli oba princové Stínu'),
+    ('svedl Rauko finální boj s Rivalenem Tanthulem a rozhodl o porážce Temných; padli princové Stínu Rivalen a Clariburnus',
+     'svedl Rauko finální boj s Rivalenem Tanthulem a rozhodl o porážce Temných a Ho po jeho boku s Arwin zničil Clariburnuse; padli oba princové Stínu'),
+    (ANAUROCH_OLD, ''),
 ]
 # (a) dovětek k bitvě v Anaurochu: tady souboje skončily
-ANAUROCH_ADD = (' Souběžně s finále na Pyramidě času tu dokončili své souboje z třetí kapitoly Alaundova proroctví Ho a Elminster: '
+ANAUROCH_ADD = (' Součástí bitvy bylo i finále na Pyramidě času, kde Rauko porazil Rivalena Tanthula a Ho s Arwin zničil Clariburnuse. V téže bitvě dohráli své souboje z třetí kapitoly Alaundova proroctví Ho a Elminster: '
                 'Ho se se šamanem z plání Yamohem Hokhrou nakonec nebil, přesvědčil ho, že boj je ztracen, a Yamoh v dračí podobě '
                 'zmizel i se svými lidmi; Sar Saratara, kostěje z cizího světa, Elminster rozdrtil.')
 # metadata svědectví (ne namluvený text, ten se nemění): vazba k družině a stav
 VAZBA = {
     'rivalen': 'Raukův osobní nepřítel a poslední soupeř družiny; Rauko ho pronásledoval z Thultantharu až na vrchol Pyramidy času, kde ho porazil a rozhodl o porážce Temných.',
-    'arwin': 'Družina si ji roku 1384 odvedla ze základny en Rewin; s Raukem a Hoem šla Thultantharem až k Pyramidě času a v epilogu je s Raukem ve zbroji Zeleného anděla.',
+    'arwin': '„Devátá“ z Alaundova proroctví. Družina si ji roku 1384 odvedla ze základny en Rewin; na vrcholu Pyramidy času s Hoem systematicky ničila Clariburnuse, zatímco Rauko porazil Rivalena. V epilogu je s Raukem ve zbroji Zeleného anděla.',
     'kung-lao': 'Hoův učitel na východě; padl ve Feng Asay rukou šamana Yamoha Hokhry a přešel do Broskvové zahrady, kde s ním Ho dál mluví.',
     'chuang-li': 'Hoova učitelka z Tempat Larangu a zrádkyně: na konci příběhu o Cham Fau se chtěla přidat k Temným a padla ve finálním souboji s Hoem.',
     'seung-mina': 'Hoova žena; Ho ji osvobodil z Feng Asay. S Hoem bojovala od Sid-hou po obranu tethyrských držav.',
@@ -123,14 +156,17 @@ def fix_battles(battles):
                 moved += [u for u in side.get('units', []) if u.get('unit') in DUEL_UNITS]
                 side['units'] = keep
     for b in battles:
-        # Ho byl v téže době v Anaurochu (souboj s Yamohem), na Pyramidě času finále vedl Rauko
-        if 'Pyramid' in b.get('name', '') and 'souboj' in b.get('name', '').lower():
-            for side in b.get('sides', []):
-                side['commanders'] = [c for c in side.get('commanders', []) if c != 'Ho Wu Long']
-                side['units'] = [u for u in side.get('units', []) if u.get('unit') != 'Ho Wu Long']
+        # Ho byl na vrcholu Pyramidy času po Raukově boku (iterace 10; iterace 9 ho odtud mylně odebrala)
+        if 'Pyramid' in b.get('name', '') and 'souboj' in b.get('name', '').lower() and b.get('sides'):
+            s0 = b['sides'][0]
+            cm = s0.setdefault('commanders', [])
+            if 'Ho Wu Long' not in cm: cm.insert(1 if 'Rauko Daerond' in cm else 0, 'Ho Wu Long')
+            us = s0.setdefault('units', [])
+            if not any(u.get('unit') == 'Ho Wu Long' for u in us):
+                us.insert(1 if us and us[0].get('unit') == 'Rauko Daerond' else 0, {'unit': 'Ho Wu Long', 'count': '1', 'commander': '—'})
     for b in battles:
         if b.get('name') == 'Bitva v Anaurochu':
-            if 'Souběžně s finále na Pyramidě času' not in b.get('summary', ''):
+            if 'Součástí bitvy bylo i finále' not in b.get('summary', ''):
                 b['summary'] = b.get('summary', '') + ANAUROCH_ADD
             if len(b.get('sides', [])) > 1:
                 have = {u.get('unit') for u in b['sides'][1].get('units', [])}
@@ -152,6 +188,18 @@ def fix_characters(chars):
             c['status'] = 'padl'
         if c.get('id') == 'ho':
             c['aliases'] = [a for a in c.get('aliases', []) if a != 'Ho Wu Lung']   # jméno je vždy „Ho Wu Long“
+            for m in c.get('milestones', []):
+                if m.get('title') == 'Thultanthar a Pyramida času' and 'Clarib' not in m.get('text', ''):
+                    m['text'] = m['text'].replace('V ulicích Města stínů a na vrcholu Chronosovy pyramidy padli princové Stínu.',
+                                                  'Na vrcholu Chronosovy pyramidy bojoval po Raukově boku a s Arwin systematicky ničil prince Stínu Clariburnuse, zatímco Rauko porazil Rivalena; padli oba princové.')
+        if c.get('id') == 'arwin' and 'Devátá' not in c.get('aliases', []):
+            c['aliases'] = c.get('aliases', []) + ['Devátá']   # proroctví 3-1 „Ke Strážcům nepatří, devátá z desíti“ (výklad z her: Arwin)
+        if c.get('id') == 'princove-stinu':
+            if 'Clarib' not in c.get('fate', '').split('Rauko', 1)[-1]:
+                c['fate'] = c.get('fate', '').rstrip() + ' Clariburnuse tam po Raukově boku systematicky ničil Ho s Arwin.'
+            for m in c.get('milestones', []):
+                if m.get('title') == 'Poslední souboj' and 'Arwin' not in m.get('text', ''):
+                    m['text'] = m['text'].replace('; oba princové padli.', ', Ho s Arwin zničil Clariburnuse; oba princové padli.')
         if c.get('id') == 'yamoh-hokhra':
             c['status'] = 'zmizel'
         if c.get('id') == 'sar-saratar':
@@ -165,6 +213,8 @@ NPC_ADD = {  # jméno v npcs.json → věta doplněná na konec popisu (upřesn�
     'lord Ryden': ('; zemřel při prošetřování Cham Fau rukou Chuang-Li', 'Chuang'),
     'Arduna': ('; vedle Hoa jediný dosud žijící šedý mnich', 'jediný'),
     'Lei Wu-Long': ('; je v Broskvové zahradě', 'Broskvov'),
+    'Clariburnus Tanthul': ('; na vrcholu Pyramidy času ho po Raukově boku systematicky ničil Ho Wu Long s Arwin', 'Arwin'),
+    'Arwin en Rewin': ('; „Devátá“ z Alaundova proroctví', 'Devátá'),
 }
 
 
@@ -176,6 +226,8 @@ def fix_npcs(N):
         add = NPC_ADD_L.get((n.get('name') or '').lower())
         if add and add[1] not in n.get('who', '') + n.get('when', ''):
             n['who'] = n.get('who', '').rstrip('.') + add[0]
+        if (n.get('name') or '') == 'Arwin en Rewin' and 'Devátá' not in (n.get('aliases') or []):
+            n['aliases'] = (n.get('aliases') or []) + ['Devátá']
     return N
 
 
@@ -201,6 +253,14 @@ if __name__ == '__main__':
     camp = _walk(camp, hits)
     fix_battles(camp.get('battles', []))
     fix_witnesses(camp.get('witnesses', []), 'bond')
+    def _npc3d(o):  # 3D mapa má u míst seznamy osob {n, w, k}: stejné dovětky jako npcs.json
+        if isinstance(o, dict):
+            add = NPC_ADD_L.get(str(o.get('n', '')).lower())
+            if add and isinstance(o.get('w'), str) and add[1] not in o['w']: o['w'] = o['w'].rstrip('.') + add[0]
+            for v in o.values(): _npc3d(v)
+        elif isinstance(o, list):
+            for v in o: _npc3d(v)
+    _npc3d(camp)
     txt = json.dumps(camp, ensure_ascii=False, separators=(',', ':'))
     open(p, 'w', encoding='utf-8').write(txt)
     print('campaign.json:', sum(hits.values()), 'náhrad', file=sys.stderr)

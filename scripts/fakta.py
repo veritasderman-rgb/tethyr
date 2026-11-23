@@ -279,14 +279,19 @@ for f, p, s in CORPUS:
         if re.search(r'Seung Min\w*', sen) and re.search(r'Ho\w* (?:sestr|matk|dcer|neteř|teta)', sen):
             fail(f'{f} {p}: Seung Mina je Hoova žena: …{sen[:170]}…')
         # souboje v bitvě o Anauroch × finále na Pyramidě času
-        if re.search(r'Yamoh|Sar Saratar', sen) and re.search(r'Pyramid\w* času', sen) and not re.search(r'souběžn|zatímco|mezitím|zároveň|nebyl|nebyli|ne na', sen, re.I):
+        if re.search(r'Yamoh|Sar Saratar', sen) and re.search(r'Pyramid\w* času', sen) and not re.search(r'souběžn|zatímco|mezitím|zároveň|nebyl|nebyli|ne na|součást|téže bitv', sen, re.I):
             fail(f'{f} {p}: souboje Ho × Yamoh a Elminster × Sar Saratar patří do bitvy o Anauroch: …{sen[:170]}…')
-        if re.search(r'Rivalen', sen) and re.search(r'Anauroch', sen) and not re.search(r'souběžn|zatímco|mezitím|zároveň|velel|velitel|armád|Temní', sen, re.I):
+        if re.search(r'Rivalen', sen) and re.search(r'Anauroch', sen) and not re.search(r'souběžn|zatímco|mezitím|zároveň|velel|velitel|armád|Temní|součást|téže bitv', sen, re.I):
             fail(f'{f} {p}: Rivalena porazil Rauko na Pyramidě času, ne v Anaurochu: …{sen[:170]}…')
         if re.search(r'\b(?:Ho|Elminster) (?:porazil|zabil)\w* \w*Rivalen', sen):
             fail(f'{f} {p}: Rivalena porazil Rauko: …{sen[:170]}…')
         if re.search(r'Sar Saratar', sen) and re.search(r'(?:Ho|Rauko|Veritas) (?:porazil|zabil|rozdrtil)\w* \w*Sar Saratar', sen):
             fail(f'{f} {p}: Sar Saratara rozdrtil Elminster: …{sen[:170]}…')
+        # iterace 10: Ho byl na vrcholu Pyramidy času (s Arwin ničil Clariburnuse); nic nesmí tvrdit opak
+        if re.search(r'[Pp]yramid', sen) and re.search(r'Ho\w*\s+(?:byl\s+)?(?:mezitím|v téže době|tou dobou)\b[^.;]{0,60}Anauroch|Ho\w*\s+(?:na|při)[^.;]{0,40}(?:nebyl|chyběl)|(?:nebyl|chyběl)[^.;]{0,30}\bHo\b[^.;]{0,40}pyramid|(?:jen|pouze|sám)\s+Rauko\b|bez\s+Hoa', sen):
+            fail(f'{f} {p}: Ho Wu Long byl při finále na vrcholu Pyramidy času: …{sen[:170]}…')
+        if re.search(r'Clarib', sen) and re.search(r'(?:Rauko|Elminster|Veritas|Mitsurugy|Seltar|Erylthil)\w*\s+(?:porazil|zabil|zničil|rozdrtil|ničil)\w*\s+(?:\w+\s+){0,3}Clarib', sen):
+            fail(f'{f} {p}: Clariburnuse zničil Ho s Arwin: …{sen[:170]}…')
         if re.search(r'Yamoh', sen) and re.search(r'(?:Elminster|Rauko) (?:porazil|zabil|rozdrtil)\w* \w*Yamoh', sen):
             fail(f'{f} {p}: Yamoh ustoupil po domluvě s Hoem a zmizel v dračí podobě: …{sen[:170]}…')
 
@@ -308,7 +313,8 @@ if os.path.exists('public/data/world.json'):
         check('Yamoh' not in up and 'Sar Saratar' not in up, 'Pyramida času: Yamoh a Sar Saratar tu nebojovali')
         check('Rivalen' in up + py.get('summary', ''), 'Pyramida času: Rivalen')
         check('Rauko' in up + py.get('summary', ''), 'Pyramida času: Rauko porazil Rivalena')
-        check('Ho Wu Long' not in up, 'Pyramida času: Ho byl souběžně v Anaurochu, ne na Pyramidě')
+        check('Ho Wu Long' in up, 'Pyramida času: Ho Wu Long bojoval na vrcholu po Raukově boku')
+        check('Clarib' in py.get('summary', '') and 'Arwin' in py.get('summary', ''), 'Pyramida času: Ho s Arwin ničil Clariburnuse')
 
 # postavy
 for c in chars:
