@@ -13,6 +13,7 @@ import { ensure, moduleOf } from './sections.js';
 import { $, $$, esc } from './util.js';
 
 import { SITE, ROM, ROM_NAME, PAGES, EXTRA } from './pages.js';
+import { startNbsp } from './nbsp.js';
 export { SITE, PAGES };
 export const pageById = (id) => PAGES.find((p) => p.id === id) || EXTRA[id] || null;
 const SLUG = { 'u-stolu': 'stul' };
@@ -296,6 +297,7 @@ export function startRouter({ film } = {}) {
   hooks.film = film;
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   fixLinks(document.body);
+  startNbsp(document.body);
   new MutationObserver((ms) => { for (const m of ms) for (const n of m.addedNodes) if (n.nodeType === 1) fixLinks(n); }).observe(document.body, { childList: true, subtree: true });
   document.addEventListener('click', (e) => {
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;

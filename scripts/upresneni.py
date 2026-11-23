@@ -96,6 +96,7 @@ NAME_RX = [
 def norm_names(t):
     for rx, rep in NAME_RX:
         t = rx.sub(rep, t)
+    t = re.sub(r'(?<=[a-zěščřžýáíéúůďťň]),(?=[A-Za-zÁ-ž])', ', ', t)   # chybějící mezera po čárce
     return t
 
 
