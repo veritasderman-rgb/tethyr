@@ -354,6 +354,8 @@ Vráceno vše, co iterace 9 změnila na „Ho byl u Anaurochu, na pyramidě fin�
 - Český zvuk i timing se stahují až při zvolení CZ; první načtení webu beze změny (0,61 MB desktop / 0,56 MB mobil). Dokument, vsazené hlasy v Příběhu a 3D mapa zůstávají anglicky s českými titulky; Proroctví jen česky (beze změny).
 - `scripts/fakta.py`: české znění jen pro svědky ze `svedectvi.json` (žádná hráčská postava), počet časů = počet titulků, mp3 existuje, titulky přesně podle `voices4/timing.json`.
 - Test `scripts/test-it10-cz.py` (desktop + mobil): 33× zvuk a timing, počty řádků, shoda se zdrojem, výchozí EN, v EN se nic českého nestahuje, přepnutí během přehrávání, titulek podle času českého zvuku, volba přežije jiného svědka i reload, Elminster CZ smyčka / EN lip-sync, jeden zvuk, konzole: **30/30**. Regrese: players, it4-witness 21/21, it4-audio 18/18, it7 71/71, axe 0.
+- Oprava přehrávače (commit 11): ▶ během načítání svědka se neztratí, přepnutí svědka během přehrávání nenechá stav „hraje“ (projevilo se na pomalé síti živé adresy).
+- Celá sada v Chromiu po bodu G: players 1/1, it10 83/83, **it10-cz 30/30**, it9 38/38, it8 321/321, it4-audio 18/18, it4-witness 21/21, it4-film 36/36, it5-map 26/26, it5-3d 10/10, it6 94/94, it7 71/71, axe 0. Na https://tethyr-six.vercel.app `test-it10-cz` 30/30 (alusair EN → CZ, Elminster CZ smyčka / EN lip-sync).
 - **Velikost repa: 162,5 MB pracovní strom – nad dosavadním cílem 150 MB** (o 12,5 MB, celý přírůstek je české znění); podle zadání se kvůli tomu nic jiného nemazalo.
 
 ### Ověření
