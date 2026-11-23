@@ -5,7 +5,7 @@ staré kotvy (překlad dělá router webu: window.__router.legacy) nebo podle ce
 otevře adresu přímo. ready(pg) počká, až je aktuální stránka vykreslená."""
 READY = "(() => { const p = document.body.dataset.page; if (!p) return false; if (p === 'nenalezeno') return true; const s = document.getElementById(p); return !!s && s.hasAttribute('data-ready') && !s.hidden; })()"
 
-def ready(pg, timeout=20000):
+def ready(pg, timeout=int(__import__('os').environ.get('READY_MS', '20000'))):
     pg.wait_for_function(READY, timeout=timeout)
 
 def open_(pg, url, path='/', ms=600):

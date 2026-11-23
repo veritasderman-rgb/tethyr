@@ -36,6 +36,8 @@ PAGES = [
     ('/proroctvi', 'Proroctví', '/osa'), ('/osa', 'Časová osa', '/lexikon'), ('/lexikon', 'Lexikon', '/u-stolu'), ('/lexikon/o-kung-lao', 'Kung Lao', '/u-stolu'),
     ('/u-stolu', 'U stolu', '/hymna'), ('/hymna', 'Hymna', '/dokument'), ('/podekovani', 'Poděkování', '/'), ('/tohle-neni', 'nenalezena', '/'),
 ]
+# Na Vercelu dostane adresa mimo stránky webu statickou 404.html (bez aplikace), kterou ověřuje scripts/live-check.py; náhled (vite preview) vrací aplikaci.
+if not any(h in URL for h in ('127.0.0.1', 'localhost')): PAGES = [x for x in PAGES if x[0] != '/tohle-neni']
 SES = BOOKS[1]['chapters'][2]['sessions'][1]
 LEGACY = [
     ('#uvod', '/'), ('#pribeh', '/pribeh'), ('#kniha-II', '/pribeh/kniha-2'), ('#ch-anauroch', '/pribeh/kniha-5/anauroch'),
