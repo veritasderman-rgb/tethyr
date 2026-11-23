@@ -1,6 +1,7 @@
 // Oddíly se vykreslují líně: až když se k nim čtenář blíží, nebo když na ně vede odkaz či událost.
 import { need } from './data.js';
 import { observe, parallax } from './reveal.js';
+import { decorate } from './chrome.js';
 
 const REG = {};
 /** Zaregistruje oddíl: id elementu <section>, vykreslovací funkce a soubory dat, které potřebuje. */
@@ -13,7 +14,7 @@ export function ensure(id) {
   if (!r) return Promise.resolve();
   return (r.done ||= need(...r.needs).then(() => {
     const el = document.getElementById(id);
-    try { r.fn(); } catch (e) { console.error(r.fn.name, e); }
+    try { r.fn(); decorate(id, el); } catch (e) { console.error(r.fn.name, e); }
     el?.setAttribute('data-ready', '');
     if (el) { observe(el); parallax(el); }
   }).catch((e) => { console.error('data pro oddíl', id, e); r.done = null; }));

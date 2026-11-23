@@ -7,6 +7,24 @@ import { openDrawer } from '../lib/lightbox.js';
 
 const yrs = (s) => (String(s || '').match(/\d{4}/g) || []).map(Number);
 
+
+// hráč křestním jménem, bez titulu „Pán jeskyně“
+const playerOf = (c) => String(c.player || '').replace(/,\s*Pán jeskyně/, ' (Pán jeskyně)');
+// dva klíčové milníky: první a poslední zapsaný
+function keyMs(c) {
+  const ms = (c.milestones || []).filter((m) => m.title);
+  if (!ms.length) return '';
+  const pick = ms.length > 1 ? [ms[0], ms[ms.length - 1]] : [ms[0]];
+  const yr = (m) => (String(m.date_label || m.date || '').match(/\d{4}/) || [''])[0];
+  return `<span class="pc-ms">${pick.map((m) => `<span class="pc-m"><b>${esc(yr(m))}</b><span>${esc(m.title)}</span></span>`).join('')}</span>`;
+}
+// osud: první věta, nejvýš kolem 150 znaků
+function fateShort(t) {
+  const s = String(t).trim();
+  const m = s.match(/^(.{40,170}?[.!?])(\s|$)/);
+  return m ? m[1] : s.length > 170 ? s.slice(0, 160).replace(/\s+\S*$/, '') + '…' : s;
+}
+
 function portraitHtml(c, sizes = '(max-width:760px) 50vw, 25vw') {
   if (c.portrait) return img(c.portrait.src, { alt: `Portrét: ${c.full_name || c.name}`, sizes, pos: c.portrait.kind === 'port' ? '50% 28%' : '50% 22%' });
   const ini = (c.name || '?').split(/\s+/).map((x) => x[0]).slice(0, 2).join('');
@@ -59,9 +77,11 @@ export function renderParty() {
 
   el.innerHTML = `<header class="sec-head"><p class="kicker">Družina</p><h2 id="druzina-h">Kdo šel s nimi</h2>
     <p class="lead">Za třiadvacet let prošlo družinou osm hráčů a přes dvacet postav, hru vedl jeden Pán jeskyně. Celou hru, od první hry po epilog, odehrál jen Rauko. Každá postava má dva životopisy: jeden ve hře a jeden u stolu.</p><div class="orn">✦</div></header>
-    <div class="cards wrap">${main.map((c, i) => `<button class="pc rv d${i % 3}" data-c="${esc(c.id)}">
-      <span class="pc-i">${portraitHtml(c)}</span>
-      <span class="pc-t"><b>${esc(c.full_name || c.name)}</b><i>${esc([c.race, c.class].filter(Boolean).join(' · '))}</i><em>${esc(c.player || '')} · ${esc(c.active_real || '')}</em></span></button>`).join('')}</div>
+    <div class="cards wrap">${main.map((c, i) => `<button class="pc rv d${i % 3}" data-c="${esc(c.id)}" aria-label="${esc(c.full_name || c.name)}: otevřít životopis">
+      <span class="pc-i" data-n="${String(i + 1).padStart(2, '0')}">${portraitHtml(c)}</span>
+      <span class="pc-t"><b>${esc(c.full_name || c.name)}</b><i>${esc([c.race, c.class].filter(Boolean).join(' · '))}</i><em>Hraje <strong>${esc(playerOf(c))}</strong> · ${esc(c.active_real || '')}</em>
+        ${keyMs(c)}${c.fate ? `<span class="pc-fate">${esc(nb(fateShort(c.fate)))}</span>` : ''}<span class="pc-more">Celý životopis</span></span></button>`).join('')}</div>
+    <aside class="dm rv" aria-label="Pán jeskyně"><div><h4>Pán jeskyně</h4><b>Zdeněk T.</b><p>Hru vedl od první hry v roce 2003 po velké finále 1. srpna 2026. Sám si zahrál jen pixie Zaxe v Sigilských lovcích a goliáše Zeka v nové hře.</p></div><a class="btn red" href="#podekovani">Poděkování od všech vděčných hráčů</a></aside>
     <div class="wrap minor-pcs"><h4>Další postavy hráčů</h4><p>${rest.map((c) => `<button class="chip" data-c="${esc(c.id)}">${esc(c.name)} <span>· ${esc(c.player || '')}</span></button>`).join(' ')}</p>
     <h4>Průvodci a důležité postavy Pána jeskyně</h4><p>${guides.map((c) => `<button class="chip gold" data-c="${esc(c.id)}">${esc(c.name)}</button>`).join(' ')}</p>
     <h4>Protivníci</h4><p>${D.characters.filter((c) => c.kind === 'protivnik').map((c) => `<button class="chip red" data-c="${esc(c.id)}">${esc(c.name)}</button>`).join(' ')}</p></div>

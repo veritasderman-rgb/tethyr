@@ -74,6 +74,10 @@ Data zastávek (`public/data/map.json` `route[]`) mají `k` (rok), `s` (sezení 
 
 Text kapitol je v `data/vypraveni/1.md`–`4.md`: `## <id kapitoly>`, odstavce oddělené prázdným řádkem, `{s-…}` na konci odstavce = marginálie (datum u stolu a ve hře), citace `> text` + `> — Jméno, zdroj`. Odkazy v textu: `[text](w:svědek)`, `(m:místo z 3D mapy)`, `(b:bitva)`, `(p:kapitola-verš)`, `(c:postava)`, `(s:sezení)`. `build-data.py` texty zkontroluje (platnost odkazů, 4–8 odstavců, zakázaná slova, otazníky, autor citace) a zapíše `public/data/vypraveni.json`. Úsek trasy pro mapku kapitoly je v `CH_ROUTE` v `build-data.py`. Data webu se načítají po oddílech (`src/lib/data.js` `need`, `src/lib/sections.js` `ensure`/`emit`). Kontrola v prohlížeči: `python3 scripts/shots3.py` (snímky a testy odkazů do `/home/claude/webshots/it3/`).
 
+## Iterace 6: systém, scény, metadata
+
+`src/styles/system.css` (typografická škála, číslování oddílů, předěly, scroll-driven animace, fokus, tisk) a `scenes.css` (úvod, Družina, Bitvy, Proroctví, mobilní osa) se načítají po `sections.css`. Rám oddílů přidává `src/lib/chrome.js`. Testy: `scripts/test-it6.py`, `scripts/test-it6-a11y.py` (axe-core, `AXE_JS=<cesta k axe.min.js>`), snímky `scripts/shots6.py <složka>`. Ikony a `og.jpg` se přegenerují `python3 scripts/build-icons.py`. Absolutní adresa náhledu pro sdílení: proměnná `SITE_URL` nebo automaticky Vercel. Tisk kapitoly: tlačítko „Vytisknout kapitolu“.
+
 ## Struktura
 
 ```

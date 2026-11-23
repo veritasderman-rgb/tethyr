@@ -48,9 +48,20 @@ function mediaPlugin() {
   };
 }
 
+// Odkazy v og:image / twitter:image musí být absolutní. Na Vercelu se doplní z adresy nasazení, jinde zůstanou relativní.
+function sitePlugin() {
+  return {
+    name: 'site-url',
+    transformIndexHtml(html) {
+      const host = process.env.SITE_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '');
+      return html.replaceAll('%SITE%', host ? host.replace(/\/$/, '') + '/' : '');
+    },
+  };
+}
+
 export default defineConfig({
   base: './',
-  plugins: [mediaPlugin()],
+  plugins: [mediaPlugin(), sitePlugin()],
   build: { outDir: 'dist', assetsInlineLimit: 0, chunkSizeWarningLimit: 900 },
   server: { host: true },
 });

@@ -4,10 +4,25 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Západní draci – kronika Tethyrské královské družiny</title>
-  <meta name="description" content="Soukromá kronika jedné kampaně Forgotten Realms: Tethyrská královská družina, 1372–1385 DR, u stolu 2003–2026." />
+  <meta name="description" content="Kronika jedné kampaně Forgotten Realms: Tethyrská královská družina, ve hře 1372–1385 DR, u stolu 2003–2026. Příběh v pěti knihách, mapa tažení, hlasy přátel i nepřátel, bojová hlášení a Alaundovo proroctví." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Západní draci" />
+  <meta property="og:locale" content="cs_CZ" />
+  <meta property="og:title" content="Západní draci – kronika Tethyrské královské družiny" />
+  <meta property="og:description" content="Třiadvacet let jedné kampaně ve Forgotten Realms. Vyprávějí ti, kdo u toho byli, přátelé i nepřátelé." />
+  <meta property="og:image" content="%SITE%img/misc/og.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Čtyři postavy na útesu nad mořem, nad nimi draci. Nápis Západní draci, kronika Tethyrské královské družiny." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Západní draci – kronika Tethyrské královské družiny" />
+  <meta name="twitter:description" content="Třiadvacet let jedné kampaně ve Forgotten Realms. Vyprávějí ti, kdo u toho byli, přátelé i nepřátelé." />
+  <meta name="twitter:image" content="%SITE%img/misc/og.jpg" />
   <meta name="robots" content="noindex, nofollow" />
   <meta name="theme-color" content="#12100d" />
-  <link rel="icon" href="img/misc/znak.svg" type="image/svg+xml" />
+  <link rel="icon" href="img/misc/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="img/misc/favicon-32.png" type="image/png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="img/misc/apple-touch-icon.png" />
   <link rel="preload" as="image" imagesrcset="img/ilu/D_01-720.webp 720w, img/ilu/D_01-1360.webp 1360w" imagesizes="100vw" />
 </head>
 <body>
@@ -55,13 +70,16 @@
   </main>
 
   <footer class="foot">
-    <p>Kronika Tethyrské královské družiny · hraje se od roku 2003 · <a href="#hymna">Hymna</a> · <a href="#podekovani">Poděkování</a> · <a href="#mapa3d">3D mapa</a></p>
+    <span class="foot-orn" aria-hidden="true">✦ ✦ ✦</span>
+    <nav aria-label="Oddíly v patičce"><a href="#pribeh">Příběh</a><a href="#mapa">Mapa</a><a href="#svedectvi">Svědectví</a><a href="#druzina">Družina</a><a href="#bitvy">Bitvy</a><a href="#proroctvi">Proroctví</a><a href="#osa">Časová osa</a><a href="#rejstrik">Rejstřík</a><a href="#stul">U stolu</a><a href="#hymna">Hymna</a><a href="#mapa3d">3D mapa</a><a href="#podekovani">Poděkování</a></nav>
+    <p>Kronika Tethyrské královské družiny · hraje se od roku 2003 · hru vede Zdeněk T.</p>
     <p class="small">Forgotten Realms a Dungeons &amp; Dragons jsou ochranné známky Wizards of the Coast. Obrazy a portréty vznikly pro tuto kroniku.</p>
   </footer>
 
   <div id="lightbox" class="lightbox" hidden></div>
   <div id="drawer" class="drawer" hidden></div>
-  <div id="loading" class="loading" aria-live="polite"><span>Kronika se otevírá…</span></div>
+  <div id="loading" class="loading" role="status" aria-live="polite"><span>Kronika se otevírá…</span></div>
+  <noscript><p style="position:fixed;inset:auto 0 0;padding:14px;background:#12100d;color:#eadfc6;text-align:center;z-index:300">Kronika potřebuje JavaScript.</p></noscript>
 
   <script type="module" src="/src/main.js"></script>
 </body>

@@ -23,7 +23,7 @@ function svg(Wpx) {
   const laneY = {}; lanes.forEach((l, i) => { laneY[l.name] = 182 + i * 19; });
   const yEnd = 182 + lanes.length * 19 + 10;
   const sesY = yEnd + 34, drY = sesY + 46, H = drY + 40;
-  let s = `<svg class="tl-svg" viewBox="0 0 ${Wpx} ${H}" width="${Wpx}" height="${H}" role="img" aria-label="Časová osa hry 2003–2026">`;
+  let s = `<svg class="tl-svg" viewBox="0 0 ${Wpx} ${H}" width="${Wpx}" height="${H}" role="group" aria-label="Časová osa hry 2003–2026">`;
   // knihy
   TL.books.forEach((b, i) => {
     s += `<rect x="${x(b.t0)}" y="18" width="${x(b.t1) - x(b.t0)}" height="${H - 18}" class="tl-band b${i % 2}"/>`;
@@ -88,6 +88,50 @@ function svg(Wpx) {
   return s + '</svg>';
 }
 
+
+// Mobilní varianta: karty po letech, vodorovný posun s přichytáváním, dotykové cíle >= 44 px.
+function mobileHtml() {
+  const TL = D.timeline;
+  const yrs = Array.from({ length: T1 - T0 }, (_, i) => T0 + i);
+  const books = TL.books;
+  const romans = ['I', 'II', 'III', 'IV', 'V'];
+  const charOf = (name) => D.characters.find((ch) => norm(ch.name) === norm(name) || norm(ch.name.split(' ')[0]) === norm(name));
+  const card = (y) => {
+    const bi = books.findIndex((b) => y + 0.5 >= b.t0 && y + 0.5 < b.t1);
+    const ds = TL.dr.filter(([t]) => t >= y && t < y + 1).map(([, d]) => d);
+    const drTxt = ds.length ? (Math.min(...ds) === Math.max(...ds) ? `${ds[0]} DR` : `${Math.min(...ds)}–${String(Math.max(...ds)).slice(-2)} DR`) : '';
+    const ev = TL.events.filter((e) => Math.floor(e.t) === y);
+    const act = TL.lines.filter((l) => l.t0 < y + 1 && l.t1 > y).sort((a, b) => a.lane - b.lane);
+    const ses = TL.sessions.filter((x) => Math.floor(x.t) === y);
+    return `<article class="tl-y" id="tly-${y}" data-y="${y}" style="--bk:${ERA_COL[romans[bi]] || '#c9a54a'}" aria-label="Rok ${y}">
+      <header><h4>${y}</h4><span class="dr">${esc(drTxt)}</span></header>
+      <p class="bk">${bi >= 0 ? esc(books[bi].label.replace('Kniha ', 'Kniha ')) : ''}</p>
+      ${ev.length ? `<h5>Události</h5><ul class="tl-ev-l">${ev.map((e) => `<li>${esc(e.label)}</li>`).join('')}</ul>` : ''}
+      ${act.length ? `<h5>U stolu hráli (${act.length})</h5><div class="tl-pc">${act.map((l) => { const c = charOf(l.name); return `<button type="button" ${c ? `data-c="${esc(c.id)}"` : 'disabled'} style="--c:${lift(l.color)}"><i></i>${esc(l.name)} <small>${esc(l.player)}</small></button>`; }).join('')}</div>` : ''}
+      ${ses.length ? `<h5>Sezení (${ses.length})</h5><div class="tl-ses">${ses.map((x) => `<a href="#${esc(x.id)}" style="--c:${ERA_COL[x.era] || '#aaa'}">${esc(x.title.length > 30 ? x.title.slice(0, 28).trim() + '…' : x.title)}</a>`).join('')}</div>` : '<h5>Sezení</h5><p class="small">V tomto roce kronika žádné sezení nezná.</p>'}
+    </article>`;
+  };
+  return `<div class="tl-mob" id="tlMob" aria-label="Časová osa po letech">
+    <div class="tl-mob-h" role="group" aria-label="Skok na rok">${yrs.map((y) => `<button type="button" data-y="${y}" aria-label="Rok ${y}">${y}</button>`).join('')}</div>
+    <div class="tl-mob-track" id="tlTrack" tabindex="0" aria-label="Roky hry, posouvejte vodorovně">${yrs.map(card).join('')}</div>
+    <p class="tl-mob-hint">Posouvejte do stran · klepnutím na postavu otevřete její životopis</p></div>`;
+}
+function wireMobile(el) {
+  const root = $('#tlMob', el); if (!root) return;
+  const track = $('#tlTrack', root), chips = $$('.tl-mob-h button', root), cards = $$('.tl-y', track);
+  const setOn = (y) => chips.forEach((b) => { const on = +b.dataset.y === y; b.setAttribute('aria-current', on ? 'true' : 'false'); if (on) { const h = b.parentElement; h.scrollTo({ left: b.offsetLeft - h.clientWidth / 2 + b.clientWidth / 2, behavior: 'smooth' }); } });
+  const io = new IntersectionObserver((ents) => { for (const e of ents) if (e.isIntersecting) setOn(+e.target.dataset.y); }, { root: track, threshold: 0.6 });
+  cards.forEach((c) => io.observe(c));
+  root.addEventListener('click', (e) => {
+    const b = e.target.closest('.tl-mob-h button');
+    if (b) { document.getElementById('tly-' + b.dataset.y)?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }); return; }
+    const c = e.target.closest('.tl-pc button[data-c]');
+    if (c) emit('party:open', { id: c.dataset.c });
+  });
+  // začít u roku, kde se hrálo právě „teď“ příběhu: první rok
+  setOn(T0);
+}
+
 export function renderTimeline() {
   const el = $('#osa');
   const dr = D.timeline.dr_events;
@@ -96,11 +140,13 @@ export function renderTimeline() {
     <div class="wrap tl-ctl"><div><button class="btn sm" data-z="-1" aria-label="Oddálit">−</button><button class="btn sm" data-z="1" aria-label="Přiblížit">+</button></div>
       <button class="btn sm" id="tlPaint">Malovaná osa ▸</button></div>
     <div class="tl-scroll wrap" id="tlScroll" tabindex="0" aria-label="Časová osa, lze posouvat"></div>
+    ${mobileHtml()}
     <div class="wrap tl-paint">
       <button class="tl-paint-btn" id="tlPaint2" aria-label="Otevřít malovanou osu"><span class="pic">${img('osa/osa_full', { alt: 'Malovaná časová osa Cesty Tethyrské královské družiny', sizes: '320px' })}</span><span><b>Cesta Tethyrské královské družiny</b><i>Malovaná osa, jak visí na zdi. Otevřít a přiblížit.</i></span></button>
     </div>
     <div class="wrap dr-list"><h3>Herní letopočet</h3><p class="small">Události světa v pořadí, v jakém se staly. Zlatě jsou ty, které se odehrály u stolu.</p>
       <ol class="drl">${dr.map((t) => `<li class="${t.played ? 'played' : ''}"><span>${esc(t.dr_label || t.dr)}</span><b>${esc(t.title)}</b><p>${esc(t.text || '')}</p></li>`).join('')}</ol></div>`;
+  wireMobile(el);
   const box = $('#tlScroll', el);
   let z = 1;
   const draw = () => {

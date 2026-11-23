@@ -109,3 +109,46 @@
 3. **Pořadí zastávek uvnitř jednoho sezení** (Shou Lung, návrat 2006–2007) je odvozené ze shrnutí a z geometrie, data ho neurčují; kapitoly Štíty Apokalypsy a návrat mají dál po jednom překřížení.
 4. **3D mapa samostatně (mimo web)** už nemá obrázky ani média svědků, protože je bere z `../img` a `../assets`; zdrojová složka `/home/claude/mapa3d` je synchronizovaná, ale sama o sobě neúplná.
 5. 2D mapa: na úzkém displeji zabírají ovládací prvky výšku (tři řádky tlačítek nad mapou) a sféry jsou jen sloupec značek bez tras do nich; `test-anchors.py` z iterace 2 neprojde, protože záložní přehrávač hymny je od iterace 3 sbalený.
+
+## Iterace 6 – vizuální kritika a animace (23. 11. 2026)
+
+Snímky před úpravami: `/home/claude/webshots/it6/pred/`, po úpravách: `/home/claude/webshots/it6/po/` (`scripts/shots6.py <složka>`, desktop 1440×900 a mobil 390×844, všech 12 oddílů, u dlouhých více výřezů).
+
+### Kritika před úpravami (co bylo špatně)
+1. **Úvod:** titul se dělil s postavami v malbě, kicker splýval s pozadím, šest počítadel pod okrajem obrazovky, vstupy do webu jen tři tlačítka a drobné odkazy; malba se jen pomalu přibližovala, žádné světlo, mlha ani jiskry.
+2. **Hierarchie a rytmus:** všech 11 oddílů začínalo stejně (kicker, velký nadpis kapitálkami, kurzivní perex, ornament), bez čísla, bez předělu; tmavé plochy za sebou bez přechodu.
+3. **Kontrast:** `--parch-faint` (45 % pergamenu) měl poměr 3,6 : 1, axe-core hlásil **446 porušení AA** (hlavně popisky střihů, data, marginálie), červená `#b3332b` na tmavém 3 : 1.
+4. **Družina:** karta měla portrét, jméno a řádek s hráčem; chyběly milníky a osud, kdo vedl hru, jen malým písmem pod tabulkou. Na mobilu jedna portrétová karta zabírala celou obrazovku.
+5. **Bitvy:** dlouhá bílá/tmavá šablona obraz – text – dvě tabulky; nic nepřipomínalo hlášení, žádný proklik na mapu, strany a velitelé zapadli v tabulkách.
+6. **Proroctví:** verše se odhalovaly jen jako celek, žádné rozsvěcování při čtení, u naplněných veršů nebylo kam jít.
+7. **Časová osa na mobilu:** SVG široké 1700 px s překrývajícími se linkami, zásah postavy jen přibližný.
+8. **Drobnosti:** favicon jako zploštělý obdélník, žádný náhled pro sdílení, jeden titulek stránky, žádná 404, tisk kapitoly vypsal celý web, patička jen jeden řádek, `role="img"` na SVG s fokusovatelnými potomky.
+9. **Nekonzistence:** červená text/pozadí, tři různé velikosti perexu, třída `.pl` použitá pro tabulku hráčů a (při první verzi nových veršů) znovu.
+
+### Opraveno (15 věcí)
+1. **Úvod jako film** (`sections/hero.js`, `styles/scenes.css`): nástup po písmenech titulu, léta 2003–2026 jako kreslená linka se žhavou tečkou, mlha ve dvou vrstvách, paprsek světla, paralaxa malby (myš + rolování, rAF jen když je úvod vidět), jiskry s ocáskem a prach ve světle (`lib/ash.js`, canvas, vypne se při skrytí karty i `prefers-reduced-motion`), levý stín pod titulkem. Při dalším načtení ve stejné relaci zkrácený nástup (`sessionStorage`).
+2. **Pět vstupů** přímo pod titulkem: Číst příběh / Pustit dokument / Mapa / Svědectví / Hymna (skleněné dlaždice s ikonou a popiskem), počítadla se spouštějí po doběhnutí nástupu.
+3. **Typografická škála a tokeny** (`base.css`: `--t-*`, `--space-sec`, `--red-t`), Cardo/Crimson na text, Cinzel jen na tituly, Fira na popisky; jednotná hlavička oddílu.
+4. **Číslování oddílů I–XI** s předělem „—— ✦ Oddíl IV ✦ ——“ (`lib/chrome.js`, přidává se po líném vykreslení), záře za nadpisem, zlatá linka na začátku oddílu.
+5. **Scroll-driven animace** (`animation-timeline: view()`, `system.css`): nadpisy oddílů, linky předělu, paralaxa obrazu bitev; kde to prohlížeč neumí, zůstává odhalení přes IntersectionObserver; nové varianty `.rv-l/.rv-r/.rv-s`.
+6. **Družina:** karta = portrét, jméno, povolání, „Hraje <hráč křestním jménem> · roky“, dva klíčové milníky (první a poslední zapsaný), osud (první věta), „Celý životopis“; detail v dialogu beze změny a bez svědectví. Na mobilu vodorovná kompaktní karta. Panel **Pán jeskyně Zdeněk T.** s odkazem na Poděkování („Všichni vděční hráči“).
+7. **Bitvy jako depeše:** obraz s odhalením zleva, přes něj číslo hlášení a název, papírový list „Depeše z bojiště“ (místo, ve hře, u stolu, v kronice), naše strana × druhá strana s „VS“, velitelé a síly, průběh, výsledek s razítkem, tlačítko „Na mapě ▸“ (otevře kartu místa na 2D mapě), svědci obou stran, soupisky jednotek sbalené. Animovaný nástup po částech.
+8. **Proroctví:** verše se odhalují po řádcích (rozostření → ostrost), verš, který čtenář čte, se rozsvítí, ukazatel kapitol I–III nad malbou. **Naplněné verše** (3-6, 3-7, 3-12; kronika je ve finále 1. 8. 2026 výslovně označuje za naplněné) mají odkaz „Naplnilo se · Thultanthar a Pyramida času“, ostatní verše odkazují na kapitoly, kde je vyprávění cituje (výpočet z odkazů `(p:…)` v `vypraveni.json`).
+9. **Časová osa na mobilu:** karty po letech 2003–2026 (kniha, herní rok, události, kdo hrál, sezení) s vodorovným posunem, `scroll-snap`, lištou let a dotykovými cíli ≥ 44 px; klepnutí na postavu otevře její detail. Desktop zůstává u SVG.
+10. **Přístupnost:** kontrast AA (**axe-core: 856 → 0** uzlů na desktopu i mobilu, `scripts/test-it6-a11y.py`), `role="group"` místo `img` u SVG osy, viditelný fokus (na papírových panelech červený), `role="status"` u načítání, `aria-label` u karet, tlačítek svědků a tisku, dotykové cíle ≥ 44 px (`shots4.py` bez malých cílů kromě opravených).
+11. **Titulky stránek** podle oddílu a podle čtené kapitoly („Anauroch · Příběh · Západní draci“).
+12. **Sdílení:** `og:*` a `twitter:*` meta, popis, `og.jpg` 1200×630 (`scripts/build-icons.py`: malba + titul, lokálně přes Playwright), čtvercový `favicon.svg`, `favicon-32.png`, `apple-touch-icon.png`; absolutní URL obrázku se doplní při buildu z `VERCEL_PROJECT_PRODUCTION_URL` (nebo `SITE_URL`).
+13. **404:** `public/404.html` (Vercel ji použije sám), ve stylu kroniky, tři cesty zpět.
+14. **Tisk kapitoly:** tlačítko „Vytisknout kapitolu“ u každé kapitoly; `@media print` ukáže jen zvolenou kapitolu na bílém papíře s hlavičkou a patičkou, bez galerie, map a ovládání; titulek dokumentu se na čas změní na název kapitoly.
+15. **Reduced motion a patička:** při `prefers-reduced-motion` je obsah úvodu, depeší a veršů hned viditelný (opraveno: zpožděné animace s `both`), částice a paralaxa vypnuté; patička s ornamentem a odkazy na všechny oddíly.
+Opravy za běhu: třída `.pl` (tabulka hráčů) kolidovala s novými řádky veršů, přejmenováno na `.vl`; boční posuny depeše natahovaly stránku na mobilu (405 px), řešeno `overflow-x: clip`.
+
+### Ověření
+`npm run build` projde. Testy po buildu a `npx vite preview --port 4173`: nový `scripts/test-it6.py` (96 kontrol: úvod, systém, Družina, Bitvy včetně prokliku na mapu, Proroctví včetně odkazů na kapitolu, osa na mobilu, metadata, 404, tisk, reduced motion, fokus, konzole), `test-it6-a11y.py` (axe, 0 porušení), a beze změny prošly `test-it4-audio`, `test-it4-witness`, `test-it4-film`, `test-it5-map`, `test-it5-3d`, `test-players`; `shots4.py` bez přetékání. Konzole bez chyb.
+
+### Kritika po úpravách – 5 největších slabin
+1. **Nástup úvodu a scroll-driven animace nejsou ověřené v Safari/Firefoxu ani na skutečném telefonu**; Safari < 26 a Firefox použijí zálohu bez plynulého svázání s rolováním. Jiskry a mlha nebyly změřené na slabém mobilu.
+2. **Úvod stojí na jediné malbě**; paralaxa je jen posun vrstev stejného obrazu a CSS mlhy. Skutečná hloubka (rozřezané vrstvy popředí / pozadí) potřebuje novou malbu od zadavatele.
+3. **Příběh (36 kapitol) zůstal vizuálně nejméně dotčený**: kapitoly jsou stále dlouhý sloupec textu s galerií; chybí vizuální přechod mezi kapitolami uvnitř knihy a větší využití malby ve sloupci.
+4. **Depeše nemají kvantitativní „síly“ jako graf**: data mají počty jen u několika bitev a ve volném textu (`—` u většiny), takže strany stojí proti sobě bez měřítka; „Na mapě“ chybí u 6 bitev, které v datech mapy nemají místo.
+5. **404 a tisk jsou jen systémové písmo / bez náhledu**: 404 nenačítá Cinzel (hash souborů v `dist`), tisk neobsahuje obrázky a „Kronika sezení“; tisk celé knihy nebo více kapitol najednou není.

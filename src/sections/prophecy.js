@@ -6,26 +6,49 @@ import { openLightbox } from '../lib/lightbox.js';
 
 const NAMES = ['první', 'druhá', 'třetí'];
 const ROM = ['I', 'II', 'III'];
+// Verše třetí kapitoly, které kronika výslovně označuje za naplněné ve finále 1. 8. 2026 (kapitola „Thultanthar a Pyramida času“:
+// „Naplnila se třetí kapitola proroctví se svými spárovanými souboji“): Ho × Yamoh (3-6, 3-7) a Sar Saratar (3-12).
+const FUL = { '3-6': 'ch-thultanthar-a-pyramida-casu', '3-7': 'ch-thultanthar-a-pyramida-casu', '3-12': 'ch-thultanthar-a-pyramida-casu' };
+/** Které kapitoly vyprávění odkazují na který verš (odkazy (p:kapitola-verš) v textech kapitol). */
+function refsOf() {
+  const m = {};
+  for (const [cid, blocks] of Object.entries(D.vypraveni?.chapters || {})) {
+    for (const mm of JSON.stringify(blocks).matchAll(/\]\(p:(\d)-(\d+)\)/g)) (m[`${mm[1]}-${mm[2]}`] ||= new Set()).add(cid);
+  }
+  return m;
+}
+const chTitle = (id) => D.chById?.[id]?.title || '';
+const lines = (v) => v.t.flatMap((l) => String(l).split(/\s*\|\s*/));
+function linkRow(key) {
+  const refs = [...(refsOf.cache[key] || [])];
+  const ful = FUL[key];
+  if (!ful && !refs.length) return '';
+  const others = refs.filter((c) => c !== ful);
+  return `<div class="pr-link">${ful ? `<a class="ful" href="#${ful}">✦ Naplnilo se · ${esc(chTitle(ful))} ▸</a>` : ''}${!ful ? others.map((c) => `<a href="#${c}">V kronice · ${esc(chTitle(c))} ▸</a>`).join('') : ''}${ful && others.length ? `<span class="ref">Výklad: ${others.map((c) => `<a href="#${c}">${esc(chTitle(c))}</a>`).join(', ')}</span>` : ''}</div>`;
+}
 
 export function renderProphecy() {
   const el = $('#proroctvi');
+  refsOf.cache = refsOf();
   const P = D.prophecy;
   const known = P.chapters.reduce((n, c) => n + c.verses.filter((v) => v.who).length, 0);
   el.innerHTML = `<header class="sec-head"><p class="kicker">Proroctví</p><h2 id="proroctvi-h">Alaundovo proroctví</h2>
     <p class="lead">${esc(P.intro)}</p><div class="orn">✦</div></header>
     <div class="pr-grid wrap">
-      <div class="pr-art" aria-hidden="true">${P.chapters.map((c, i) => `<div class="pr-pic${i === 0 ? ' on' : ''}" data-ch="${i}">${img('ilu/' + (c.img || P.img), { alt: '', sizes: '(max-width:900px) 100vw, 40vw', pos: '50% 30%' })}</div>`).join('')}<div class="pr-art-shade"></div></div>
+      <div class="pr-art" aria-hidden="true">${P.chapters.map((c, i) => `<div class="pr-pic${i === 0 ? ' on' : ''}" data-ch="${i}">${img('ilu/' + (c.img || P.img), { alt: '', sizes: '(max-width:900px) 100vw, 40vw', pos: '50% 30%' })}</div>`).join('')}<div class="pr-art-shade"></div><div class="pr-prog" aria-hidden="true">${ROM.map((r, i) => `<span class="${i === 0 ? 'on' : ''}" data-ch="${i}">${r}</span>`).join('')}</div></div>
       <div class="pr-text">
+        <p class="pr-sum"><span><b>Naplnění.</b> Třetí kapitola se podle kroniky naplnila ve finále 1. srpna 2026. Verše s doloženým výkladem odkazují na kapitolu, kde se to stalo.</span><a href="#${FUL['3-6']}">${esc(chTitle(FUL['3-6']))} ▸</a></p>
         <p class="pr-note ui">U ${known} dvojverší je z her známo, komu patří. Klepněte na <span class="pr-key">✦</span>.</p>
         ${P.chapters.map((c, i) => `<section class="pr-ch" data-ch="${i}" aria-label="Kapitola ${NAMES[i]}">
           <div class="pr-mobpic">${img('ilu/' + (c.img || P.img), { alt: '', sizes: '100vw', pos: '50% 30%' })}</div>
           <p class="pr-rom rv">${ROM[i]}</p><h3 class="pr-k rv">Kapitola ${NAMES[i]}</h3>
           <div class="pr-terc rv">${c.tercet.map((l) => `<p>${esc(l)}</p>`).join('')}</div>
           <div class="pr-orn">✦</div>
-          ${c.verses.map((v, j) => `<div class="pr-v rv${v.who ? ' known' : ''}" id="pv-${i + 1}-${j}">
-            <p>${v.t.map((l) => esc(l).replace(/\s*\|\s*/g, "<br>")).join("<br>")}</p>
+          ${c.verses.map((v, j) => `<div class="pr-v rv${v.who ? ' known' : ''}${FUL[`${i + 1}-${j}`] ? ' ful' : ''}" id="pv-${i + 1}-${j}">
+            <p>${lines(v).map((l, k) => `<span class="vl" style="--l:${k}">${esc(l)}</span>`).join('')}</p>
             ${v.img ? `<button class="pr-thumb" data-lb="${esc(largest('ilu/' + v.img))}" data-cap="${esc(v.cap || '')}" aria-label="Obraz k verši: ${esc(v.cap || '')}"><img src="${small('ilu/' + v.img)}" alt="" loading="lazy" decoding="async"></button>` : ''}
             ${v.who ? `<button class="pr-who" aria-expanded="false" aria-controls="prw-${i}-${j}">✦ <span>Komu patří</span></button><p class="pr-ans" id="prw-${i}-${j}" hidden><b>${esc(v.who)}</b><small>${esc(v.src)}</small></p>` : ''}
+            ${linkRow(`${i + 1}-${j}`)}
           </div>`).join('')}
           <div class="pr-orn">✦</div>
         </section>`).join('')}
@@ -48,7 +71,10 @@ export function renderProphecy() {
   // obraz kapitoly vlevo podle toho, kterou kapitolu čtenář právě čte
   const pics = $$('.pr-pic', el);
   const io = new IntersectionObserver((ents) => {
-    for (const e of ents) if (e.isIntersecting) pics.forEach((p) => p.classList.toggle('on', p.dataset.ch === e.target.dataset.ch));
+    for (const e of ents) if (e.isIntersecting) { pics.forEach((p) => p.classList.toggle('on', p.dataset.ch === e.target.dataset.ch)); $$('.pr-prog span', el).forEach((p) => p.classList.toggle('on', p.dataset.ch === e.target.dataset.ch)); }
   }, { rootMargin: '-40% 0px -55% 0px' });
   $$('.pr-ch', el).forEach((s) => io.observe(s));
+  // verš, který čtenář právě čte, se rozsvítí
+  const lit = new IntersectionObserver((ents) => { for (const e of ents) e.target.classList.toggle('lit', e.isIntersecting); }, { rootMargin: '-38% 0px -38% 0px' });
+  $$('.pr-v', el).forEach((v) => lit.observe(v));
 }

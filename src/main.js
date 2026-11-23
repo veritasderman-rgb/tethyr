@@ -19,6 +19,8 @@ import '@fontsource/fira-sans/latin-ext-500.css';
 import 'leaflet/dist/leaflet.css';
 import './styles/base.css';
 import './styles/sections.css';
+import './styles/system.css';
+import './styles/scenes.css';
 
 import { need } from './lib/data.js';
 import { register, ensure, sections, emit } from './lib/sections.js';
@@ -36,6 +38,7 @@ import { renderTable } from './sections/table.js';
 import { renderHymna } from './sections/hymna.js';
 import { renderPodekovani } from './sections/podekovani.js';
 import { initFilm } from './sections/film.js';
+import { SECTION_LABEL } from './lib/chrome.js';
 import './lib/audio.js';
 
 // Oddíly a data, která potřebují (načítají se až při přiblížení k oddílu).
@@ -44,14 +47,15 @@ register('pribeh', renderStory, ['images', 'books', 'sessions', 'svedectvi', 'wo
 register('mapa', renderMap, ['images', 'map', 'sessions', 'npcs', 'books', 'svedectvi', 'world']);
 register('svedectvi', renderWitness, ['images', 'svedectvi', 'books', 'map', 'sessions', 'world']);
 register('druzina', renderParty, ['images', 'characters', 'sessions', 'svedectvi']);
-register('bitvy', renderBattles, ['images', 'world', 'sessions', 'svedectvi']);
-register('proroctvi', renderProphecy, ['images', 'prophecy']);
+register('bitvy', renderBattles, ['images', 'world', 'sessions', 'svedectvi', 'map']);
+register('proroctvi', renderProphecy, ['images', 'prophecy', 'books', 'vypraveni']);
 register('osa', renderTimeline, ['images', 'timeline', 'characters']);
 register('rejstrik', renderRegistry, ['npcs', 'sessions']);
 register('stul', renderTable, ['images', 'gallery', 'sessions']);
 register('hymna', renderHymna, ['images']);
 register('podekovani', renderPodekovani, ['images']);
 
+const BASE_TITLE = document.title;
 function nav() {
   const bar = $('#topbar');
   const btn = $('#menuBtn');
@@ -67,7 +71,12 @@ function nav() {
   // zvýraznění aktivního oddílu
   const links = [...$$('a', menu), ...$$('a', $('#bottomNav'))];
   const io = new IntersectionObserver((ents) => {
-    for (const e of ents) if (e.isIntersecting) links.forEach((a) => a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id));
+    for (const e of ents) if (e.isIntersecting) {
+      links.forEach((a) => a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id));
+      // titulek karty podle toho, kde čtenář je (u kapitol příběhu titulek nastavuje story.js)
+      const id = e.target.id, lab = SECTION_LABEL[id];
+      if (lab) document.title = id === 'uvod' ? BASE_TITLE : id === 'pribeh' && window.__chTitle ? `${window.__chTitle} · Příběh · Západní draci` : `${lab} · Západní draci`;
+    }
   }, { rootMargin: '-45% 0px -50% 0px' });
   $$('main > section').forEach((s) => io.observe(s));
 }

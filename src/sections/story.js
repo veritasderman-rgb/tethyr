@@ -129,7 +129,8 @@ function chapterHtml(c, book, n, prev, next) {
   const real = c.real, dr = c.drs;
   return `<section class="chap" id="${c.id}" data-ch="${c.id}" aria-labelledby="${c.id}-h">
     <header class="chap-h rv"><p class="chap-n">${esc(book.kap)} · kapitola ${n}</p><h3 id="${c.id}-h">${esc(c.title)}</h3>
-      <p class="chap-m"><span>${esc(real)} u stolu</span>${dr ? `<span>${esc(dr)}</span>` : ''}<span>${plural(list.length, 'sezení', 'sezení', 'sezení')}</span><span>čtení asi ${c.min} min</span></p></header>
+      <p class="chap-m"><span>${esc(real)} u stolu</span>${dr ? `<span>${esc(dr)}</span>` : ''}<span>${plural(list.length, 'sezení', 'sezení', 'sezení')}</span><span>čtení asi ${c.min} min</span></p>
+      <button class="chap-print" type="button" data-print="${c.id}" aria-label="Vytisknout kapitolu ${esc(c.title)}">Vytisknout kapitolu</button></header>
     ${c.cast?.length ? `<p class="chap-cast rv"><b>Kdo hrál</b> ${c.cast.map(([ch, p]) => `<span>${esc(ch)}${p ? ` <i>${esc(p)}</i>` : ''}</span>`).join('')}</p>` : ''}
     <div class="chap-body">${body}</div>
     <div class="chap-x rv">
@@ -203,6 +204,14 @@ export function renderStory() {
 
 function wireClicks(el) {
   el.addEventListener('click', (e) => {
+    const pr = e.target.closest('[data-print]');
+    if (pr) {
+      const sec = document.getElementById(pr.dataset.print); if (!sec) return;
+      const old = document.title; sec.setAttribute('data-printing', ''); document.body.setAttribute('data-print-ch', '');
+      document.title = `${$('h3', sec)?.textContent || 'Kapitola'} · Západní draci`;
+      const done = () => { sec.removeAttribute('data-printing'); document.body.removeAttribute('data-print-ch'); document.title = old; window.removeEventListener('afterprint', done); };
+      window.addEventListener('afterprint', done); setTimeout(() => window.print(), 60); return;
+    }
     const w = e.target.closest('[data-wit]');
     if (w) { e.preventDefault(); emit('witness:open', { id: w.dataset.wit }); return; }
     const pl = e.target.closest('[data-place]');
@@ -274,6 +283,8 @@ function wireReading(el, chs) {
       if (cur >= 0) timeIn[secs[cur].id] = (timeIn[secs[cur].id] || 0) + performance.now() - curAt;
       if (cur >= 0) items[secs[cur].id].lastElementChild.style.setProperty('--p', done.has(secs[cur].id) ? 1 : 0);
       cur = k; curAt = performance.now();
+      window.__chTitle = k >= 0 ? chs[k].c.title : '';
+      if (inStory && k >= 0) document.title = `${chs[k].c.title} · Příběh · Západní draci`;
       Object.values(items).forEach((a) => a.classList.remove('on'));
       if (k >= 0) {
         const id = secs[k].id; items[id].classList.add('on');
