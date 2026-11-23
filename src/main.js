@@ -30,7 +30,7 @@ import { $ } from './lib/util.js';
 import { initMenu } from './lib/menu.js';
 import { initSearch } from './lib/search.js';
 import { initHoverCards } from './lib/hovercard.js';
-import { filmHooks } from './lib/filmhook.js';
+import { filmHooks, pfilmHooks } from './lib/filmhook.js';
 import './lib/audio.js';
 import { closeDrawer, close as closeLightbox } from './lib/lightbox.js';
 
@@ -71,7 +71,7 @@ async function boot() {
     $('#loading span').textContent = 'Data se nepodařilo načíst. Zkuste stránku obnovit.';
     console.error(e); return;
   }
-  await startRouter({ film: filmHooks });
+  await startRouter({ film: filmHooks, pfilm: pfilmHooks });
   onScroll();
   $('#loading').classList.add('done');
   setTimeout(() => $('#loading')?.remove(), 1200);

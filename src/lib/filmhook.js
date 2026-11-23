@@ -19,3 +19,20 @@ window.addEventListener('film:closed', (e) => {
 });
 // ladění a testy
 window.__openFilm = (o) => navigate('/dokument', { gesture: true, ...o });
+
+// Film proroctví (/proroctvi/film, iterace 10): sections/pfilm.js se načte až při prvním otevření.
+let pmod = null, pOpen = false;
+const pget = () => (pmod ||= import('../sections/pfilm.js'));
+export const pfilmHooks = {
+  async open(opts) { pOpen = true; const m = await pget(); if (pOpen) m.openFilm(opts); },
+  close() { if (!pOpen) return; pOpen = false; pmod?.then((m) => m.closeFilm()); },
+};
+window.addEventListener('pfilm:closed', (e) => {
+  if (!pOpen) return;
+  pOpen = false;
+  const href = e.detail?.href;
+  if (href) { navigate(href, { replace: true }); return; }
+  if (location.pathname.replace(/\/+$/, '') !== '/proroctvi/film') return;
+  if (history.state?.app) history.back(); else navigate('/proroctvi', { replace: true });
+});
+window.__openPfilm = () => navigate('/proroctvi/film', { gesture: true });

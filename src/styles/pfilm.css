@@ -1,0 +1,124 @@
+/* Iterace 10: filmový režim proroctví (/proroctvi/film). Načítá se jen s filmem (import v sections/pfilm.js). */
+.pf { position: fixed; inset: 0; z-index: 400; background: #050403; color: #f1e6cc; overflow: hidden; outline: none; font-family: var(--f-text, 'Cardo', serif); --tilt: 0%; }
+.pf[hidden] { display: none; }
+.pf-slides, .pf-vids, .pf-mood, .pf-vig, .pf-grain, .pf-fx, .pf-eclipse { position: absolute; inset: 0; pointer-events: none; }
+.pf-sl { position: absolute; inset: 0; opacity: 0; transition: opacity 1.8s ease; overflow: hidden; }
+.pf-sl.on { opacity: 1; }
+.pf-sl img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 35%; transform-origin: 50% 45%; will-change: transform; filter: saturate(.85) contrast(1.05) brightness(.8); }
+.pf-vids video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .7s ease; }
+.pf-vids video.on { opacity: 1; }
+.pf.in-vid .pf-mood { opacity: .25; }
+/* Selûne (stříbrná) × Shar (fialově černá): dvě vrstvy záře, které se přetlačují */
+.pf-mood { transition: opacity 1.2s; }
+.pf-mood i { position: absolute; inset: -20%; transition: opacity 3.2s ease, transform 6s ease; will-change: opacity, transform; }
+.pf-sel { background: radial-gradient(ellipse 55% 45% at calc(28% + var(--tilt)) 22%, rgba(214, 226, 255, .55), rgba(170, 190, 240, .18) 45%, transparent 70%); mix-blend-mode: screen; opacity: .2; animation: pf-drift-a 23s ease-in-out infinite alternate; }
+.pf-shar { background: radial-gradient(ellipse 65% 60% at calc(76% + var(--tilt)) 78%, rgba(26, 6, 40, .95), rgba(48, 16, 72, .55) 40%, transparent 72%); mix-blend-mode: multiply; opacity: .25; animation: pf-drift-b 29s ease-in-out infinite alternate; }
+@keyframes pf-drift-a { to { transform: translate(6%, 4%) scale(1.08); } }
+@keyframes pf-drift-b { to { transform: translate(-7%, -3%) scale(1.1); } }
+.pf-vig { background: radial-gradient(ellipse 80% 75% at 50% 48%, transparent 45%, rgba(0, 0, 0, .55) 80%, rgba(0, 0, 0, .9) 100%), linear-gradient(180deg, rgba(0,0,0,.35), transparent 22%, transparent 70%, rgba(0,0,0,.55)); }
+.pf-grain { opacity: .09; mix-blend-mode: overlay; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"); animation: pf-grain .6s steps(6) infinite; }
+@keyframes pf-grain { 0% { background-position: 0 0; } 20% { background-position: -40px 20px; } 40% { background-position: 30px -50px; } 60% { background-position: -60px -10px; } 80% { background-position: 20px 60px; } 100% { background-position: 0 0; } }
+.pf-fx { width: 100%; height: 100%; opacity: 0; transition: opacity .4s; }
+/* zatmění na začátku kapitoly II */
+.pf-eclipse { opacity: 0; }
+.pf-eclipse.run { animation: pf-ecl 9s ease-in-out var(--d, 0s) both; }
+.pf-moon, .pf-disc { position: absolute; left: 20%; top: 7%; width: min(15vw, 19vh); aspect-ratio: 1; border-radius: 50%; translate: -50% 0; }
+.pf-moon { mix-blend-mode: screen; background: radial-gradient(circle at 40% 38%, #fbfcff, #c9d3ea 55%, #8d97b5 75%); box-shadow: 0 0 60px 18px rgba(220, 230, 255, .55), 0 0 160px 50px rgba(160, 180, 240, .25); }
+.pf-disc { background: #050208; box-shadow: inset 0 0 22px rgba(90, 40, 130, .7); transform: translateX(120%); }
+.pf-eclipse.run .pf-disc { animation: pf-disc 9s cubic-bezier(.4, 0, .3, 1) var(--d, 0s) both; }
+.pf-eclipse.run .pf-moon { animation: pf-corona 9s ease-in-out var(--d, 0s) both; }
+@keyframes pf-ecl { 0% { opacity: 0; } 12% { opacity: 1; } 78% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes pf-disc { 0% { transform: translateX(120%); } 55% { transform: translateX(0); } 75% { transform: translateX(0); } 100% { transform: translateX(-8%); } }
+@keyframes pf-corona { 0%, 40% { box-shadow: 0 0 60px 18px rgba(220,230,255,.55), 0 0 160px 50px rgba(160,180,240,.25); } 58% { box-shadow: 0 0 30px 8px rgba(240,236,255,.95), 0 0 220px 90px rgba(150,110,230,.45); } 100% { box-shadow: 0 0 40px 10px rgba(200,190,255,.4), 0 0 120px 40px rgba(90,40,140,.35); } }
+/* hořící nadpis přes předěly */
+.pf-title { position: absolute; left: 0; right: 0; text-align: center; opacity: 0; pointer-events: none; transition: opacity .25s; padding: 0 4vw; }
+.pf-title.on { opacity: 1; }
+.pf-title.pos-top { top: 6vh; } .pf-title.pos-center { top: 50%; translate: 0 -50%; } .pf-title.pos-bottom { bottom: 12vh; }
+.pf-title svg { width: min(92vw, 1200px); height: auto; display: block; margin: 0 auto; overflow: visible; }
+.pf-title text { font-family: 'Cinzel', serif; letter-spacing: .06em; }
+.pf-tk { font: 500 clamp(.7rem, 1.2vw, .9rem)/1 'Fira Sans', sans-serif; letter-spacing: .4em; text-transform: uppercase; color: #d9b45a; margin: 0 0 .4em; text-shadow: 0 2px 12px #000; }
+.pf-ts { font: italic clamp(1rem, 1.8vw, 1.4rem)/1.3 'Cardo', serif; color: #eadfc6; margin: .2em 0 0; text-shadow: 0 2px 14px #000; }
+.pf-title.pos-top .pf-ts { position: fixed; left: 0; right: 0; bottom: 14vh; }
+/* verše uprostřed obrazu */
+.pf-verse { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; padding: 0 6vw; }
+.pf-v { grid-area: 1 / 1; margin: 0; max-width: 22em; text-align: center; font-family: 'Cardo', serif; font-size: clamp(1.45rem, 3.4vw, 3.3rem); line-height: 1.32; color: #f3e8cf; text-shadow: 0 0 22px rgba(201, 162, 74, .45), 0 2px 18px rgba(0, 0, 0, .95), 0 0 2px #000; }
+.pf-l { display: block; }
+.pf-w { display: inline-block; opacity: 0; animation: pf-in 1.1s cubic-bezier(.2, .7, .2, 1) var(--d) both; }
+.pf-w.lt { animation: pf-in 1.1s cubic-bezier(.2, .7, .2, 1) var(--d) both, pf-light 2.2s ease calc(var(--d) + .5s) both; }
+.pf-w.dk { animation: pf-in 1.1s cubic-bezier(.2, .7, .2, 1) var(--d) both, pf-dark 2.2s ease calc(var(--d) + .5s) both; }
+@keyframes pf-in { from { opacity: 0; transform: translateY(.35em) scale(.98); filter: blur(8px); letter-spacing: .12em; } to { opacity: 1; transform: none; filter: blur(0); letter-spacing: 0; } }
+@keyframes pf-light { to { color: #f4f7ff; text-shadow: 0 0 10px rgba(235, 242, 255, .95), 0 0 28px rgba(190, 210, 255, .8), 0 0 60px rgba(160, 185, 255, .45), 0 2px 10px #000; } }
+@keyframes pf-dark { to { color: #3a2150; text-shadow: 0 0 8px rgba(170, 120, 230, .65), 0 0 22px rgba(70, 20, 110, .9), 0 0 1px rgba(220, 200, 255, .8); } }
+.pf-v.terc { font-size: clamp(1.7rem, 4.3vw, 4.2rem); font-family: 'Cinzel', serif; letter-spacing: .02em; line-height: 1.25; max-width: 18em; }
+.pf-v.terc .pf-w { color: #ffe3a0; text-shadow: 0 0 16px rgba(255, 150, 40, .85), 0 0 40px rgba(255, 90, 0, .45), 0 2px 16px #000; animation: pf-in 1.3s cubic-bezier(.2, .7, .2, 1) var(--d) both, pf-ember 2.8s ease-in-out calc(var(--d) + 1.2s) infinite alternate; }
+.pf-v.terc .pf-w.lt { animation: pf-in 1.3s cubic-bezier(.2, .7, .2, 1) var(--d) both, pf-light 2.2s ease calc(var(--d) + .6s) both; }
+.pf-v.terc .pf-w.dk { animation: pf-in 1.3s cubic-bezier(.2, .7, .2, 1) var(--d) both, pf-dark 2.2s ease calc(var(--d) + .6s) both; }
+@keyframes pf-ember { from { text-shadow: 0 0 16px rgba(255, 150, 40, .85), 0 0 40px rgba(255, 90, 0, .45), 0 2px 16px #000; } to { text-shadow: 0 0 22px rgba(255, 190, 80, 1), 0 0 64px rgba(255, 100, 10, .6), 0 -4px 30px rgba(255, 60, 0, .35), 0 2px 16px #000; } }
+.pf-v.out { animation: pf-out 1s ease forwards; }
+.pf-v.out .pf-w { animation: pf-wout 1s ease forwards; }
+@keyframes pf-out { to { opacity: 0; } }
+@keyframes pf-wout { from { opacity: 1; filter: blur(0); transform: none; } to { opacity: 0; filter: blur(10px); transform: translate(calc(var(--dx) * .6em), -.6em) scale(1.06); } }
+.pf.paused .pf-w, .pf.paused .pf-eclipse, .pf.paused .pf-eclipse i, .pf.paused .pf-mood i, .pf.paused .pf-grain { animation-play-state: paused !important; }
+.pf.no-cc .pf-verse { display: none; }
+.pf-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+/* úvodní a závěrečná karta */
+.pf-start, .pf-done { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; padding: 6vh 7vw; background: radial-gradient(ellipse at 50% 55%, rgba(10, 8, 6, .35), rgba(5, 4, 3, .88) 75%); z-index: 3; }
+.pf-start[hidden], .pf-done[hidden] { display: none; }
+.pf-start h2, .pf-done blockquote { font: 400 clamp(2rem, 6vw, 4.6rem)/1.05 'Cinzel', serif; margin: .2em 0 .35em; color: #f3e1b0; text-shadow: 0 0 30px rgba(255, 150, 40, .45), 0 3px 18px #000; }
+.pf-start p { max-width: 36em; margin: 0 auto 1.2em; font-size: clamp(1rem, 1.6vw, 1.25rem); color: #e6dcc4; }
+.pf-start .kicker, .pf-done .kicker { font: 500 .8rem/1 'Fira Sans', sans-serif; letter-spacing: .32em; text-transform: uppercase; color: #d9b45a; margin: 0; }
+.pf-go { font-size: 1.15rem; padding: 16px 34px; min-height: 52px; justify-self: center; }
+.pf-keys { font: 400 .8rem/1.5 'Fira Sans', sans-serif; color: #b9ab8c; margin-top: 1.4em !important; }
+.pf-done blockquote { font-family: 'Cardo', serif; font-style: italic; font-size: clamp(1.5rem, 3.6vw, 2.8rem); line-height: 1.3; max-width: 24em; margin-inline: auto; }
+.pf-src { font: 500 .78rem/1 'Fira Sans', sans-serif; letter-spacing: .2em; text-transform: uppercase; color: #b9ab8c; margin: 0 0 2em; }
+.pf-done nav { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+.pf-done .btn { min-height: 44px; display: inline-flex; align-items: center; }
+/* ovládání */
+.pf-ui { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; padding: 30px max(16px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); background: linear-gradient(transparent, rgba(0, 0, 0, .78)); opacity: 0; transition: opacity .4s; }
+.pf-ui.show, .pf:not(.is-playing) .pf-ui, .pf-ui:focus-within { opacity: 1; }
+.pf:not(.started) .pf-ui { display: none; }
+.pf-tl { position: relative; height: 18px; cursor: pointer; margin-bottom: 6px; touch-action: none; }
+.pf-tl::before { content: ''; position: absolute; left: 0; right: 0; top: 8px; height: 3px; background: rgba(234, 223, 198, .25); }
+.pf-bar { position: absolute; left: 0; right: 0; top: 8px; height: 3px; background: linear-gradient(90deg, #a8842c, #f0c96a); transform-origin: 0 50%; transform: scaleX(0); }
+.pf-tl b { position: absolute; top: 0; width: 2px; height: 18px; background: #d9b45a; font: 600 .62rem/1 'Fira Sans', sans-serif; color: #d9b45a; }
+.pf-tl b::after { content: attr(title); position: absolute; bottom: 20px; left: 4px; white-space: nowrap; font-weight: 500; letter-spacing: .08em; opacity: .85; }
+.pf-ctl { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.pf-b { min-width: 44px; height: 44px; padding: 0 10px; border: 1px solid rgba(234, 223, 198, .3); background: rgba(18, 16, 13, .6); color: #f1e6cc; font: 500 .9rem/1 'Fira Sans', sans-serif; cursor: pointer; border-radius: 2px; }
+.pf-b:hover, .pf-b:focus-visible { border-color: #d9b45a; background: rgba(139, 30, 30, .55); }
+.pf-b[aria-pressed="true"] { border-color: #d9b45a; color: #ffe3a0; }
+.pf-time { font: 500 .85rem/1 'Fira Sans', sans-serif; color: #e6dcc4; min-width: 7.5em; padding-left: 6px; font-variant-numeric: tabular-nums; }
+.pf-now { flex: 1; font: italic .95rem/1.2 'Cardo', serif; color: #cfc3a6; min-width: 8em; }
+.pf-chs { display: inline-flex; gap: 4px; }
+.pf-vol { width: 90px; accent-color: #d9b45a; }
+.pf.need-tap::after { content: '▶ Klepněte pro pokračování'; position: absolute; left: 50%; top: 50%; translate: -50% -50%; font: 500 1rem 'Fira Sans', sans-serif; padding: 14px 22px; background: rgba(139, 30, 30, .85); border: 1px solid #d9b45a; z-index: 5; }
+@media (max-width: 760px) {
+  .pf-v { font-size: clamp(1.25rem, 5.6vw, 2rem); max-width: 100%; }
+  .pf-v.terc { font-size: clamp(1.4rem, 6.4vw, 2.3rem); }
+  .pf-now, .pf-vol { display: none; }
+  .pf-ctl { gap: 4px; }
+  .pf-b { min-width: 44px; padding: 0 6px; }
+  .pf-title.pos-top { top: 10vh; }
+  .pf-title.pos-top .pf-ts { bottom: 24vh; }
+  .pf-tl b::after { content: attr(data-r); }
+}
+@media (orientation: portrait) and (max-width: 760px) {
+  .pf-sl img { object-position: 50% 40%; }
+  .pf-verse { padding: 0 5vw 12vh; }
+}
+@media (max-height: 480px) {
+  .pf-v { font-size: clamp(1.1rem, 4.2vh + 1vw, 1.8rem); }
+  .pf-ui { padding-top: 12px; }
+  .pf-vol, .pf-now { display: none; }
+  .pf-ctl { flex-wrap: nowrap; }
+  .pf-time { min-width: 0; font-size: .75rem; }
+  .pf-title.pos-top .pf-ts { bottom: 26vh; }
+}
+/* omezený pohyb: bez částic, plamenů a pohybu kamery, jen prolínání */
+.pf.rm .pf-grain, .pf.rm .pf-fx, .pf.rm .pf-eclipse { display: none; }
+.pf.rm .pf-mood i { animation: none; }
+.pf.rm .pf-w, .pf.rm .pf-w.lt, .pf.rm .pf-w.dk, .pf.rm .pf-v.terc .pf-w { animation: pf-fade .8s ease var(--d) both; }
+.pf.rm .pf-w.lt { color: #f4f7ff; } .pf.rm .pf-w.dk { color: #b9a0d6; }
+.pf.rm .pf-v.out .pf-w { animation: pf-out .4s ease forwards; }
+.pf.rm .pf-title text { filter: none; }
+@keyframes pf-fade { from { opacity: 0; } to { opacity: 1; } }
+.pf-cta-film { margin-left: 10px; }

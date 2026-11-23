@@ -1,4 +1,4 @@
-// Logo webu: stylizovaná dračí hlava (vlastní originální kresba, src/assets/draci.svg), zlatá linka přes currentColor.
+// Logo webu: heraldický drak se vztyčeným křídlem (iterace 10) (vlastní originální kresba, src/assets/draci.svg), zlatá linka přes currentColor.
 // Jediný zdroj: stejný soubor čte build ikon (scripts/build-icons.py → favicon, apple-touch-icon) i vite.config.js
 // (dosazení do statického index.html), takže horní lišta, menu, favicon a náhled sdílení ukazují totéž.
 // Znak Chrámu Západního úsvitu se na webu používá jen tam, kde jde přímo o chrám.

@@ -45,6 +45,7 @@ export function renderProphecy() {
   el.innerHTML = `<header class="sec-head"><p class="kicker">Proroctví</p><h1 id="proroctvi-h" tabindex="-1">Alaundovo proroctví</h1>
     <p class="lead">${esc(P.intro)}</p>
     ${A ? `<div class="pp-cta" id="ppCta"><button class="btn red pp-go" type="button" id="ppStart"><span aria-hidden="true">▶</span> Vyslechnout proroctví</button><p>Čte Alaundo · ${Math.round(A.total / 60)} minut · tři kapitoly za sebou, verš, který zní, se rozsvítí</p></div>` : ''}
+    <a class="pr-film" href="/proroctvi/film" aria-label="Promítnout proroctví – film s recitací, malbami a předěly kapitol"><span class="pr-film-pic" aria-hidden="true"><img src="pfilm/uvod.webp" alt="" loading="lazy" decoding="async"></span><span class="pr-film-t"><b><span aria-hidden="true">▶</span> Promítnout proroctví</b><small>Film přes celou obrazovku · ${A ? Math.round((A.total + 22) / 60) : 15} minut · recitace, malby proroctví, předěly kapitol</small></span></a>
     <div class="orn">✦</div></header>
     <div class="pr-grid wrap">
       <div class="pr-art" aria-hidden="true">${P.chapters.map((c, i) => `<div class="pr-pic${i === 0 ? ' on' : ''}" data-ch="${i}">${img('ilu/' + (c.img || P.img), { alt: '', sizes: '(max-width:900px) 100vw, 40vw', pos: '50% 30%' })}</div>`).join('')}<div class="pr-art-shade"></div><div class="pr-prog" aria-hidden="true">${ROM.map((r, i) => `<span class="${i === 0 ? 'on' : ''}" data-ch="${i}">${r}</span>`).join('')}</div></div>

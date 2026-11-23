@@ -5,7 +5,7 @@
 //   /pribeh/kniha-2           kniha (předěl, obsah, co se změnilo)
 //   /pribeh/kniha-2/<kapitola>[#s-…]   kapitola (jedna stránka, předchozí/další), #s-… = sezení v kronice kapitoly
 //   /druzina[/<postava>]  /svedectvi[/<svědek>]  /bitvy[/<bitva>]  /mapa[?misto=…|?kniha=II]  /mapa/3d
-//   /proroctvi[/<kapitola-verš>]  /osa  /lexikon[/<heslo>|?q=…]  /u-stolu  /hymna  /dokument  /podekovani
+//   /proroctvi[/<kapitola-verš>]  /proroctvi/film (iterace 10: film proroctví)  /osa  /lexikon[/<heslo>|?q=…]  /u-stolu  /hymna  /dokument  /podekovani
 // Staré kotvy jednostránkové verze (#pribeh, #ch-…, #s-…, #kniha-…, #b-…, #pv-…, #lx/…, #rejstrik, #svedectvi/<id>, #mapa,
 // #mapa3d, #dokument, #hymna…) se přesměrují na nové adresy, a to i v odkazech uvnitř stránky (fixLinks).
 import { D } from './data.js';
@@ -88,6 +88,7 @@ export function parse(loc = location) {
   if (c) return { ...r, page: 'nenalezeno' };
   if (a === 'mapa' && b === '3d') return { ...r, page: 'm3d' };
   if (a === 'bitvy' && b) r.sub = 'b-' + b;
+  else if (a === 'proroctvi' && b === 'film') return { ...r, page: 'pfilm' };
   else if (a === 'proroctvi' && b) r.sub = 'pv-' + b;
   else if (b && ['svedectvi', 'druzina', 'lexikon'].includes(a)) r.sub = b;
   else if (b) return { ...r, page: 'nenalezeno' };
@@ -113,7 +114,8 @@ function fixLinks(root) {
 
 // ------------------------------------------------------------------ navigace
 let cur = null, seq = 0, first = true;
-const hooks = { film: null };
+const hooks = { film: null, pfilm: null };
+let fromPfilm = false;
 /** Přejde na adresu. gesture = přechod vyvolal klik (zvuk smí hned hrát). */
 export function navigate(to, { replace = false, gesture = false, state = {} } = {}) {
   if (to.startsWith('#')) to = legacy(to) || location.pathname;
@@ -168,6 +170,18 @@ async function apply(ctx = {}) {
     return hooks.film?.open({ autostart: !!ctx.gesture && !ctx.pop });
   }
   hooks.film?.close();
+  if (r.page === 'pfilm') {
+    // film proroctví: pod ním stojí stránka Proroctví (přímý vstup ji vykreslí potichu, bez spuštění hlasu)
+    if (!cur || cur.page !== 'proroctvi') await show({ ...parse({ pathname: '/proroctvi', search: '', hash: '' }) }, { ...ctx, quiet: true });
+    document.title = `Film · Alaundovo proroctví · ${SITE}`;
+    setMeta(pageById('proroctvi'), '/proroctvi/film', 'Alaundovo proroctví jako film: recitace, malby proroctví, předěly kapitol a verše hořící uprostřed obrazu.');
+    renderCrumbs([['Proroctví', '/proroctvi'], ['Film', null]]);
+    fromPfilm = true;
+    return hooks.pfilm?.open({ autostart: !!ctx.gesture && !ctx.pop });
+  }
+  hooks.pfilm?.close();
+  // návrat z filmu na verše: hlas stránky se sám nespouští (film právě dohrál nebo byl zavřen)
+  if (fromPfilm) { fromPfilm = false; if (r.page === 'proroctvi') ctx = { ...ctx, quiet: true, gesture: false }; }
   return show(r, ctx);
 }
 
@@ -293,8 +307,8 @@ export function syncMeta() {
 }
 
 // ------------------------------------------------------------------ start
-export function startRouter({ film } = {}) {
-  hooks.film = film;
+export function startRouter({ film, pfilm } = {}) {
+  hooks.film = film; hooks.pfilm = pfilm;
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   fixLinks(document.body);
   startNbsp(document.body);

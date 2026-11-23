@@ -150,7 +150,6 @@ body[data-page="proroctvi"] .nextp { margin-bottom: 110px; }
   body[data-page="proroctvi"] .nextp { margin-bottom: 150px; }
   .topbar .tb-search { display: none; }
 }
-}
 
 /* spodní lišta: Hledat místo Dokumentu (Dokument je v menu, na úvodu a nahoře) */
 @media (max-width: 760px) {
@@ -167,3 +166,14 @@ body[data-page="proroctvi"] .nextp { margin-bottom: 110px; }
   .chap-pr { display: none; }
   .chap-cast { margin-bottom: 28px; }
 }
+
+/* iterace 10: vstup do filmu proroctví */
+.pr-film { display: flex; align-items: stretch; gap: 0; max-width: 560px; margin: 22px auto 4px; text-decoration: none; color: var(--parch); border: 1px solid var(--gold); background: rgba(18, 16, 13, .7); box-shadow: 0 0 40px rgba(201, 120, 40, .18); transition: box-shadow .3s, border-color .3s, transform .3s; }
+.pr-film:hover, .pr-film:focus-visible { box-shadow: 0 0 60px rgba(230, 140, 40, .35); border-color: #f0c96a; transform: translateY(-1px); }
+.pr-film-pic { flex: 0 0 38%; overflow: hidden; position: relative; }
+.pr-film-pic img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 6s ease; }
+.pr-film:hover .pr-film-pic img { transform: scale(1.08); }
+.pr-film-t { display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 16px 18px; text-align: left; }
+.pr-film-t b { font: 600 1.15rem/1.15 var(--f-title, 'Cinzel', serif); letter-spacing: .04em; color: #f3d27a; }
+.pr-film-t small { font: 400 .85rem/1.35 var(--f-ui); color: var(--parch-dim); }
+@media (max-width: 520px) { .pr-film { flex-direction: column; } .pr-film-pic { flex-basis: auto; aspect-ratio: 16 / 7; } }
