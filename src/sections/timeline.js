@@ -3,7 +3,7 @@ import L from 'leaflet';
 import { D } from '../lib/data.js';
 import { img, largest } from '../lib/img.js';
 import { $, $$, esc, norm } from '../lib/util.js';
-import { emit } from '../lib/router.js';
+import { emit, H as HREF } from '../lib/router.js';
 
 const T0 = 2003, T1 = 2027;
 // tmavé barvy linek (z malované osy na pergamenu) zesvětlit pro tmavé pozadí
@@ -75,7 +75,7 @@ function svg(Wpx) {
   s += `<text x="${padL}" y="${sesY - 14}" class="tl-lab">Sezení</text>`;
   for (const se of TL.sessions) {
     if (se.t > 2026.95) continue;
-    s += `<a href="#${se.id}" class="tl-s"><circle cx="${x(se.t)}" cy="${sesY}" r="4" fill="${ERA_COL[se.era] || '#aaa'}"><title>${esc(se.title)}${se.dr ? ` · ${se.dr} DR` : ''}</title></circle></a>`;
+    s += `<a href="${HREF(`#${se.id}`)}" class="tl-s"><circle cx="${x(se.t)}" cy="${sesY}" r="4" fill="${ERA_COL[se.era] || '#aaa'}"><title>${esc(se.title)}${se.dr ? ` · ${se.dr} DR` : ''}</title></circle></a>`;
   }
   // DR osa
   s += `<text x="${padL}" y="${drY - 16}" class="tl-lab">Ve hře (DR)</text>`;
@@ -108,7 +108,7 @@ function mobileHtml() {
       <p class="bk">${bi >= 0 ? esc(books[bi].label.replace('Kniha ', 'Kniha ')) : ''}</p>
       ${ev.length ? `<h5>Události</h5><ul class="tl-ev-l">${ev.map((e) => `<li>${esc(e.label)}</li>`).join('')}</ul>` : ''}
       ${act.length ? `<h5>U stolu hráli (${act.length})</h5><div class="tl-pc">${act.map((l) => { const c = charOf(l.name); return `<button type="button" ${c ? `data-c="${esc(c.id)}"` : 'disabled'} style="--c:${lift(l.color)}"><i></i>${esc(l.name)} <small>${esc(l.player)}</small></button>`; }).join('')}</div>` : ''}
-      ${ses.length ? `<h5>Sezení (${ses.length})</h5><div class="tl-ses">${ses.map((x) => `<a href="#${esc(x.id)}" style="--c:${ERA_COL[x.era] || '#aaa'}">${esc(x.title.length > 30 ? x.title.slice(0, 28).trim() + '…' : x.title)}</a>`).join('')}</div>` : '<h5>Sezení</h5><p class="small">V tomto roce kronika žádné sezení nezná.</p>'}
+      ${ses.length ? `<h5>Sezení (${ses.length})</h5><div class="tl-ses">${ses.map((x) => `<a href="${HREF(`#${esc(x.id)}`)}" style="--c:${ERA_COL[x.era] || '#aaa'}">${esc(x.title.length > 30 ? x.title.slice(0, 28).trim() + '…' : x.title)}</a>`).join('')}</div>` : '<h5>Sezení</h5><p class="small">V tomto roce kronika žádné sezení nezná.</p>'}
     </article>`;
   };
   return `<div class="tl-mob" id="tlMob" aria-label="Časová osa po letech">

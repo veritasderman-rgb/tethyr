@@ -1,6 +1,7 @@
 // 1. Úvod: filmový nástup (titul po písmenech, léta 2003–2026 jako kreslená linka), malba s paralaxou
 // (scroll + myš), mlha, paprsek světla, jiskry a prach, pět jasných vstupů do kroniky, počítadla.
 import { D } from '../lib/data.js';
+import { H } from '../lib/router.js';
 import { img } from '../lib/img.js';
 import { $, $$, esc, reduced, fmt } from '../lib/util.js';
 import { ash } from '../lib/ash.js';
@@ -45,7 +46,7 @@ export function renderHero() {
   const el = $('#uvod');
   el.classList.add(seen ? 'quick' : 'cine');
   const ticks = Array.from({ length: 24 }, (_, i) => `<i style="--i:${i}"${[0, 7, 17, 23].includes(i) ? ' class="big"' : ''}></i>`).join('');
-  const door = (href, ico, t, s, extra = '') => `<a class="door${extra}" href="${href}"><svg viewBox="0 0 24 24" aria-hidden="true">${ico}</svg><b>${t}</b><span>${s}</span></a>`;
+  const door = (href, ico, t, s, extra = '') => `<a class="door${extra}" href="${H(href)}"><svg viewBox="0 0 24 24" aria-hidden="true">${ico}</svg><b>${t}</b><span>${s}</span></a>`;
   el.innerHTML = `
     <div class="hero-bg">${img('ilu/D_01', { alt: 'Čtyři postavy na útesu nad mořem, nad nimi draci a pevnost v dálce.', eager: true, pos: '50% 24%', cls: 'kb' })}</div>
     <div class="hero-ray" aria-hidden="true"></div>
@@ -64,7 +65,7 @@ export function renderHero() {
         ${door('#svedectvi', '<circle cx="12" cy="9" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/>', 'Svědectví', 'hlasy přátel i nepřátel')}
         ${door('#hymna', '<path d="M9 18V6l10-2v12"/><circle cx="7" cy="18" r="2.5"/><circle cx="17" cy="16" r="2.5"/>', 'Hymna', 'Rauko, videoklip')}
       </nav>
-      <p class="hero-more"><a href="#mapa3d">3D mapa Faerûnu</a><i>✦</i><a href="#podekovani">Poděkování Pánu jeskyně</a>${pos?.ch && pos.n > 1 ? `<i>✦</i><a href="#${esc(pos.ch)}" data-cont>Pokračovat: kapitola ${+pos.n}, ${esc(pos.title || '')}</a>` : ''}</p>
+      <p class="hero-more"><a href="${H(`#mapa3d`)}">3D mapa Faerûnu</a><i>✦</i><a href="${H(`#podekovani`)}">Poděkování Pánu jeskyně</a>${pos?.ch && pos.n > 1 ? `<i>✦</i><a href="${H(`#${esc(pos.ch)}`)}" data-cont>Pokračovat: kapitola ${+pos.n}, ${esc(pos.title || '')}</a>` : ''}</p>
     </div>
     <dl class="hero-stats">${stats.map(([n, l]) => `<div><dt data-n="${n}">${reduced() ? fmt(n) : '0'}</dt><dd>${l}</dd></div>`).join('')}</dl>
     <a class="hero-down" href="#nextPage" aria-label="Dolů"><span></span></a>`;

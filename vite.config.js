@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 
 // Svědectví: audio a video dodá zadavatel do assets/voices/<id>.mp3 a assets/video/<id>.mp4.
 // Plugin z nich udělá manifest (virtual:media), aby web věděl, co existuje, a při buildu je zkopíruje do dist/.
@@ -53,15 +54,36 @@ function sitePlugin() {
   return {
     name: 'site-url',
     transformIndexHtml(html) {
+      const logo = fs.readFileSync('src/assets/draci.svg', 'utf8').trim();
+      html = html.replace(/<!--LOGO:(\d+)-->/g, (_, n) => logo.replace('<svg ', `<svg class="logo" width="${n}" height="${n}" role="img" aria-label="Západní draci" focusable="false" `));
       const host = process.env.SITE_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '');
       return html.replaceAll('%SITE%', host ? host.replace(/\/$/, '') + '/' : '');
     },
   };
 }
 
+// Kontrola faktů (scripts/fakta.py) se spouští při každém buildu; porušení invariantů build zastaví.
+// Když na stroji není Python, kontrola se přeskočí s varováním (chybí-li, build kvůli tomu nespadne).
+function faktaPlugin() {
+  return {
+    name: 'kontrola-faktu',
+    apply: 'build',
+    buildStart() {
+      for (const py of ['python3', 'python']) {
+        const r = spawnSync(py, ['scripts/fakta.py'], { encoding: 'utf8' });
+        if (r.error) continue;
+        if (r.stdout) console.log(r.stdout.trim());
+        if (r.status !== 0) { if (r.stderr) console.error(r.stderr); throw new Error('Kontrola faktů (scripts/fakta.py) našla rozpory, build se zastavuje.'); }
+        return;
+      }
+      console.warn('! Python není k dispozici, kontrola faktů (scripts/fakta.py) se přeskakuje.');
+    },
+  };
+}
+
 export default defineConfig({
   base: './',
-  plugins: [mediaPlugin(), sitePlugin()],
+  plugins: [faktaPlugin(), mediaPlugin(), sitePlugin()],
   build: { outDir: 'dist', assetsInlineLimit: 0, chunkSizeWarningLimit: 900 },
   server: { host: true },
 });

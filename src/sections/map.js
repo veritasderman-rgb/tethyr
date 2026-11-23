@@ -5,7 +5,7 @@ import { D } from '../lib/data.js';
 import { img } from '../lib/img.js';
 import 'leaflet/dist/leaflet.css';
 import { $, $$, esc, reduced, settleScroll } from '../lib/util.js';
-import { emit } from '../lib/router.js';
+import { emit, H as HREF } from '../lib/router.js';
 
 const W = 2576, H = 884;
 const ERAS = ['I', 'II', 'III', 'IV', 'V', 'epilog'];
@@ -182,11 +182,11 @@ export function renderMap() {
 
   function chLink(chId, cls = '') {
     const c = CH[chId]; if (!c) return '';
-    return `<a class="${cls}" href="#${esc(chId)}" title="Kapitola v Příběhu">${esc(c.title)}</a>`;
+    return `<a class="${cls}" href="${HREF(`#${esc(chId)}`)}" title="Kapitola v Příběhu">${esc(c.title)}</a>`;
   }
   function caption(s) {
     const ses = (s.s || []).map((id) => D.sesById[id]).filter(Boolean);
-    $('#mpStep', el).innerHTML = `<b style="color:${ERA_COL[s.era]}">${esc(ERA_NAME[s.era] || '')}</b>${s.ch ? ` · kapitola ${chLink(s.ch)}` : ''} · u stolu ${esc(s.real)} · ${esc(s.dr)} DR<br><b class="ms-pl">${esc(s.place)}</b> – ${esc(s.what)}${ses.length ? ` <span class="ms-s">· sezení ${ses.slice(0, 3).map((x) => `<a href="#${x.id}">${esc(x.date_label)}</a>`).join(', ')}</span>` : ''}`;
+    $('#mpStep', el).innerHTML = `<b style="color:${ERA_COL[s.era]}">${esc(ERA_NAME[s.era] || '')}</b>${s.ch ? ` · kapitola ${chLink(s.ch)}` : ''} · u stolu ${esc(s.real)} · ${esc(s.dr)} DR<br><b class="ms-pl">${esc(s.place)}</b> – ${esc(s.what)}${ses.length ? ` <span class="ms-s">· sezení ${ses.slice(0, 3).map((x) => `<a href="${HREF(`#${x.id}`)}">${esc(x.date_label)}</a>`).join(', ')}</span>` : ''}`;
     if (s.ch !== curCh) { const prev = curCh; curCh = s.ch; if (prev !== null || playing) chapterTitle(s); }
   }
   let chTimer = 0;
@@ -257,7 +257,7 @@ export function renderMap() {
   function witHTML(ids) {
     const ws = [...new Set(ids)].map((id) => WIT[id]).filter(Boolean);
     if (!ws.length) return '';
-    return `<h5>Svědci</h5><div class="mp-w">${ws.map((w) => `<a href="#svedectvi/${esc(w.id)}" class="${w.strana === 'nepřítel' ? 'foe' : ''}">${w.portret ? img(w.portret, { alt: '', sizes: '48px', cls: 'mp-wi' }) : ''}<span><b>${esc(w.jmeno)}</b>${esc(w.role || '')}</span></a>`).join('')}</div>`;
+    return `<h5>Svědci</h5><div class="mp-w">${ws.map((w) => `<a href="${HREF(`#svedectvi/${esc(w.id)}`)}" class="${w.strana === 'nepřítel' ? 'foe' : ''}">${w.portret ? img(w.portret, { alt: '', sizes: '48px', cls: 'mp-wi' }) : ''}<span><b>${esc(w.jmeno)}</b>${esc(w.role || '')}</span></a>`).join('')}</div>`;
   }
   function panelPlace(p) {
     const ses = (p.sessions || []).map((id) => D.sesById[id]).filter(Boolean);
@@ -270,10 +270,10 @@ export function renderMap() {
       <h3>${esc(p.name)}</h3><p>${esc(p.desc || '')}</p>
       ${p.visits?.length ? `<h5>Co se tu stalo</h5><ul class="mp-v">${p.visits.map((v) => { const si = stops.find((i) => R[i].real === v.real && R[i].what === v.what); return `<li><b style="color:${ERA_COL[v.era] || '#ccc'}">${esc(ERA_SHORT[v.era] || v.era || '')}</b> <span>${esc(v.real)} · ${esc(v.dr)} DR</span> ${esc(v.what)}${si != null ? ` <button class="mp-go" data-stop="${si}" title="Ukázat na trase">↳ na trase</button>` : ''}</li>`; }).join('')}</ul>` : ''}
       ${chs.length ? `<h5>V Příběhu</h5><p class="mp-ch">${chs.map((c) => chLink(c)).join(' · ')}</p>` : ''}
-      ${bats.length ? `<h5>Bitvy</h5><ul class="mp-s">${bats.map((b) => `<li><a href="#${esc(b.id)}">⚔ ${esc(b.name)}</a> <span>${esc(b.real_label || '')}</span></li>`).join('')}</ul>` : ''}
+      ${bats.length ? `<h5>Bitvy</h5><ul class="mp-s">${bats.map((b) => `<li><a href="${HREF(`#${esc(b.id)}`)}">⚔ ${esc(b.name)}</a> <span>${esc(b.real_label || '')}</span></li>`).join('')}</ul>` : ''}
       ${witHTML(wits)}
-      ${ses.length ? `<h5>Sezení</h5><ul class="mp-s">${ses.slice(0, 12).map((s) => `<li><a href="#${s.id}">${esc(s.date_label)} · ${esc(s.title)}</a></li>`).join('')}</ul>` : ''}
-      ${npcs.length ? `<h5>Kdo tu žije a působí</h5><p class="mp-n">${npcs.slice(0, 24).map((n) => `<a href="#rejstrik" data-npc="${esc(n.name)}" class="${n.kind === 'nepřítel' ? 'foe' : ''}">${esc(n.name)}</a>`).join(', ')}${npcs.length > 24 ? ' …' : ''}</p>` : ''}
+      ${ses.length ? `<h5>Sezení</h5><ul class="mp-s">${ses.slice(0, 12).map((s) => `<li><a href="${HREF(`#${s.id}`)}">${esc(s.date_label)} · ${esc(s.title)}</a></li>`).join('')}</ul>` : ''}
+      ${npcs.length ? `<h5>Kdo tu žije a působí</h5><p class="mp-n">${npcs.slice(0, 24).map((n) => `<a href="${HREF(`#rejstrik`)}" data-npc="${esc(n.name)}" class="${n.kind === 'nepřítel' ? 'foe' : ''}">${esc(n.name)}</a>`).join(', ')}${npcs.length > 24 ? ' …' : ''}</p>` : ''}
       <p class="mp-3d"><a href="mapa3d/index.html#p=${esc(p.id)}" target="_blank" rel="noopener">Ukázat ve 3D mapě ⤢</a></p>`);
     Object.values(markers).forEach((o) => o.m.getElement()?.classList.toggle('sel', o.p.id === p.id));
   }
@@ -286,7 +286,7 @@ export function renderMap() {
       ${sides.length ? `<h5>Strany</h5><ul class="mp-s">${sides.map((s) => `<li><b>${esc(s.name)}</b>${s.commanders?.length ? ` <span>– ${esc(s.commanders.slice(0, 4).join(', '))}</span>` : ''}</li>`).join('')}</ul>` : ''}
       ${w.outcome ? `<h5>Výsledek</h5><p>${esc(w.outcome)}</p>` : ''}
       ${witHTML(D.witBySrc?.[b.id] || [])}
-      <p class="mp-ch"><a href="#${esc(b.id)}">Bojové hlášení →</a>${ses ? ` · <a href="#${ses.id}">sezení ${esc(ses.date_label)}</a>` : ''}${b.pl ? ` · <a href="mapa3d/index.html#b=${esc(b.id)}" target="_blank" rel="noopener">ve 3D ⤢</a>` : ''}</p>`);
+      <p class="mp-ch"><a href="${HREF(`#${esc(b.id)}`)}">Bojové hlášení →</a>${ses ? ` · <a href="${HREF(`#${ses.id}`)}">sezení ${esc(ses.date_label)}</a>` : ''}${b.pl ? ` · <a href="mapa3d/index.html#b=${esc(b.id)}" target="_blank" rel="noopener">ve 3D ⤢</a>` : ''}</p>`);
   }
 
   // ------------------------------------------------------------------ značky, shluky, popisky

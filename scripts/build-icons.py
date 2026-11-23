@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 """Ikony a náhledový obrázek pro sdílení (OG 1200x630) z malby D_01 a písma Cinzel/Cardo z node_modules. Lokálně, bez placených služeb."""
-import os, pathlib
+import os, pathlib, re
 from playwright.sync_api import sync_playwright
 R = pathlib.Path(__file__).resolve().parent.parent
 M = R / 'public/img/misc'
+# Logo = src/assets/draci.svg (jediný zdroj: dračí hlava). Favicon: tmavý čtverec se zlatou hlavou bez rámečku (čitelné v 16 px).
+DR = (R / 'src/assets/draci.svg').read_text(encoding='utf-8')
+INNER = re.search(r'<svg[^>]*>(.*)</svg>', DR, re.S).group(1)
+(M / 'favicon.svg').write_text(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><title>Západní draci</title><rect width="64" height="64" rx="12" fill="#12100d"/><g transform="translate(4.6 5.5) scale(.9)" fill="#c9a54a">{INNER}</g></svg>', encoding='utf-8')
 font = lambda f: (R / 'node_modules/@fontsource' / f).as_uri()
 html = f'''<!doctype html><meta charset=utf-8><style>
 @font-face{{font-family:Cin;src:url({font('cinzel/files/cinzel-latin-400-normal.woff2')})}}
@@ -18,7 +22,8 @@ h1{{font:400 118px/.92 Cin;letter-spacing:.04em;text-transform:uppercase;margin:
 h1 span{{display:block}} h1 span+span{{color:#d9cba9}}
 .y{{font:italic 30px Car;margin-top:22px;color:#eadfc6}} .y b{{font-style:normal;font-weight:400;color:#c9a54a}}
 .l{{position:absolute;left:70px;top:58px;width:120px;height:1px;background:#c9a54a}}
-</style><div class=bg></div><div class=sh></div><div class=l></div><div class=t><div class=k>Kronika Tethyrské královské družiny</div><h1><span>Západní</span><span>draci</span></h1><div class=y>ve hře <b>1372–1385</b> · u stolu <b>2003–2026</b></div></div>'''
+.lg{{position:absolute;left:70px;top:70px;width:74px;height:74px;color:#c9a54a;filter:drop-shadow(0 2px 12px #000)}}
+</style><div class=bg></div><div class=sh></div><div class=l></div><svg class=lg viewBox="0 0 64 64" fill="currentColor">{INNER}</svg><div class=t><div class=k>Kronika Tethyrské královské družiny</div><h1><span>Západní</span><span>draci</span></h1><div class=y>ve hře <b>1372–1385</b> · u stolu <b>2003–2026</b></div></div>'''
 with sync_playwright() as p:
     b = p.chromium.launch(); pg = b.new_page(viewport={'width': 1200, 'height': 630})
     open('/tmp/og.html', 'w').write(html); pg.goto('file:///tmp/og.html'); pg.wait_for_timeout(1000)

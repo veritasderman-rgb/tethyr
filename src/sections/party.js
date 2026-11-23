@@ -2,7 +2,7 @@
 import { D } from '../lib/data.js';
 import { img, small } from '../lib/img.js';
 import { $, esc, nb } from '../lib/util.js';
-import { emit, charPath, syncMeta } from '../lib/router.js';
+import { emit, charPath, syncMeta, H } from '../lib/router.js';
 import { openDrawer } from '../lib/lightbox.js';
 
 const yrs = (s) => (String(s || '').match(/\d{4}/g) || []).map(Number);
@@ -52,7 +52,7 @@ function detail(c) {
         ${c.relations?.length ? `<div><h5>Vztahy</h5><ul class="rel">${c.relations.map((r) => `<li><b>${esc(r.who)}</b> – ${esc(r.what)}</li>`).join('')}</ul></div>` : ''}
       </div>
       ${c.fate ? `<div class="pd-fate"><h5>Osud</h5><p>${esc(nb(c.fate))}</p></div>` : ''}
-      ${ses.length ? `<h5>Sezení (${ses.length})</h5><p class="pd-ses">${ses.map((s) => `<a href="#${s.id}" data-close>${esc(s.date_label)}</a>`).join(' · ')}</p>` : ''}
+      ${ses.length ? `<h5>Sezení (${ses.length})</h5><p class="pd-ses">${ses.map((s) => `<a href="${H(`#${s.id}`)}" data-close>${esc(s.date_label)}</a>`).join(' · ')}</p>` : ''}
     </div></div>`;
 }
 
@@ -72,7 +72,7 @@ export function renderParty() {
   const rows = order.filter((p) => players[p]).map((p) => {
     const cs = players[p];
     const bars = cs.map((c) => { const y = yrs(c.active_real); const a = y[0] || Y0, b = y[y.length - 1] || a; return `<i style="left:${((a - Y0) / span * 100).toFixed(2)}%;width:${(((b - a + 1) / span) * 100).toFixed(2)}%" title="${esc(c.name)} ${esc(c.active_real)}"><span>${esc(c.name)}</span></i>`; }).join('');
-    return `<tr><th scope="row">${esc(p)}${p === 'Zdeněk T.' ? '<small>Pán jeskyně</small>' : ''}</th><td>${cs.map((c) => `<a href="#druzina" data-c="${esc(c.id)}">${esc(c.name)}</a>`).join(', ')}</td><td class="pl-bar"><div>${bars}</div></td></tr>`;
+    return `<tr><th scope="row">${esc(p)}${p === 'Zdeněk T.' ? '<small>Pán jeskyně</small>' : ''}</th><td>${cs.map((c) => `<a href="${H(`#druzina`)}" data-c="${esc(c.id)}">${esc(c.name)}</a>`).join(', ')}</td><td class="pl-bar"><div>${bars}</div></td></tr>`;
   }).join('');
 
   el.innerHTML = `<header class="sec-head"><p class="kicker">Družina</p><h1 id="druzina-h" tabindex="-1">Kdo šel s nimi</h1>
@@ -81,7 +81,7 @@ export function renderParty() {
       <span class="pc-i" data-n="${String(i + 1).padStart(2, '0')}">${portraitHtml(c)}</span>
       <span class="pc-t"><b>${esc(c.full_name || c.name)}</b><i>${esc([c.race, c.class].filter(Boolean).join(' · '))}</i><em>Hraje <strong>${esc(playerOf(c))}</strong> · ${esc(c.active_real || '')}</em>
         ${keyMs(c)}${c.fate ? `<span class="pc-fate">${esc(nb(fateShort(c.fate)))}</span>` : ''}<span class="pc-more">Celý životopis</span></span></button>`).join('')}</div>
-    <aside class="dm rv" aria-label="Pán jeskyně"><div><h4>Pán jeskyně</h4><b>Zdeněk T.</b><p>Hru vedl od první hry v roce 2003 po velké finále 1. srpna 2026. Sám si zahrál jen pixie Zaxe v Sigilských lovcích a goliáše Zeka v nové hře.</p></div><a class="btn red" href="#podekovani">Poděkování od všech vděčných hráčů</a></aside>
+    <aside class="dm rv" aria-label="Pán jeskyně"><div><h4>Pán jeskyně</h4><b>Zdeněk T.</b><p>Hru vedl od první hry v roce 2003 po velké finále 1. srpna 2026. Sám si zahrál jen pixie Zaxe v Sigilských lovcích a goliáše Zeka v nové hře.</p></div><a class="btn red" href="${H(`#podekovani`)}">Poděkování od všech vděčných hráčů</a></aside>
     <div class="wrap minor-pcs"><h4>Další postavy hráčů</h4><p>${rest.map((c) => `<button class="chip" data-c="${esc(c.id)}">${esc(c.name)} <span>· ${esc(c.player || '')}</span></button>`).join(' ')}</p>
     <h4>Průvodci a důležité postavy Pána jeskyně</h4><p>${guides.map((c) => `<button class="chip gold" data-c="${esc(c.id)}">${esc(c.name)}</button>`).join(' ')}</p>
     <h4>Protivníci</h4><p>${D.characters.filter((c) => c.kind === 'protivnik').map((c) => `<button class="chip red" data-c="${esc(c.id)}">${esc(c.name)}</button>`).join(' ')}</p></div>

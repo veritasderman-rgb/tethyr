@@ -2,7 +2,7 @@
 import { D } from '../lib/data.js';
 import { img, largest, small } from '../lib/img.js';
 import { $, esc, nb } from '../lib/util.js';
-import { emit, battlePath, nextAfter } from '../lib/router.js';
+import { emit, battlePath, nextAfter, H } from '../lib/router.js';
 import { openLightbox } from '../lib/lightbox.js';
 
 const real = (v) => v && !['—', '–', '-', '?'].includes(String(v).trim());
@@ -36,7 +36,7 @@ export function renderBattles() {
       const force = (x, k) => x ? `<div class="dp-side s${k}"><h5>${k ? 'Druhá strana' : 'Naše strana'}</h5><span class="nm">${esc(x.name)}</span>${real(x.total) ? `<span class="tot">Síly: <b>${esc(x.total)}</b></span>` : ''}${x.commanders?.length ? `<span class="cmd"><b>Velitelé</b>${x.commanders.map(esc).join(', ')}</span>` : ''}</div>` : '';
       const img0 = b.images?.[0];
       const links = [
-        pl ? `<a class="btn sm" href="#mapa" data-place="${esc(pl)}">Na mapě ▸</a>` : '',
+        pl ? `<a class="btn sm" href="${H(`#mapa`)}" data-place="${esc(pl)}">Na mapě ▸</a>` : '',
         fr.length ? `<span class="lbl">Svědci naší strany</span>${fr.map((w) => `<button class="chip" data-wit="${esc(w.id)}" aria-label="Pustit svědectví: ${esc(w.jmeno)}">▶ ${esc(w.jmeno)}</button>`).join('')}` : '',
         fo.length ? `<span class="lbl">Druhé strany</span>${fo.map((w) => `<button class="chip red" data-wit="${esc(w.id)}" aria-label="Pustit svědectví nepřítele: ${esc(w.jmeno)}">▶ ${esc(w.jmeno)}</button>`).join('')}` : '',
       ].join('');
@@ -45,7 +45,7 @@ export function renderBattles() {
           <div class="dp-ov"><p class="bt-no">Hlášení č. ${String(i + 1).padStart(2, '0')}</p><h3 id="${b.id}-h">${esc(b.name)}</h3></div></div>
         <div class="dp-paper">
           <div class="dp-head"><span>Depeše z bojiště</span><b>č. ${String(i + 1).padStart(2, '0')} / ${String(B.length).padStart(2, '0')}</b></div>
-          <dl class="dp-meta"><div><dt>Místo</dt><dd>${esc(b.place)}</dd></div><div><dt>Ve hře</dt><dd>${esc(b.dr)} DR</dd></div><div><dt>U stolu</dt><dd>${esc(b.real_label || '—')}</dd></div>${ses ? `<div><dt>V kronice</dt><dd><a href="#${ses.id}">${esc(ses.date_label)}</a></dd></div>` : ''}</dl>
+          <dl class="dp-meta"><div><dt>Místo</dt><dd>${esc(b.place)}</dd></div><div><dt>Ve hře</dt><dd>${esc(b.dr)} DR</dd></div><div><dt>U stolu</dt><dd>${esc(b.real_label || '—')}</dd></div>${ses ? `<div><dt>V kronice</dt><dd><a href="${H(`#${ses.id}`)}">${esc(ses.date_label)}</a></dd></div>` : ''}</dl>
           ${A ? `<div class="dp-forces">${force(A, 0)}${Z ? '<span class="dp-vs" aria-hidden="true">VS</span>' + force(Z, 1) : ''}</div>` : ''}
           <div class="dp-cols"><div class="dp-sum"><h5 class="dh">Průběh</h5><p>${esc(nb(b.summary))}</p></div>
             <div class="dp-res"><h5 class="dh">Výsledek</h5><p>${esc(nb(b.outcome))}</p></div></div>

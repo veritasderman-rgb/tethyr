@@ -4,6 +4,7 @@
 // Ovládání: mezerník, šipky (←/→ ±10 s, Shift+←/→ scéna), ↑/↓ hlasitost, C titulky, M zvuk, F celá obrazovka, Esc zavřít,
 // časová lišta s kapitolami. Svědkové jsou jen vedlejší postavy (nikdy hráčské). Nic se nespouští samo bez kliknutí.
 import media from 'virtual:media';
+import { H } from '../lib/router.js';
 import DOC from '../../data/dokument.json';
 import TXT from '../../data/podekovani.txt?raw';
 import HY from '../../data/hymna.json';
@@ -150,7 +151,7 @@ function create(timing) {
     <div class="f-done" id="fDone" hidden>
       <p class="f-k">Konec dokumentu</p>
       <h2>Kronika Tethyrské královské družiny</h2>
-      <div class="f-start-b"><button class="btn red" data-a="again">Přehrát znovu</button><a class="btn" href="#podekovani" data-a="close">Poděkování</a><a class="btn" href="#hymna" data-a="close">Hymna</a><button class="btn" data-a="close">Zavřít</button></div>
+      <div class="f-start-b"><button class="btn red" data-a="again">Přehrát znovu</button><a class="btn" href="${H(`#podekovani`)}" data-a="close">Poděkování</a><a class="btn" href="${H(`#hymna`)}" data-a="close">Hymna</a><button class="btn" data-a="close">Zavřít</button></div>
     </div>`;
   document.body.appendChild(root);
 

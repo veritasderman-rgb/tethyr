@@ -17,6 +17,11 @@ import json, os, sys
 
 # přesné náhrady podřetězců ve všech textových hodnotách (stará věta → nová věta)
 REPL = [
+    # Ho dokončoval souboj s Yamohem v Anaurochu, na vrcholu Pyramidy času stál Rauko
+    ('Po vítězné bitvě v Anaurochu po nich Rauko a Ho šli ulicemi Města stínů až na vrchol Chronosovy pyramidy. S Rivalenem tam svedl finální boj Rauko',
+     'Po nich šel Rauko ulicemi Města stínů až na vrchol Chronosovy pyramidy, zatímco Ho v téže době dokončoval v bitvě o Anauroch svůj souboj. S Rivalenem na vrcholu svedl finální boj Rauko'),
+    ('z města začala honba za stínem, která skončila na vrcholu Chronosovy pyramidy.',
+     'z města začala honba za stínem. Na vrcholu Chronosovy pyramidy ji dokončil Rauko, Ho byl mezitím v bitvě o Anauroch.'),
     # Broskvová zahrada je vlastní jméno místa (upřesnění autora): i zmínka z roku 1382 DR (Hoův dotaz u Li-Longa) je totéž místo
     ('ptal na broskvovou zahradu', 'ptal na Broskvovou zahradu'),
     ('ptá se na broskvovou zahradu', 'ptá se na Broskvovou zahradu'),
@@ -41,6 +46,8 @@ ANAUROCH_ADD = (' Souběžně s finále na Pyramidě času tu dokončili své so
                 'zmizel i se svými lidmi; Sar Saratara, kostěje z cizího světa, Elminster rozdrtil.')
 # metadata svědectví (ne namluvený text, ten se nemění): vazba k družině a stav
 VAZBA = {
+    'rivalen': 'Raukův osobní nepřítel a poslední soupeř družiny; Rauko ho pronásledoval z Thultantharu až na vrchol Pyramidy času, kde ho porazil a rozhodl o porážce Temných.',
+    'arwin': 'Družina si ji roku 1384 odvedla ze základny en Rewin; s Raukem a Hoem šla Thultantharem až k Pyramidě času a v epilogu je s Raukem ve zbroji Zeleného anděla.',
     'kung-lao': 'Hoův učitel na východě; padl ve Feng Asay rukou šamana Yamoha Hokhry a přešel do Broskvové zahrady, kde s ním Ho dál mluví.',
     'chuang-li': 'Hoova učitelka z Tempat Larangu a zrádkyně: na konci příběhu o Cham Fau se chtěla přidat k Temným a padla ve finálním souboji s Hoem.',
     'seung-mina': 'Hoova žena; Ho ji osvobodil z Feng Asay. S Hoem bojovala od Sid-hou po obranu tethyrských držav.',
@@ -72,12 +79,33 @@ def fix_witnesses(ws, key_vazba='vazba'):
 DUEL_UNITS = ('Yamoh Hokhra, šaman z plání', 'Sar Saratar, kostěj z cizího světa')
 
 
+# jednotný tvar jmen (iterace 9): kniha i data používala několik pravopisů téhož jména
+import re
+NAME_RX = [
+    (re.compile(r'Jamah[ -]Hogr(a|ovi|u|ou|ovo|y|o|e)\b'), lambda m: {'a': 'Yamoh Hokhra', 'ovi': 'Yamohu Hokhrovi', 'u': 'Yamohu Hokhrovi', 'ou': 'Yamohem Hokhrou', 'y': 'Yamoha Hokhry', 'o': 'Yamoh Hokhra', 'e': 'Yamohu Hokhrovi', 'ovo': 'Yamohovo'}[m.group(1)]),
+    (re.compile(r'Yamoh Hokra\b'), 'Yamoh Hokhra'),
+    (re.compile(r'Chuang Li\b'), 'Chuang-Li'),
+    (re.compile(r'Chuang-li\b'), 'Chuang-Li'),
+    (re.compile(r'Wang Fei-hung'), 'Wang Fei-Hung'),
+    (re.compile(r'\blord (Ryden\w*)'), r'Lord \1'),
+    (re.compile(r'\blorda (Ryden\w*)'), r'Lorda \1'),
+    (re.compile(r'\blordu (Ryden\w*)'), r'Lordu \1'),
+]
+
+
+def norm_names(t):
+    for rx, rep in NAME_RX:
+        t = rx.sub(rep, t)
+    return t
+
+
 def _walk(o, hits):
     if isinstance(o, dict):
         return {k: _walk(v, hits) for k, v in o.items()}
     if isinstance(o, list):
         return [_walk(v, hits) for v in o]
     if isinstance(o, str):
+        o = norm_names(o)
         for i, (a, b) in enumerate(REPL):
             if a in o:
                 o = o.replace(a, b); hits[i] = hits.get(i, 0) + 1
@@ -93,6 +121,12 @@ def fix_battles(battles):
                 keep = [u for u in side.get('units', []) if u.get('unit') not in DUEL_UNITS]
                 moved += [u for u in side.get('units', []) if u.get('unit') in DUEL_UNITS]
                 side['units'] = keep
+    for b in battles:
+        # Ho byl v téže době v Anaurochu (souboj s Yamohem), na Pyramidě času finále vedl Rauko
+        if 'Pyramid' in b.get('name', '') and 'souboj' in b.get('name', '').lower():
+            for side in b.get('sides', []):
+                side['commanders'] = [c for c in side.get('commanders', []) if c != 'Ho Wu Long']
+                side['units'] = [u for u in side.get('units', []) if u.get('unit') != 'Ho Wu Long']
     for b in battles:
         if b.get('name') == 'Bitva v Anaurochu':
             if 'Souběžně s finále na Pyramidě času' not in b.get('summary', ''):
@@ -115,6 +149,8 @@ def fix_characters(chars):
                     m['text'] = 'V Broskvové zahradě, kam po smrti přešel: ' + m['text'][:1].lower() + m['text'][1:]
             c['fate'] = 'Padl ve Feng Asay a přešel do Broskvové zahrady, laoneyského nebe, kde ho lze vyhledat a mluvit s ním; jeho klobouk nosí Ho.'
             c['status'] = 'padl'
+        if c.get('id') == 'ho':
+            c['aliases'] = [a for a in c.get('aliases', []) if a != 'Ho Wu Lung']   # jméno je vždy „Ho Wu Long“
         if c.get('id') == 'yamoh-hokhra':
             c['status'] = 'zmizel'
         if c.get('id') == 'sar-saratar':
@@ -123,17 +159,20 @@ def fix_characters(chars):
 
 
 NPC_ADD = {  # jméno v npcs.json → věta doplněná na konec popisu (upřesnění 23. 11.), případně nový „when“
-    'Chuang-li': ('; zrádkyně: na konci příběhu o Cham Fau se chtěla přidat k Temným a padla ve finálním souboji s Hoem; v Broskvové zahradě není', 'Temným'),
-    'Wang Fei-Hung': ('; byl vězněm Chuang-li, jeho tělo už nešlo zachránit, a tak se astrálně přesunul do Broskvové zahrady', 'Broskvov'),
-    'lord Ryden': ('; zemřel při prošetřování Cham Fau rukou Chuang-li', 'Chuang'),
+    'Chuang-Li': ('; zrádkyně: na konci příběhu o Cham Fau se chtěla přidat k Temným a padla ve finálním souboji s Hoem; v Broskvové zahradě není', 'Temným'),
+    'Wang Fei-Hung': ('; byl vězněm Chuang-Li, jeho tělo už nešlo zachránit, a tak se astrálně přesunul do Broskvové zahrady', 'Broskvov'),
+    'lord Ryden': ('; zemřel při prošetřování Cham Fau rukou Chuang-Li', 'Chuang'),
     'Arduna': ('; vedle Hoa jediný dosud žijící šedý mnich', 'jediný'),
     'Lei Wu-Long': ('; je v Broskvové zahradě', 'Broskvov'),
 }
 
 
+NPC_ADD_L = {k.lower(): v for k, v in NPC_ADD.items()}
+
+
 def fix_npcs(N):
     for n in N or []:
-        add = NPC_ADD.get(n.get('name'))
+        add = NPC_ADD_L.get((n.get('name') or '').lower())
         if add and add[1] not in n.get('who', '') + n.get('when', ''):
             n['who'] = n.get('who', '').rstrip('.') + add[0]
     return N

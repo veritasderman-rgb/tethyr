@@ -7,7 +7,7 @@ import { D } from '../lib/data.js';
 import { img, small, largest } from '../lib/img.js';
 import { $, $$, esc, settleScroll, reduced } from '../lib/util.js';
 import { voice, load as loadVoice, unlock, claim, fadeOut, getVolume, setVolume, isMuted, setMuted, onVolume, audioOwner } from '../lib/audio.js';
-import { versePath } from '../lib/router.js';
+import { versePath, H } from '../lib/router.js';
 import { openLightbox } from '../lib/lightbox.js';
 
 const NAMES = ['první', 'druhá', 'třetí'];
@@ -33,7 +33,7 @@ function linkRow(key) {
   const ful = FUL[key];
   if (!ful && !refs.length) return '';
   const others = ful ? [...new Set([FIN_CH, ...refs])] : refs;
-  return `<div class="pr-link">${ful ? `<a class="ful" href="#${ful}">✦ Naplnilo se · ${esc(FUL_LABEL)} ▸</a>` : ''}${!ful ? others.map((c) => `<a href="#${c}">V kronice · ${esc(chTitle(c))} ▸</a>`).join('') : ''}${ful && others.length ? `<span class="ref">Výklad: ${others.map((c) => `<a href="#${c}">${esc(chTitle(c))}</a>`).join(', ')}</span>` : ''}</div>`;
+  return `<div class="pr-link">${ful ? `<a class="ful" href="${H(`#${ful}`)}">✦ Naplnilo se · ${esc(FUL_LABEL)} ▸</a>` : ''}${!ful ? others.map((c) => `<a href="${H(`#${c}`)}">V kronice · ${esc(chTitle(c))} ▸</a>`).join('') : ''}${ful && others.length ? `<span class="ref">Výklad: ${others.map((c) => `<a href="${H(`#${c}`)}">${esc(chTitle(c))}</a>`).join(', ')}</span>` : ''}</div>`;
 }
 
 export function renderProphecy() {
@@ -49,7 +49,7 @@ export function renderProphecy() {
     <div class="pr-grid wrap">
       <div class="pr-art" aria-hidden="true">${P.chapters.map((c, i) => `<div class="pr-pic${i === 0 ? ' on' : ''}" data-ch="${i}">${img('ilu/' + (c.img || P.img), { alt: '', sizes: '(max-width:900px) 100vw, 40vw', pos: '50% 30%' })}</div>`).join('')}<div class="pr-art-shade"></div><div class="pr-prog" aria-hidden="true">${ROM.map((r, i) => `<span class="${i === 0 ? 'on' : ''}" data-ch="${i}">${r}</span>`).join('')}</div></div>
       <div class="pr-text">
-        <p class="pr-sum"><span><b>Naplnění.</b> Třetí kapitola se podle kroniky naplnila ve finále 1. srpna 2026. Spárované souboje skončily v bitvě o Anauroch, souběžně s finále na Pyramidě času. Verše s doloženým výkladem odkazují na místo, kde se to stalo.</span><a href="#${FIN_CH}">${esc(chTitle(FIN_CH))} ▸</a></p>
+        <p class="pr-sum"><span><b>Naplnění.</b> Třetí kapitola se podle kroniky naplnila ve finále 1. srpna 2026. Spárované souboje skončily v bitvě o Anauroch, souběžně s finále na Pyramidě času. Verše s doloženým výkladem odkazují na místo, kde se to stalo.</span><a href="${H(`#${FIN_CH}`)}">${esc(chTitle(FIN_CH))} ▸</a></p>
         <p class="pr-note ui">U ${known} dvojverší je z her známo, komu patří. Klepněte na <span class="pr-key">✦</span>.</p>
         ${P.chapters.map((c, i) => `<section class="pr-ch" data-ch="${i}" aria-label="Kapitola ${NAMES[i]}">
           <div class="pr-mobpic">${img('ilu/' + (c.img || P.img), { alt: '', sizes: '100vw', pos: '50% 30%' })}</div>

@@ -3,7 +3,7 @@
 import os
 from playwright.sync_api import sync_playwright
 import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from browsers import launch
+from browsers import launch, noise
 URL = os.environ.get('SHOT_URL', 'http://127.0.0.1:4173/')
 OUT = os.environ.get('SHOT_OUT', '/home/claude/webshots/it2')
 with sync_playwright() as p:

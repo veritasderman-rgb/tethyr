@@ -10,7 +10,7 @@ Spuštění po `npm run build` a `npx vite preview --port 4173`."""
 import os, sys, json
 from playwright.sync_api import sync_playwright
 import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from browsers import launch
+from browsers import launch, noise
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from nav8 import go, open_, ready, here
 URL = os.environ.get('SHOT_URL', 'http://127.0.0.1:4173/').rstrip('/')
@@ -51,7 +51,7 @@ with sync_playwright() as p:
     b = launch(p, ['--mute-audio'])   # běžná politika automatického přehrávání (bez výjimky)
     for name, opts in (('desktop', dict(viewport={'width': 1440, 'height': 900})), ('mobile', dict(viewport={'width': 390, 'height': 844}, device_scale_factor=2, is_mobile=True, has_touch=True))):
         ctx = b.new_context(**opts); pg = ctx.new_page(); T = f'[{name}] '; M = name == 'mobile'
-        pg.on('console', lambda m, n=name: errs.append(f'[{n}] {m.type}: {m.text}') if m.type in ('error', 'warning') else None)
+        pg.on('console', lambda m, n=name: errs.append(f'[{n}] {m.type}: {m.text}') if m.type in ('error', 'warning') and not noise(m) else None)
         pg.on('pageerror', lambda e, n=name: errs.append(f'[{n}] pageerror: {e}'))
         pg.on('response', lambda r, n=name: errs.append(f'[{n}] HTTP {r.status}: {r.url}') if r.status >= 400 and '/tohle-neni' not in r.url else None)
         click = (lambda sel: pg.tap(sel)) if M else (lambda sel: pg.click(sel))

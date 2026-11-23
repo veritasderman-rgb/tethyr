@@ -59,6 +59,8 @@ export const charPath = (id) => `/druzina/${id}`;
 export const placePath = (id) => `/mapa?misto=${encodeURIComponent(id)}`;
 
 /** Stará kotva (#…) → nová adresa, nebo null, když kotvu neznáme. */
+/** Adresa pro odkaz v šabloně: stará kotva (#s-…, #lx/…, #mapa …) se hned přeloží na novou cestu; neznámé zůstane (router ho přeloží při kliknutí). */
+export const H = (h) => legacy(h) || h;
 export function legacy(h) {
   if (h == null) return null;
   h = String(h).replace(/^#/, '');

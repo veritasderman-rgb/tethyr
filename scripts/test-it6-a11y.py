@@ -3,7 +3,7 @@
 import os, sys, json
 from playwright.sync_api import sync_playwright
 import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from browsers import launch
+from browsers import launch, noise
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from nav8 import go, open_
 URL = os.environ.get('SHOT_URL', 'http://127.0.0.1:4173/')

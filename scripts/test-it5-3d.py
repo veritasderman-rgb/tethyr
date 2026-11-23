@@ -3,7 +3,7 @@
 import os
 from playwright.sync_api import sync_playwright
 import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from browsers import launch
+from browsers import launch, noise
 URL = os.environ.get('SHOT_URL', 'http://127.0.0.1:4173/') + 'mapa3d/index.html'
 OUT = os.environ.get('SHOT_OUT', '/home/claude/webshots/it5'); os.makedirs(OUT, exist_ok=True)
 errs, ok = [], []
@@ -14,7 +14,7 @@ with sync_playwright() as p:
     # mobil: brána
     ctx = b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=2, is_mobile=True, has_touch=True); pg = ctx.new_page()
     reqs = []; pg.on('request', lambda r: reqs.append(r.url))
-    pg.on('console', lambda m: errs.append(f'[mobil] console {m.type}: {m.text}') if m.type == 'error' else None)
+    pg.on('console', lambda m: errs.append(f'[mobil] console {m.type}: {m.text}') if m.type == 'error' and not noise(m) else None)
     pg.goto(URL, wait_until='networkidle'); pg.wait_for_timeout(1500)
     check(pg.locator('#ldGo').is_visible(), '[mobil] tlačítko Načíst 3D mapu')
     check(not any('height.bin' in u or 'three.module' in u or 'main.js' in u for u in reqs), '[mobil] před klepnutím se nic těžkého nestahuje')
@@ -29,7 +29,7 @@ with sync_playwright() as p:
     # desktop (lehká kvalita kvůli SwiftShaderu)
     ctx = b.new_context(viewport={'width': 1440, 'height': 900}); pg = ctx.new_page()
     bad = []
-    pg.on('console', lambda m: errs.append(f'[desktop] console {m.type}: {m.text}') if m.type == 'error' else None)
+    pg.on('console', lambda m: errs.append(f'[desktop] console {m.type}: {m.text}') if m.type == 'error' and not noise(m) else None)
     pg.on('pageerror', lambda e: errs.append(f'[desktop] pageerror {e}'))
     pg.on('response', lambda r: bad.append(f'{r.status} {r.url}') if r.status >= 400 else None)
     pg.goto(URL + '?q=low'); pg.wait_for_function('window.__ready === true', timeout=120000); pg.wait_for_timeout(2500)

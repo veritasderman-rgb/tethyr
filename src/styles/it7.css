@@ -20,7 +20,7 @@ kbd { display: inline-block; min-width: 1.5em; padding: .15em .4em; border: 1px 
 
 /* ------------------------------------------------------------------ panel menu */
 .navp { position: fixed; inset: 0; z-index: 120; }
-.navp-bg { position: absolute; inset: 0; background: rgba(8, 7, 5, .62); backdrop-filter: blur(3px); opacity: 0; transition: opacity .25s; }
+.navp-bg { position: absolute; inset: 0; background: rgba(8, 7, 5, .62); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); opacity: 0; transition: opacity .25s; }
 .navp-p { position: absolute; top: 0; right: 0; bottom: 0; width: min(420px, 100vw); overflow-y: auto; overscroll-behavior: contain; background: linear-gradient(180deg, #17130f, #110e0b); border-left: 1px solid var(--line); box-shadow: -30px 0 80px rgba(0, 0, 0, .55); padding: 0 0 calc(24px + env(safe-area-inset-bottom)); transform: translateX(104%); transition: transform .3s var(--ease); scrollbar-width: thin; scrollbar-color: rgba(168, 132, 44, .4) transparent; }
 .navp.open .navp-bg { opacity: 1; }
 .navp.open .navp-p { transform: none; }
@@ -74,7 +74,7 @@ kbd { display: inline-block; min-width: 1.5em; padding: .15em .4em; border: 1px 
 
 /* ------------------------------------------------------------------ hledání */
 .srch { position: fixed; inset: 0; z-index: 130; display: grid; justify-items: center; align-items: start; padding: max(8vh, 20px) 14px 14px; }
-.srch-bg { position: absolute; inset: 0; background: rgba(8, 7, 5, .72); backdrop-filter: blur(4px); opacity: 0; transition: opacity .2s; }
+.srch-bg { position: absolute; inset: 0; background: rgba(8, 7, 5, .72); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); opacity: 0; transition: opacity .2s; }
 .srch-p { position: relative; width: min(760px, 100%); max-height: calc(100dvh - max(8vh, 20px) - 24px); display: flex; flex-direction: column; background: #16120e; border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 40px 120px rgba(0, 0, 0, .7); transform: translateY(-14px) scale(.98); opacity: 0; transition: transform .22s var(--ease), opacity .2s; overflow: hidden; }
 .srch.open .srch-bg { opacity: 1; }
 .srch.open .srch-p { transform: none; opacity: 1; }

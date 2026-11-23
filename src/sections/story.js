@@ -5,7 +5,7 @@ import { img, largest, small, ratio } from '../lib/img.js';
 import { $, $$, esc, nb, plural, reduced, settleScroll } from '../lib/util.js';
 import { ash } from '../lib/ash.js';
 import { openLightbox } from '../lib/lightbox.js';
-import { emit, navigate, bookPath, chPath, sesPath, nextAfter } from '../lib/router.js';
+import { emit, navigate, bookPath, chPath, sesPath, nextAfter, H } from '../lib/router.js';
 import { observe, parallax } from '../lib/reveal.js';
 import { routeSvg, lazyMaps } from '../lib/minimap.js';
 import media from 'virtual:media';
@@ -33,18 +33,18 @@ function link3d(id) {
 /** Text vyprávění → HTML (nejdřív escapovat, pak nahradit značky odkazů). */
 function rich(t) {
   return nb(esc(t)).replace(/\[([^\]]+)\]\(([wmbpcsx]):([^)]+)\)/g, (_, txt, k, id) => {
-    if (k === 'x') return `<a class="lk lk-x" href="#lx/${id}" data-lx="${id}">${txt}</a>`;
+    if (k === 'x') return `<a class="lk lk-x" href="${H(`#lx/${id}`)}" data-lx="${id}">${txt}</a>`;
     if (k === 'w') {
       const w = D.witById[id];
-      return `<a class="lk lk-w" href="#svedectvi/${id}" data-wit="${id}" title="Pustit svědectví: ${esc(w?.jmeno || '')}">${txt}<i aria-hidden="true">▶</i></a>`;
+      return `<a class="lk lk-w" href="${H(`#svedectvi/${id}`)}" data-wit="${id}" title="Pustit svědectví: ${esc(w?.jmeno || '')}">${txt}<i aria-hidden="true">▶</i></a>`;
     }
     if (k === 'm') return placeOf(id)
-      ? `<a class="lk lk-m" href="#mapa" data-place="${id}" title="Ukázat na mapě">${txt}</a><sup>${link3d(id)}</sup>`
+      ? `<a class="lk lk-m" href="${H(`#mapa`)}" data-place="${id}" title="Ukázat na mapě">${txt}</a><sup>${link3d(id)}</sup>`
       : `<a class="lk lk-m" href="mapa3d/index.html#p=${id}" target="_blank" rel="noopener" title="Ukázat ve 3D mapě">${txt}</a><sup>${link3d(id)}</sup>`;
-    if (k === 'b') return `<a class="lk lk-b" href="#${id}" title="Bojové hlášení">${txt}</a>`;
-    if (k === 'p') return `<a class="lk lk-p" href="#pv-${id}" data-verse="pv-${id}" title="Verš Alaundova proroctví">${txt}</a>`;
-    if (k === 'c') return `<a class="lk lk-c" href="#druzina" data-char="${id}" title="Karta postavy">${txt}</a>`;
-    return `<a class="lk lk-s" href="#${id}">${txt}</a>`;
+    if (k === 'b') return `<a class="lk lk-b" href="${H(`#${id}`)}" title="Bojové hlášení">${txt}</a>`;
+    if (k === 'p') return `<a class="lk lk-p" href="${H(`#pv-${id}`)}" data-verse="pv-${id}" title="Verš Alaundova proroctví">${txt}</a>`;
+    if (k === 'c') return `<a class="lk lk-c" href="${H(`#druzina`)}" data-char="${id}" title="Karta postavy">${txt}</a>`;
+    return `<a class="lk lk-s" href="${H(`#${id}`)}">${txt}</a>`;
   });
 }
 function margin(sids) {
@@ -53,7 +53,7 @@ function margin(sids) {
   const a = ss[0], b = ss[ss.length - 1];
   const real = a === b ? a.date_label : `${a.date_label} – ${b.date_label}`;
   const dr = a.dr_label || '';
-  return `<aside class="mn" aria-label="Kdy a kde"><a href="#${a.id}"><span class="mn-r">u stolu</span> ${esc(real)}</a>${dr ? `<span class="mn-d"><span class="mn-r">ve hře</span> ${esc(dr)}</span>` : ''}${a.where_played ? `<span class="mn-w">${esc(a.where_played)}</span>` : ''}</aside>`;
+  return `<aside class="mn" aria-label="Kdy a kde"><a href="${H(`#${a.id}`)}"><span class="mn-r">u stolu</span> ${esc(real)}</a>${dr ? `<span class="mn-d"><span class="mn-r">ve hře</span> ${esc(dr)}</span>` : ''}${a.where_played ? `<span class="mn-w">${esc(a.where_played)}</span>` : ''}</aside>`;
 }
 function linksIn(blocks, kind) {
   const out = [];
@@ -90,16 +90,16 @@ function chapMap(c, book) {
   return `<figure class="mapcut rv" aria-label="Mapa kapitoly">
     <figcaption class="mapcut-k">Kudy vedla cesta · ${esc(c.title)}</figcaption>
     ${r.svg}
-    <div class="mapcut-f"><span>${esc(r.names.join(' · '))}</span><span class="mapcut-b"><a class="btn sm" href="#mapa" data-era="${book.key}">Trasa ${esc(book.kap.toLowerCase())} na mapě</a>${pid ? `<a class="btn sm" href="mapa3d/index.html#p=${pid}" target="_blank" rel="noopener">3D mapa</a>` : ''}</span></div>
+    <div class="mapcut-f"><span>${esc(r.names.join(' · '))}</span><span class="mapcut-b"><a class="btn sm" href="${H(`#mapa`)}" data-era="${book.key}">Trasa ${esc(book.kap.toLowerCase())} na mapě</a>${pid ? `<a class="btn sm" href="mapa3d/index.html#p=${pid}" target="_blank" rel="noopener">3D mapa</a>` : ''}</span></div>
   </figure>`;
 }
 function sessionHtml(s) {
   if (s.minor) {
     return `<li class="ses minor" id="${s.id}"><div class="ses-rail"><time>${esc(s.date_label)}</time><span>${esc(s.dr_label || '')}</span></div><div class="ses-b"><h4>${esc(s.title)}</h4><p>${esc(nb(s.summary || ''))}</p></div></li>`;
   }
-  const bat = (s.battles || []).map((id) => D.battleById[id]).filter(Boolean).map((b) => `<a class="ses-bat" href="#${b.id}"><span>Bitva</span><b>${esc(b.name)}</b><i>${esc(b.outcome)}</i></a>`).join('');
+  const bat = (s.battles || []).map((id) => D.battleById[id]).filter(Boolean).map((b) => `<a class="ses-bat" href="${H(`#${b.id}`)}"><span>Bitva</span><b>${esc(b.name)}</b><i>${esc(b.outcome)}</i></a>`).join('');
   const more = [];
-  if (s.npcs?.length) more.push(`<p class="ses-npc"><b>Vystupují:</b> ${s.npcs.map((n) => `<a href="#rejstrik" data-npc="${esc(n)}">${esc(n)}</a>`).join(', ')}</p>`);
+  if (s.npcs?.length) more.push(`<p class="ses-npc"><b>Vystupují:</b> ${s.npcs.map((n) => `<a href="${H(`#rejstrik`)}" data-npc="${esc(n)}">${esc(n)}</a>`).join(', ')}</p>`);
   if (s.lore) more.push(`<div class="ses-lore"><h5>${esc(s.lore[0])}</h5><p>${esc(s.lore[1])}</p></div>`);
   if (s.region) more.push(`<p class="ses-meta">Oblast: ${esc(s.region)}${s.game_label ? ` · ${esc(s.game_label)}` : ''}</p>`);
   return `<li class="ses" id="${s.id}">
@@ -147,8 +147,8 @@ function chapterHtml(c, book, n, prev, next) {
     <div class="chap-body">${body}</div>
     <div class="chap-x rv">
       ${wits.length ? `<div class="cx"><h5>Svědci</h5><div class="cx-w">${wits.map((id) => { const w = D.witById[id]; return `<button class="cx-wit${w.strana === 'nepřítel' ? ' foe' : ''}" data-wit="${id}" aria-label="Pustit svědectví: ${esc(w.jmeno)}"><img src="${small(w.portret)}" alt="" loading="lazy" decoding="async"><span>${esc(w.jmeno.split(' (')[0])}</span></button>`; }).join('')}</div></div>` : ''}
-      ${placeIds.length ? `<div class="cx"><h5>Místa</h5><p class="cx-p">${placeIds.map((id) => `<span class="chip">${placeOf(id) ? `<a href="#mapa" data-place="${id}">${esc(placeName(id))}</a>` : esc(placeName(id))}${link3d(id)}</span>`).join(' ')}</p></div>` : ''}
-      ${bats.length ? `<div class="cx"><h5>Bitvy</h5><p class="cx-p">${bats.map((b) => `<a class="chip red" href="#${b.id}">${esc(b.name)}</a>`).join(' ')}</p></div>` : ''}
+      ${placeIds.length ? `<div class="cx"><h5>Místa</h5><p class="cx-p">${placeIds.map((id) => `<span class="chip">${placeOf(id) ? `<a href="${H(`#mapa`)}" data-place="${id}">${esc(placeName(id))}</a>` : esc(placeName(id))}${link3d(id)}</span>`).join(' ')}</p></div>` : ''}
+      ${bats.length ? `<div class="cx"><h5>Bitvy</h5><p class="cx-p">${bats.map((b) => `<a class="chip red" href="${H(`#${b.id}`)}">${esc(b.name)}</a>`).join(' ')}</p></div>` : ''}
     </div>
     ${chapMap(c, book)}
     ${gal.length ? `<div class="chap-gal rv" aria-label="Galerie kapitoly"><h5>Obrazy a fotky od stolu <span>${gal.length}</span></h5><div class="cg">${gal.slice(0, 12).map((g, i) => `<button class="cg-i${g.k.startsWith('foto/') ? ' ph' : ''}" data-gi="${i}" aria-label="Zvětšit: ${esc(g.cap)}"><img src="${small(g.k)}" alt="" loading="lazy" decoding="async"></button>`).join('')}${gal.length > 12 ? `<button class="cg-more" data-gi="12">+${gal.length - 12}</button>` : ''}</div></div>` : ''}
@@ -181,7 +181,7 @@ function changes(b, books) {
     li('Noví hráči u stolu', newPlayers.map(esc).join(', ')),
     li('Naposledy ve hře', left.length ? left.map(esc).join(', ') : ''),
     li('Padli a zmizeli', fallen.map(([n, v, s]) => `${esc(n.split(' (')[0])} <span>(${s === 'zmizel' ? 'zmizel' : 'padl'}, ${esc(v.kde)})</span>`).join(', ')),
-    li('Bitvy', bats.map((x) => `<a href="#${x.id}">${esc(x.name)}</a> <span>${esc(x.outcome.split('.')[0])}</span>`).join('<br>')),
+    li('Bitvy', bats.map((x) => `<a href="${H(`#${x.id}`)}">${esc(x.name)}</a> <span>${esc(x.outcome.split('.')[0])}</span>`).join('<br>')),
     li('Poprvé na mapě', newPl.length ? `${newPl.length} míst: ${newPl.slice(0, 8).map(esc).join(', ')}${newPl.length > 8 ? ' …' : ''}` : ''),
   ].join('');
   return `<aside class="book-chg rv" aria-label="Co se změnilo v knize ${esc(b.key)}"><p class="bc-k">${esc(b.kap)} · konec</p><h4>Co se změnilo</h4><dl>${rows}</dl>
@@ -344,7 +344,7 @@ function wireVoices(el) {
     for (const e of ents) {
       const v = e.target.querySelector('video'); if (!v) continue;
       if (e.isIntersecting) {
-        if (!v.src) { v.src = v.dataset.src; v.addEventListener('playing', () => v.classList.add('on'), { once: true }); }
+        if (!v.src) { v.muted = true; v.defaultMuted = true; v.playsInline = true; v.src = v.dataset.src; v.addEventListener('playing', () => v.classList.add('on'), { once: true }); }
         v.play().catch(() => {});
       } else v.pause();
     }

@@ -2,6 +2,7 @@
 // pole hledání, „Pokračovat ve čtení“, zvýraznění aktuálního oddílu. Esc / klik mimo zavře, fokus zůstává v panelu.
 // Na mobilu ho otevírá tlačítko „Menu“ ve spodní liště (horní hamburger je tam skrytý), takže navigace je jen jedna.
 import { need, D } from './data.js';
+import { logoSvg } from './logo.js';
 import { $, $$, esc } from './util.js';
 import { openSearch } from './search.js';
 import { PAGES, chPath, bookPath } from './router.js';
@@ -14,7 +15,7 @@ const readPos = () => { try { return JSON.parse(localStorage.getItem(KEY_POS) ||
 
 function render() {
   const pos = readPos();
-  inner.innerHTML = `<div class="navp-h"><a class="navp-brand" href="/"><img src="img/misc/znak.svg" alt="" width="30" height="15"><span>Západní draci</span></a>
+  inner.innerHTML = `<div class="navp-h"><a class="navp-brand" href="/" title="Západní draci, na úvod">${logoSvg(28)}<span>Západní draci</span></a>
       <button class="navp-x" type="button" data-close aria-label="Zavřít menu">×</button></div>
     <label class="navp-q"><span class="sr">Hledat v kronice</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>
       <input type="search" id="navQ" placeholder="Hledat postavu, místo, verš…" autocomplete="off" enterkeyhint="search"><kbd>/</kbd></label>

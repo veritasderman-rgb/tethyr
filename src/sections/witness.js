@@ -5,7 +5,7 @@
 import media from 'virtual:media';
 import { D } from '../lib/data.js';
 import { small } from '../lib/img.js';
-import { navigate, witPath, syncMeta } from '../lib/router.js';
+import { navigate, witPath, syncMeta, H } from '../lib/router.js';
 import { voice, load as loadVoice, stop as stopVoice, unlock, claim, getVolume, setVolume, isMuted, setMuted, onVolume } from '../lib/audio.js';
 import { createStage, grain, STAGE_HTML, sideLabel, isFoe, isPast, stavShort, stavTitle, stavInfo, groupOf, subsCs, subMode, setSubMode, SUB_LABEL } from '../lib/wstage.js';
 import { $, $$, esc, reduced, plural, settleScroll } from '../lib/util.js';
@@ -246,9 +246,9 @@ export function renderWitness() {
     const box = $('#wInfo', el);
     const links = (w.zdroje || []).map((z) => {
       const s = D.sesById[z]; const b = D.battleById[z];
-      if (s) return { d: s.date, h: `<a href="#${s.id}">${esc(s.date_label)} · ${esc(s.title)}</a>` };
-      if (b) return { d: String(b.dr || ''), h: `<a href="#${b.id}">${esc(b.name)}</a>` };
-      if (z === 'hymna') return { d: 'zzzz', h: '<a href="#hymna">Hymna družiny</a>' };
+      if (s) return { d: s.date, h: `<a href="${H(`#${s.id}`)}">${esc(s.date_label)} · ${esc(s.title)}</a>` };
+      if (b) return { d: String(b.dr || ''), h: `<a href="${H(`#${b.id}`)}">${esc(b.name)}</a>` };
+      if (z === 'hymna') return { d: 'zzzz', h: '<a href="${H(`#hymna`)}">Hymna družiny</a>' };
       return null;
     }).filter(Boolean);
     const hasTxt = (w.zdroje || []).some((z) => z.startsWith('txt:'));

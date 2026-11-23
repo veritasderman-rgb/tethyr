@@ -4,7 +4,7 @@
 import { D } from '../lib/data.js';
 import { small, img } from '../lib/img.js';
 import { $, $$, esc, norm, plural, reduced } from '../lib/util.js';
-import { emit, lexPath, syncMeta } from '../lib/router.js';
+import { emit, lexPath, syncMeta, H } from '../lib/router.js';
 
 const TYPES = [['', 'Vše'], ['osoba', 'Osoby'], ['misto', 'Místa'], ['frakce', 'Frakce a organizace'], ['pojem', 'Pojmy']];
 const TNAME = { osoba: 'osoba', misto: 'místo', frakce: 'frakce', pojem: 'pojem' };
@@ -67,12 +67,12 @@ export function renderLexikon() {
   }
 
   function sesLinks(ids) {
-    return (ids || []).slice(0, 12).map((id) => { const s = D.sesById?.[id]; return s ? `<a href="#${id}" title="${esc(s.title)}">${esc(s.date_label)}</a>` : ''; }).filter(Boolean).join(' ');
+    return (ids || []).slice(0, 12).map((id) => { const s = D.sesById?.[id]; return s ? `<a href="${H(`#${id}`)}" title="${esc(s.title)}">${esc(s.date_label)}</a>` : ''; }).filter(Boolean).join(' ');
   }
   function open(id, scroll = true) {
     const e = by[id]; if (!e) return;
     $$('.lx-i', list).forEach((b) => b.classList.toggle('on', b.dataset.id === id));
-    const chs = (e.ch || []).map((c) => `<a href="#${c}">${esc(L.chTitle[c] || c)}</a>`).join('');
+    const chs = (e.ch || []).map((c) => `<a href="${H(`#${c}`)}">${esc(L.chTitle[c] || c)}</a>`).join('');
     const rows = [];
     if (e.fn && e.fn !== e.n) rows.push(['Celým jménem', esc(e.fn)]);
     if (e.al?.length) rows.push(['Také', e.al.map(esc).join(', ')]);
@@ -82,7 +82,7 @@ export function renderLexikon() {
     if (e.grp) rows.push(['Skupina', esc(e.grp)]);
     if (e.reg) rows.push([e.t === 'misto' ? 'Oblast' : 'Odkud', esc(e.reg)]);
     if (e.kind && e.t !== 'osoba') rows.push(['Druh', esc(e.kind)]);
-    if (e.own) rows.push(['Patří', e.own[1] ? `<a href="#lx/${esc(e.own[1])}">${esc(e.own[0])}</a>` : esc(e.own[0])]);
+    if (e.own) rows.push(['Patří', e.own[1] ? `<a href="${H(`#lx/${esc(e.own[1])}`)}">${esc(e.own[0])}</a>` : esc(e.own[0])]);
     det.innerHTML = `<button class="lx-x" type="button" aria-label="Zavřít heslo">×</button>
       ${e.img ? `<div class="lx-dimg">${img(e.img, { alt: e.n, sizes: '(max-width:900px) 100vw, 420px', pos: '50% 30%' })}</div>` : ''}
       <p class="lx-dk">${esc(TNAME[e.t])}${e.sphere ? ' · sféra mimo Toril' : ''}</p><h3 id="lxDetH">${esc(e.n)}</h3>
@@ -90,11 +90,11 @@ export function renderLexikon() {
       ${rows.length ? `<dl class="lx-dl">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>` : ''}
       ${e.d && e.d !== e.s ? `<p class="lx-dd">${esc(e.d)}</p>` : ''}
       ${e.visits?.length ? `<h4>Co se tu stalo</h4><ul class="lx-v">${e.visits.map((v) => `<li>${esc(v)}</li>`).join('')}</ul>` : ''}
-      ${e.mem?.length ? `<h4>Členové</h4><p class="lx-mem">${e.mem.map(([n, i]) => i ? `<a href="#lx/${esc(i)}">${esc(n)}</a>` : esc(n)).join(', ')}</p>` : ''}
-      ${e.who?.length ? `<h4>Kdo tu žije a působí</h4><p class="lx-mem">${e.who.map((i) => by[i] ? `<a href="#lx/${esc(i)}">${esc(by[i].n)}</a>` : '').filter(Boolean).join(', ')}</p>` : ''}
+      ${e.mem?.length ? `<h4>Členové</h4><p class="lx-mem">${e.mem.map(([n, i]) => i ? `<a href="${H(`#lx/${esc(i)}`)}">${esc(n)}</a>` : esc(n)).join(', ')}</p>` : ''}
+      ${e.who?.length ? `<h4>Kdo tu žije a působí</h4><p class="lx-mem">${e.who.map((i) => by[i] ? `<a href="${H(`#lx/${esc(i)}`)}">${esc(by[i].n)}</a>` : '').filter(Boolean).join(', ')}</p>` : ''}
       ${chs ? `<h4>Kapitoly Příběhu</h4><p class="lx-ch">${chs}</p>` : ''}
       ${e.ses?.length ? `<h4>Sezení</h4><p class="lx-ses">${sesLinks(e.ses)}</p>` : ''}
-      <p class="lx-act">${e.wit ? `<button class="btn red sm" data-wit="${esc(e.wit)}">▶ Svědectví</button>` : ''}${e.pc ? `<button class="btn sm" data-char="${esc(e.pc)}">Karta postavy</button>` : ''}${e.m2 ? `<button class="btn sm" data-place="${esc(e.m2)}">2D mapa</button>` : ''}${e.m3 ? `<a class="btn sm" href="mapa3d/index.html#p=${esc(e.m3)}" target="_blank" rel="noopener">3D mapa ↗</a>` : ''}${(e.bat || []).map((b) => `<a class="btn sm" href="#${esc(b)}">Bojové hlášení</a>`).join('')}</p>`;
+      <p class="lx-act">${e.wit ? `<button class="btn red sm" data-wit="${esc(e.wit)}">▶ Svědectví</button>` : ''}${e.pc ? `<button class="btn sm" data-char="${esc(e.pc)}">Karta postavy</button>` : ''}${e.m2 ? `<button class="btn sm" data-place="${esc(e.m2)}">2D mapa</button>` : ''}${e.m3 ? `<a class="btn sm" href="mapa3d/index.html#p=${esc(e.m3)}" target="_blank" rel="noopener">3D mapa ↗</a>` : ''}${(e.bat || []).map((b) => `<a class="btn sm" href="${H(`#${esc(b)}`)}">Bojové hlášení</a>`).join('')}</p>`;
     det.classList.add('open'); document.body.classList.add('lx-open');
     det.scrollTop = 0;
     if (scroll && window.matchMedia('(max-width: 900px)').matches) det.focus({ preventScroll: true });

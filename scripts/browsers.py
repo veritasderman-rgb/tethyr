@@ -23,3 +23,8 @@ def launch(p, args=None):
     if BROWSER == 'chromium' and args: kw['args'] = args
     if BROWSER == 'firefox': kw['firefox_user_prefs'] = {'media.autoplay.default': 5}  # běžná politika: blokovat
     return _B(p, getattr(p, BROWSER).launch(**kw))
+
+def noise(m):
+    """Známé neškodné zprávy: Firefox opravuje bbox glyfů v písmu Cardo (OTS), headless prohlížeč nemá zvukové zařízení."""
+    t = m.text or ''
+    return 'downloadable font: glyf' in t or 'could not be decoded' in t or 'OnMediaSinkAudioErr' in t or 'NS_ERROR_DOM_MEDIA' in t

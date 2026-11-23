@@ -36,7 +36,7 @@
 .doors > .door { flex: 1 1 auto; }
 .doors > .door.primary { flex-grow: 1.4; }
 .hero-down { display: none; }
-.door { position: relative; display: grid; grid-template-columns: 24px 1fr; grid-template-rows: auto auto; column-gap: 12px; row-gap: 3px; align-items: center; text-align: left; padding: 14px 16px; min-height: 64px; color: var(--parch); text-decoration: none; background: rgba(18, 16, 13, .56); border: 1px solid rgba(201, 165, 74, .38); backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px); cursor: pointer; transition: transform .35s var(--ease), background .3s, border-color .3s; overflow: hidden; }
+.door { position: relative; display: grid; grid-template-columns: 24px 1fr; grid-template-rows: auto auto; column-gap: 12px; row-gap: 3px; align-items: center; text-align: left; padding: 14px 16px; min-height: 64px; color: var(--parch); text-decoration: none; background: rgba(18, 16, 13, .56); border: 1px solid rgba(201, 165, 74, .38); -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px); cursor: pointer; transition: transform .35s var(--ease), background .3s, border-color .3s; overflow: hidden; }
 .door::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgba(255, 228, 176, .18) 50%, transparent 65%); transform: translateX(-120%); transition: transform .8s var(--ease); }
 .door:hover::after, .door:focus-visible::after { transform: translateX(120%); }
 .door:hover, .door:focus-visible { transform: translateY(-3px); background: rgba(168, 132, 44, .22); border-color: var(--gold2); color: var(--parch); }
