@@ -294,3 +294,7 @@ body.tour #chapT{top:calc(9vh + env(safe-area-inset-top))}
 @keyframes lbx{from{transform:scaleY(0)}to{transform:none}}
 @media (max-width:700px){ #chapT{top:calc(70px + env(safe-area-inset-top));padding:10px 18px 12px} #chapT .cs{font-size:14px} .btn.tour{font-size:0;padding:0 12px} .btn.tour span{font-size:16px} }
 @media (prefers-reduced-motion:reduce){ #chapT{transition:none} body.tour::before{animation:none} }
+.wit-cc{display:inline-flex;gap:2px;flex:none}
+.wit-cc button{background:none;border:1px solid rgba(201,165,74,.35);color:#d9ccb0;font:500 11px/1 var(--sans,system-ui);letter-spacing:.06em;padding:6px 7px;min-width:34px;min-height:30px;cursor:pointer;border-radius:3px}
+.wit-cc button[aria-pressed="true"]{background:rgba(201,165,74,.22);color:#fff;border-color:var(--gold2)}
+.wit-v .subt[hidden],.wit-tx[hidden]{display:none}

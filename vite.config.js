@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { PAGES, SITE } from './src/lib/pages.js';
 
 // Svědectví: audio a video dodá zadavatel do assets/voices/<id>.mp3 a assets/video/<id>.mp4.
 // Plugin z nich udělá manifest (virtual:media), aby web věděl, co existuje, a při buildu je zkopíruje do dist/.
@@ -62,6 +63,52 @@ function sitePlugin() {
   };
 }
 
+// Vlastní náhled při sdílení pro hlavní adresy: při buildu vznikne statická kopie dist/index.html s vlastním <title>, description,
+// og:* a twitter:* (dist/<adresa>/index.html). Aplikace se v prohlížeči spustí stejně (<base href="/">) a router titulek znovu nastaví.
+function prerenderPlugin() {
+  const escA = (t) => String(t).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  return {
+    name: 'prerender-sdileni',
+    apply: 'build',
+    closeBundle() {
+      const dist = path.resolve('dist');
+      const src = path.join(dist, 'index.html');
+      if (!fs.existsSync(src)) return;
+      const html = fs.readFileSync(src, 'utf8');
+      const host = (process.env.SITE_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '')).replace(/\/$/, '');
+      const abs = (p) => (host ? `${host}/${p}` : p);
+      let books = [];
+      try { books = JSON.parse(fs.readFileSync('public/data/books.json', 'utf8')); } catch { /* bez knih */ }
+      const routes = [];
+      for (const p of PAGES) {
+        if (p.id === 'uvod') continue;
+        routes.push({ path: p.path, og: p.path.slice(1), title: `${p.label} · ${SITE}`, desc: p.desc });
+      }
+      books.forEach((b, i) => routes.push({ path: `/pribeh/kniha-${i + 1}`, og: `kniha-${i + 1}`, title: `${b.kap} · ${b.title} · Příběh · ${SITE}`, desc: b.summary.slice(0, 180).replace(/\s+\S*$/, '…') }));
+      const made = [];
+      for (const r of routes) {
+        const img = abs(`img/og/${r.og}.jpg`), url = abs(r.path.slice(1));
+        const t = escA(r.title), d = escA(r.desc);
+        let h = html
+          .replace(/<title>[\s\S]*?<\/title>/, `<title>${t}</title>`)
+          .replace(/(<meta name="description" content=")[^"]*"/, `$1${d}"`)
+          .replace(/(<meta property="og:title" content=")[^"]*"/, `$1${t}"`)
+          .replace(/(<meta property="og:description" content=")[^"]*"/, `$1${d}"`)
+          .replace(/(<meta property="og:image" content=")[^"]*"/, `$1${img}"`)
+          .replace(/(<meta name="twitter:title" content=")[^"]*"/, `$1${t}"`)
+          .replace(/(<meta name="twitter:description" content=")[^"]*"/, `$1${d}"`)
+          .replace(/(<meta name="twitter:image" content=")[^"]*"/, `$1${img}"`)
+          .replace('<meta property="og:type"', `<link rel="canonical" href="${url || '/'}" />\n  <meta property="og:url" content="${url || '/'}" />\n  <meta property="og:type"`);
+        const out = path.join(dist, r.path.slice(1), 'index.html');
+        fs.mkdirSync(path.dirname(out), { recursive: true });
+        fs.writeFileSync(out, h);
+        made.push(r.path);
+      }
+      console.log(`náhledy pro sdílení: ${made.length} adres (${made.join(', ')})`);
+    },
+  };
+}
+
 // Kontrola faktů (scripts/fakta.py) se spouští při každém buildu; porušení invariantů build zastaví.
 // Když na stroji není Python, kontrola se přeskočí s varováním (chybí-li, build kvůli tomu nespadne).
 function faktaPlugin() {
@@ -83,7 +130,7 @@ function faktaPlugin() {
 
 export default defineConfig({
   base: './',
-  plugins: [faktaPlugin(), mediaPlugin(), sitePlugin()],
+  plugins: [faktaPlugin(), mediaPlugin(), sitePlugin(), prerenderPlugin()],
   build: { outDir: 'dist', assetsInlineLimit: 0, chunkSizeWarningLimit: 900 },
   server: { host: true },
 });

@@ -73,6 +73,7 @@ export function load(src) {
 export function stop() { voice.pause(); voice.onended = null; }
 
 window.__voice = voice; // pro testy a ladění
+window.__audio = { owner: () => owner, claim: (n, f) => claim(n, f) };
 
 // ------------------------------------------------------------------ jeden zvuk najednou (iterace 8)
 // Sdílený <audio> používají Svědectví, Proroctví i Dokument. Kdo začne hrát, „převezme“ zvuk (claim) a dosavadní

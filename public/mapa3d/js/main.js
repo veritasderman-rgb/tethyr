@@ -657,24 +657,41 @@ function openBattle(b, fly){ curCard={type:'battle',id:b.id}; const o=b._o; if(f
     <p class="note" style="margin-top:12px">${webLink(b.id,'Bojové hlášení v kronice →')}${b.pl&&BYID[b.pl]?` · <button class="more" data-open="${esc(b.pl)}">${esc(BYID[b.pl].name)}</button>`:''}</p>`);
   setHash('b='+b.id); }
 
-// svědectví: živý portrét (smyčka), hlas a titulky po větách
+// svědectví: živý portrét (smyčka), hlas a titulky po větách (CZ / EN / vyp, stejné nastavení jako na webu: localStorage zd-titulky)
+// Vložená mapa (iframe v kronice) si s webem povídá přes postMessage: 'zd:sound' (tady začal hrát hlas → web převezme zvuk a ostatní
+// přehrávače ztiší), 'zd:pause' (jiný přehrávač webu převzal zvuk → tady pauza), 'zd:submode' (změna titulků na webu / tady).
 let wit=null;
+const SUBKEY='zd-titulky';
+const subMode=()=>{ try{ const m=localStorage.getItem(SUBKEY); return ['cs','en','off'].includes(m)?m:'cs'; }catch(e){ return 'cs'; } };
+const subsOf=w=>{ const m=subMode(); if(m==='off') return []; if(m==='en') return w.text; return (w.titulky&&w.titulky.length===w.text.length)?w.titulky:w.text; };
+const toHost=msg=>{ try{ if(window.parent!==window) window.parent.postMessage(msg,location.origin); }catch(e){} };
+function setSubMode(m,fromHost){ try{ localStorage.setItem(SUBKEY,m); }catch(e){} if(!fromHost) toHost({type:'zd:submode',mode:m}); if(wit&&wit.refresh) wit.refresh(); }
+window.addEventListener('message',e=>{ if(e.origin!==location.origin||!e.data||typeof e.data!=='object') return;
+  if(e.data.type==='zd:submode'&&['cs','en','off'].includes(e.data.mode)) setSubMode(e.data.mode,true);
+  if(e.data.type==='zd:pause'&&wit&&wit.pause) wit.pause(); });
 function stopWit(){ if(!wit) return; try{ wit.au.pause(); wit.v&&wit.v.pause(); }catch(e){} cancelAnimationFrame(wit.raf); wit=null; }
 function openWitness(w, fly){ curCard={type:'wit',id:w.id}; if(fly&&w.pl&&BYID[w.pl]) flyToObj(BYID[w.pl]);
+  const cc=['cs','en','off'].map(m=>`<button type="button" data-cc="${m}" aria-pressed="${subMode()===m}">${m==='cs'?'CZ':m==='en'?'EN':'vyp'}</button>`).join('');
   showCard(`<p class="kick">Svědectví · ${w.side==='nepřítel'?'nepřítel':w.side==='neutrální'?'neutrální':'spojenec'}</p><h2>${esc(w.name)}</h2><div class="sub">${esc(w.role)}${w.home?' · '+esc(w.home):''}</div>
     <div class="wit-v">${w.vid?`<video id="wv" muted loop playsinline preload="metadata" ${w.poster?`poster="${esc(w.poster)}"`:''} src="${esc(w.vid)}"></video>`:w.poster?`<img src="${esc(w.poster)}" alt="">`:''}<div class="subt" id="wsub"></div></div>
-    <div class="wit-ctl"><button class="btn" id="wplay">▶ Přehrát svědectví</button><div class="prog"><i id="wprog"></i></div></div>
+    <div class="wit-ctl"><button class="btn" id="wplay">▶ Přehrát svědectví</button><div class="prog"><i id="wprog"></i></div><span class="wit-cc" role="group" aria-label="Titulky">${cc}</span></div>
     <p class="note" style="margin-top:8px">${esc(w.bond||'')}</p>
-    <div class="wit-tx" id="wtx">${(w.titulky||w.text).map((t,i)=>`<span data-i="${i}">${esc(t)}</span> `).join('')}</div>
+    <div class="wit-tx" id="wtx"></div>
     <p class="note" style="margin-top:12px">${webLink('svedectvi/'+w.id,'Svědectví v kronice →')}${w.pl&&BYID[w.pl]?` · <button class="more" data-open="${esc(w.pl)}">${esc(BYID[w.pl].name)}</button>`:''}</p>`);
-  const au=new Audio(); au.preload='none'; if(w.audio) au.src=w.audio; const v=$('wv'); wit={au,v,raf:0,w};
-  const sub=$('wsub'), pr=$('wprog'), spans=[...$('wtx').querySelectorAll('span')], btn=$('wplay');
+  const au=new Audio(); au.preload='none'; au.setAttribute('playsinline',''); if(w.audio) au.src=w.audio; const v=$('wv'); if(v){ v.muted=true; v.defaultMuted=true; } wit={au,v,raf:0,w};
+  const sub=$('wsub'), pr=$('wprog'), btn=$('wplay'), tx=$('wtx'); let spans=[], lastK=-1;
   const starts=w.t||w.text.map((_,i)=>i*5.5);
-  const tick=()=>{ if(!wit||wit.w!==w) return; const t=au.currentTime, dur=au.duration||w.dur||1; let k=0; for(let i=0;i<starts.length;i++) if(t>=starts[i]) k=i;
-    sub.textContent=(w.titulky||w.text)[k]||''; spans.forEach((s,i)=>s.classList.toggle('on',i===k&&!au.paused)); pr.style.width=(t/dur*100).toFixed(1)+'%'; wit.raf=requestAnimationFrame(tick); };
-  btn.onclick=()=>{ if(!w.audio){ sub.textContent='Hlas zatím chybí.'; return; } if(au.paused){ au.volume=SND.on?0.95:0.95; au.play().then(()=>{ v&&v.play().catch(()=>{}); btn.textContent='❚❚ Pozastavit'; tick(); }).catch(()=>{ sub.textContent='Přehrávání zablokoval prohlížeč – klepni znovu.'; }); } else { au.pause(); v&&v.pause(); btn.textContent='▶ Pokračovat'; } };
+  const refresh=()=>{ const L=subsOf(w); tx.innerHTML=L.map((t,i)=>`<span data-i="${i}">${esc(t)}</span> `).join(''); spans=[...tx.querySelectorAll('span')]; tx.hidden=!L.length; lastK=-1;
+    document.querySelectorAll('.wit-cc [data-cc]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.cc===subMode()))); show(curK()); };
+  const curK=()=>{ const t=au.currentTime; let k=0; for(let i=0;i<starts.length;i++) if(t>=starts[i]) k=i; return k; };
+  const show=k=>{ const L=subsOf(w); sub.textContent=L[k]||''; sub.hidden=!L.length; spans.forEach((s,i)=>s.classList.toggle('on',i===k&&!au.paused)); lastK=k; };
+  const tick=()=>{ if(!wit||wit.w!==w) return; const t=au.currentTime, dur=au.duration||w.dur||1; show(curK()); pr.style.width=(t/dur*100).toFixed(1)+'%'; wit.raf=requestAnimationFrame(tick); };
+  const pause=()=>{ au.pause(); v&&v.pause(); btn.textContent='▶ Pokračovat'; show(curK()); };
+  wit.refresh=refresh; wit.pause=pause;
+  document.querySelectorAll('.wit-cc [data-cc]').forEach(b=>b.addEventListener('click',()=>setSubMode(b.dataset.cc)));
+  btn.onclick=()=>{ if(!w.audio){ sub.textContent='Hlas zatím chybí.'; return; } if(au.paused){ au.volume=0.95; au.play().then(()=>{ toHost({type:'zd:sound',on:true}); v&&v.play().catch(()=>{}); btn.textContent='❚❚ Pozastavit'; tick(); }).catch(()=>{ sub.textContent='Přehrávání zablokoval prohlížeč – klepni znovu.'; }); } else pause(); };
   au.onended=()=>{ btn.textContent='▶ Přehrát znovu'; v&&v.pause(); sub.textContent=''; };
-  sub.textContent=(w.titulky||w.text)[0]||''; if(v && !REDUCED) v.play().catch(()=>{});
+  refresh(); if(v && !REDUCED) v.play().catch(()=>{});
   setHash('w='+w.id); }
 
 function openNote(name){ const n=EGGNOTE[name]; if(!n) return; curCard={type:'note',id:name}; const s=n.sid&&SES[n.sid], b=n.sid&&BATT[n.sid];

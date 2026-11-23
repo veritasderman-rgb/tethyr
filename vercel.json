@@ -4,15 +4,79 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/pribeh",
+      "destination": "/pribeh/index.html"
+    },
+    {
+      "source": "/druzina",
+      "destination": "/druzina/index.html"
+    },
+    {
+      "source": "/svedectvi",
+      "destination": "/svedectvi/index.html"
+    },
+    {
+      "source": "/bitvy",
+      "destination": "/bitvy/index.html"
+    },
+    {
+      "source": "/mapa",
+      "destination": "/mapa/index.html"
+    },
+    {
+      "source": "/proroctvi",
+      "destination": "/proroctvi/index.html"
+    },
+    {
+      "source": "/osa",
+      "destination": "/osa/index.html"
+    },
+    {
+      "source": "/lexikon",
+      "destination": "/lexikon/index.html"
+    },
+    {
+      "source": "/u-stolu",
+      "destination": "/u-stolu/index.html"
+    },
+    {
+      "source": "/hymna",
+      "destination": "/hymna/index.html"
+    },
+    {
+      "source": "/dokument",
+      "destination": "/dokument/index.html"
+    },
+    {
+      "source": "/podekovani",
+      "destination": "/podekovani/index.html"
+    },
+    {
+      "source": "/pribeh/kniha-1",
+      "destination": "/pribeh/kniha-1/index.html"
+    },
+    {
+      "source": "/pribeh/kniha-2",
+      "destination": "/pribeh/kniha-2/index.html"
+    },
+    {
+      "source": "/pribeh/kniha-3",
+      "destination": "/pribeh/kniha-3/index.html"
+    },
+    {
+      "source": "/pribeh/kniha-4",
+      "destination": "/pribeh/kniha-4/index.html"
+    },
+    {
+      "source": "/pribeh/kniha-5",
+      "destination": "/pribeh/kniha-5/index.html"
+    },
+    {
       "source": "/(pribeh|druzina|svedectvi|bitvy|mapa|proroctvi|osa|lexikon|u-stolu|dokument|podekovani)",
       "destination": "/index.html"
     },
     {
       "source": "/(pribeh|druzina|svedectvi|bitvy|mapa|proroctvi|lexikon)/:rest*",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/hymna",
       "destination": "/index.html"
     }
   ]
