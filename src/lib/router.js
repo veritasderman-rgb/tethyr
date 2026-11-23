@@ -14,6 +14,7 @@ import { $, $$, esc } from './util.js';
 
 import { SITE, ROM, ROM_NAME, PAGES, EXTRA } from './pages.js';
 import { startNbsp } from './nbsp.js';
+import { isLoadError, reloadOnce, checkVersion, isStale } from './stale.js';
 export { SITE, PAGES };
 export const pageById = (id) => PAGES.find((p) => p.id === id) || EXTRA[id] || null;
 const SLUG = { 'u-stolu': 'stul' };
@@ -121,6 +122,9 @@ export function navigate(to, { replace = false, gesture = false, state = {} } = 
   if (to.startsWith('#')) to = legacy(to) || location.pathname;
   const u = new URL(to, location.origin);
   const url = u.pathname + u.search + u.hash;
+  // na serveru je novější build: přechod jako plné načtení (nové index.html i chunky)
+  if (isStale() && url !== location.pathname + location.search + location.hash) { if (replace) location.replace(url); else location.assign(url); return Promise.resolve(); }
+  checkVersion();
   try { history.replaceState({ ...(history.state || {}), y: Math.round(window.scrollY) }, ''); } catch { /* nic */ }
   const same = url === location.pathname + location.search + location.hash;
   if (replace || same) history.replaceState({ ...state, app: history.state?.app || 0 }, '', url);
@@ -150,9 +154,11 @@ function loadingState(el) {
     el.innerHTML = `<div class="pg-load wrap" role="status"><span class="pg-sk h"></span><span class="pg-sk"></span><span class="pg-sk"></span><span class="pg-sk s"></span><p>Načítám stránku…</p></div>`;
   }
 }
-function errorState(el, r) {
-  el.innerHTML = `<div class="pg-err wrap" role="alert"><h1 tabindex="-1">Stránku se nepodařilo načíst</h1><p>Zkontrolujte připojení a zkuste to znovu.</p><p><button class="btn red" type="button" data-retry>Zkusit znovu</button> <a class="btn" href="/">Na úvod</a></p></div>`;
+function errorState(el, r, err) {
+  console.error('Stránku se nepodařilo načíst:', r.path, err);
+  el.innerHTML = `<div class="pg-err wrap" role="alert"><h1 tabindex="-1">Stránku se nepodařilo načíst</h1><p>Zkontrolujte připojení a zkuste to znovu. Pokud se web mezitím aktualizoval, pomůže načíst stránku znovu.</p><p><button class="btn red" type="button" data-retry>Zkusit znovu</button> <button class="btn" type="button" data-reload>Načíst stránku znovu</button> <a class="btn" href="/">Na úvod</a></p></div>`;
   el.querySelector('[data-retry]').addEventListener('click', () => { el.innerHTML = ''; show(r, { gesture: true }); });
+  el.querySelector('[data-reload]').addEventListener('click', () => location.reload());
 }
 
 async function apply(ctx = {}) {
@@ -206,7 +212,12 @@ async function show(r, ctx = {}) {
   if (r.page === 'nenalezeno') renderNotFound(el);
   else {
     loadingState(el);
-    try { mod = await ensure(r.page); } catch { if (my === seq) errorState(el, r); return; }
+    try { mod = await ensure(r.page); } catch (e) {
+      if (my !== seq) return;
+      // chybějící chunk po novém nasazení (stará záložka): jednou tvrdý reload, teprve pak chybový stav
+      if (isLoadError(e) && reloadOnce(e?.message || String(e))) return;
+      errorState(el, r, e); return;
+    }
   }
   if (my !== seq) return;
   try { await mod?.enter?.(r, ctx); } catch (e) { console.error('enter', r.page, e); }

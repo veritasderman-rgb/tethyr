@@ -79,5 +79,61 @@
       "source": "/(pribeh|druzina|svedectvi|bitvy|mapa|proroctvi|lexikon)/:rest*",
       "destination": "/index.html"
     }
+  ],
+  "headers": [
+    {
+      "source": "/assets/:file([^/]+)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/data/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/version.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/index.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/(pribeh|druzina|svedectvi|bitvy|mapa|proroctvi|osa|lexikon|u-stolu|hymna|dokument|podekovani)(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, must-revalidate"
+        }
+      ]
+    }
   ]
 }

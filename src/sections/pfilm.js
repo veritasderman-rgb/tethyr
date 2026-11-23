@@ -611,8 +611,10 @@ function create() {
   tl.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); e.stopPropagation(); if (started) seek(globalT() + (e.key === 'ArrowRight' ? 10 : -10)); }
   });
-  root.addEventListener('keydown', (e) => {
-    if (root.hidden) return;
+  // klávesy na úrovni dokumentu: film je modální, fokus může být i mimo něj (např. po kliknutí do prázdna)
+  document.addEventListener('keydown', (e) => {
+    if (root.hidden || e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (!root.contains(e.target) && e.target !== document.body && e.target !== document.documentElement) return;
     const k = e.key, inRange = e.target.matches?.('input[type=range]');
     if (k === 'Tab') {
       const f = $$('button, a[href], input, [tabindex="0"]', root).filter((x) => x.offsetParent !== null && !x.closest('[hidden]'));

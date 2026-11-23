@@ -32,6 +32,7 @@ import { initSearch } from './lib/search.js';
 import { initHoverCards } from './lib/hovercard.js';
 import { filmHooks, pfilmHooks } from './lib/filmhook.js';
 import './lib/audio.js';
+import './lib/stale.js';
 import { closeDrawer, close as closeLightbox } from './lib/lightbox.js';
 
 // Stránky: kód (dynamický import) a data, která potřebují. Načítají se až při prvním vstupu na stránku.

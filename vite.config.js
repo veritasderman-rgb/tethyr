@@ -4,6 +4,13 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { PAGES, SITE } from './src/lib/pages.js';
 
+// Verze buildu (iterace 10): hash commitu (Vercel/git) + čas; vkládá se do kódu (__APP_VERSION__) a do dist/version.json.
+const GIT = (() => { try { return (process.env.VERCEL_GIT_COMMIT_SHA || spawnSync('git', ['rev-parse', '--short', 'HEAD'], { encoding: 'utf8' }).stdout || '').trim().slice(0, 12); } catch { return ''; } })();
+const APP_VERSION = `${GIT || 'local'}-${Date.now().toString(36)}`;
+function versionPlugin() {
+  return { name: 'app-version', apply: 'build', generateBundle() { this.emitFile({ type: 'asset', fileName: 'version.json', source: JSON.stringify({ v: APP_VERSION, commit: GIT, built: new Date().toISOString() }) }); } };
+}
+
 // Svědectví: audio a video dodá zadavatel do assets/voices/<id>.mp3 a assets/video/<id>.mp4.
 // Plugin z nich udělá manifest (virtual:media), aby web věděl, co existuje, a při buildu je zkopíruje do dist/.
 const MEDIA = { voices: /\.(mp3|m4a|ogg|wav)$/i, video: /\.(mp4|webm)$/i, hymna: /\.(mp3|mp4|webm|json)$/i, proroctvi: /\.mp3$/i };
@@ -130,7 +137,8 @@ function faktaPlugin() {
 
 export default defineConfig({
   base: './',
-  plugins: [faktaPlugin(), mediaPlugin(), sitePlugin(), prerenderPlugin()],
+  plugins: [faktaPlugin(), mediaPlugin(), sitePlugin(), prerenderPlugin(), versionPlugin()],
+  define: { __APP_VERSION__: JSON.stringify(APP_VERSION) },
   build: { outDir: 'dist', assetsInlineLimit: 0, chunkSizeWarningLimit: 900 },
   server: { host: true },
 });
