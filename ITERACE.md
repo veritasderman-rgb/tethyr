@@ -370,3 +370,6 @@ Vráceno vše, co iterace 9 změnila na „Ho byl u Anaurochu, na pyramidě fin�
 3. **Drak z jisker a hořící písmo jsou procedurální** (silueta loga ze ~700 jisker, SVG filtr): působí dobře na tmavých malbách, na světlých místech maleb méně; feDisplacementMap je na mobilu vypnutý.
 4. **Časy veršů proroctví jsou ze strojového rozpoznání** (94–97 % slov) a film na nich stojí úplně: verš může naskočit o zlomek sekundy dřív/později; ruční kontrola poslechem neproběhla.
 5. **Safari/iOS a skutečné telefony stále jen v emulaci** (WebKit headless padá při druhém kontextu na proroctví); test `test-it8` na živé adrese má na mobilu závod s automatickým dorolováním proroctví přes pomalou síť.
+
+### H) České znění svědectví – druhá půlka podle první (23. 11. odpoledne)
+Autor označil česká svědectví za nejslabší místo (druhá půlka byla samý názor a opakoval se v ní motiv rýže). 17 svědků přepsáno podle jeho první půlky (konkrétní příhody + prostá věta o vztahu k družině), záporáci podle povahy (Axel Adamantis = ranař a zabiják, ne počtář). Texty autor schválil („je ok, udělej to zatím takhle“), nahráno znovu (17 generací, 12 598 kreditů), `voices4/timing.json` sloučen, `build-media.py` překódoval 17 souborů. Nové hlasy: Rudá rytířka, Gatrya, Axel. Angličtina beze změny. `fakta.py` v pořádku, `test-it10-cz.py` 30/30 (Chromium, lokální build). Poslechem neověřeno.
