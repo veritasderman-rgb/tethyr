@@ -2,6 +2,8 @@
 """Iterace 6: úvod (vstupy, nástup), jednotný systém, Družina, Bitvy, Proroctví, osa na mobilu, metadata, 404, tisk, reduced motion, klávesnice."""
 import os, sys, json, urllib.request
 from playwright.sync_api import sync_playwright
+import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from browsers import launch
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from nav8 import go, open_, ready, here
 URL = os.environ.get('SHOT_URL', 'http://127.0.0.1:4173/')
@@ -13,7 +15,7 @@ def jclick(pg, sel):
     pg.evaluate('(s) => document.querySelector(s).click()', sel)
 errs = []
 with sync_playwright() as p:
-    b = p.chromium.launch(args=['--mute-audio'])
+    b = launch(p, ['--mute-audio'])
     # ---------------------------------------------------------------- statické věci: metadata a 404
     html = urllib.request.urlopen(URL).read().decode()
     for k in ('og:title', 'og:description', 'og:image', 'twitter:card', 'apple-touch-icon', 'name="description"', 'lang="cs"'):

@@ -2,10 +2,12 @@
 """Test kotev (#s-…, #b-…, #svedectvi/<id>, #mapa, #pribeh, #hymna, #podekovani) a přehrávače hymny. Předpoklad: běží preview na :4173."""
 import os
 from playwright.sync_api import sync_playwright
+import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from browsers import launch
 URL = os.environ.get('SHOT_URL', 'http://127.0.0.1:4173/')
 OUT = os.environ.get('SHOT_OUT', '/home/claude/webshots/it2')
 with sync_playwright() as p:
-    b = p.chromium.launch(args=['--autoplay-policy=no-user-gesture-required'])
+    b = launch(p, ['--autoplay-policy=no-user-gesture-required'])
     for h in ['s-2011-06-21', 's-2026-09-05-epilog', 'b-bitva-v-anaurochu', 'svedectvi/finian', 'svedectvi/khelben', 'mapa', 'pribeh', 'hymna', 'podekovani', 'mapa3d']:
         pg = b.new_context(viewport={'width': 1440, 'height': 900}).new_page()
         pg.goto(URL + '#' + h, wait_until='networkidle')

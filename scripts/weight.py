@@ -3,11 +3,13 @@
 import os, subprocess, json
 from collections import defaultdict
 from playwright.sync_api import sync_playwright
+import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from browsers import launch
 URL = os.environ.get('SHOT_URL', 'http://127.0.0.1:4173/')
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 res = {}
 with sync_playwright() as p:
-    b = p.chromium.launch(args=['--mute-audio'])
+    b = launch(p, ['--mute-audio'])
     for name, opts in [('desktop', dict(viewport={'width': 1440, 'height': 900})),
                        ('mobile', dict(viewport={'width': 390, 'height': 844}, device_scale_factor=2, is_mobile=True, has_touch=True))]:
         ctx = b.new_context(**opts); pg = ctx.new_page()

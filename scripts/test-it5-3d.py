@@ -2,13 +2,15 @@
 """Iterace 5: 3D mapa – brána „Načíst 3D mapu“ na mobilu, přelet tažením s titulky kapitol, odkazy do Příběhu, média svědků z webu."""
 import os
 from playwright.sync_api import sync_playwright
+import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from browsers import launch
 URL = os.environ.get('SHOT_URL', 'http://127.0.0.1:4173/') + 'mapa3d/index.html'
 OUT = os.environ.get('SHOT_OUT', '/home/claude/webshots/it5'); os.makedirs(OUT, exist_ok=True)
 errs, ok = [], []
 def check(c, msg): (ok if c else errs).append(msg)
 ARGS = ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--mute-audio']
 with sync_playwright() as p:
-    b = p.chromium.launch(args=ARGS)
+    b = launch(p, ARGS)
     # mobil: brána
     ctx = b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=2, is_mobile=True, has_touch=True); pg = ctx.new_page()
     reqs = []; pg.on('request', lambda r: reqs.append(r.url))

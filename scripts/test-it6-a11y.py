@@ -2,6 +2,8 @@
 """Iterace 6/8: axe-core (WCAG 2 A/AA) nad každou stránkou webu (od it8 samostatné adresy), desktop i mobil. axe-core se bere z AXE_JS (výchozí /tmp/axe/node_modules/axe-core/axe.min.js)."""
 import os, sys, json
 from playwright.sync_api import sync_playwright
+import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from browsers import launch
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from nav8 import go, open_
 URL = os.environ.get('SHOT_URL', 'http://127.0.0.1:4173/')
@@ -10,7 +12,7 @@ SECS = ['/', '/pribeh', '/pribeh/kniha-2', '/pribeh/kniha-5/anauroch', '/druzina
 VIEWS = {'desktop': dict(viewport={'width': 1440, 'height': 900}), 'mobile': dict(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True)}
 bad = 0
 with sync_playwright() as p:
-    b = p.chromium.launch(args=['--mute-audio'])
+    b = launch(p, ['--mute-audio'])
     for name, opts in VIEWS.items():
         pg = b.new_context(**opts).new_page()
         open_(pg, URL, '/')

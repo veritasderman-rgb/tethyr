@@ -17,6 +17,10 @@ import json, os, sys
 
 # přesné náhrady podřetězců ve všech textových hodnotách (stará věta → nová věta)
 REPL = [
+    # Broskvová zahrada je vlastní jméno místa (upřesnění autora): i zmínka z roku 1382 DR (Hoův dotaz u Li-Longa) je totéž místo
+    ('ptal na broskvovou zahradu', 'ptal na Broskvovou zahradu'),
+    ('ptá se na broskvovou zahradu', 'ptá se na Broskvovou zahradu'),
+    ('z broskvové zahrady', 'z Broskvové zahrady'),
     # (b) Kung Lao je mrtvý, ale dosažitelný v Broskvové zahradě (upřesnění 23. 11.): rozhovory a Hoův přestup u něj zůstávají,
     #     jen se doplní, kde se odehrály
     ('Ho se vydal do Tempat Larangu za Kung Laem. ', 'Ho se vydal do Tempat Larangu za Kung Laem, který po smrti ve Feng Asay přešel do Broskvové zahrady. '),

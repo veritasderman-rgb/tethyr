@@ -4,6 +4,8 @@
 Spuštění po `npm run build` a `npx vite preview --port 4173`."""
 import os, sys, json
 from playwright.sync_api import sync_playwright
+import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from browsers import launch
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from nav8 import go, open_, ready, here
 URL = os.environ.get('SHOT_URL', 'http://127.0.0.1:4173/')
@@ -17,7 +19,7 @@ def shot(pg, name):
     pg.screenshot(path=f'{OUT}/{name}.png')
 
 with sync_playwright() as p:
-    b = p.chromium.launch(args=['--mute-audio'])
+    b = launch(p, ['--mute-audio'])
     for name, opts in (('desktop', dict(viewport={'width': 1440, 'height': 900})), ('mobile', dict(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True))):
         ctx = b.new_context(**opts); pg = ctx.new_page(); T = f'[{name}] '; M = name == 'mobile'
         pg.on('console', lambda m, n=name: errs.append(f'[{n}] {m.type}: {m.text}') if m.type in ('error', 'warning') else None)

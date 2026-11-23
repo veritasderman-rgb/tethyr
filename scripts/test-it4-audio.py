@@ -3,6 +3,8 @@
 Bez příznaku autoplay (skutečná politika prohlížeče), skutečné kliknutí myší / dotyk. Předpoklad: běží `npx vite preview --port 4173`."""
 import os, sys
 from playwright.sync_api import sync_playwright
+import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from browsers import launch
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from nav8 import go, open_, ready, here
 
@@ -16,7 +18,7 @@ def audio_state(pg):
     return pg.evaluate("(() => { const a = window.__voice; return a ? {t: +a.currentTime.toFixed(2), paused: a.paused, muted: a.muted, vol: a.volume, src: (a.currentSrc||'').split('/').pop(), ended: a.ended, rs: a.readyState} : null })()")
 
 with sync_playwright() as p:
-    b = p.chromium.launch(args=['--mute-audio'])   # bez --autoplay-policy: platí běžná pravidla
+    b = launch(p, ['--mute-audio'])   # bez --autoplay-policy: platí běžná pravidla
     for name, opts in {'desktop': dict(viewport={'width': 1440, 'height': 900}),
                        'mobile': dict(viewport={'width': 390, 'height': 844}, device_scale_factor=2, is_mobile=True, has_touch=True)}.items():
         ctx = b.new_context(**opts); pg = ctx.new_page()

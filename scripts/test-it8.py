@@ -9,6 +9,8 @@ Hráčské postavy bez svědectví. Desktop 1440×900 a mobil 390×844, snímky 
 Spuštění po `npm run build` a `npx vite preview --port 4173`."""
 import os, sys, json
 from playwright.sync_api import sync_playwright
+import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from browsers import launch
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from nav8 import go, open_, ready, here
 URL = os.environ.get('SHOT_URL', 'http://127.0.0.1:4173/').rstrip('/')
@@ -46,7 +48,7 @@ def pstate(pg): return pg.evaluate("window.__prophecy.player ? window.__prophecy
 def voice(pg): return pg.evaluate("({paused: __voice.paused, src: (__voice.currentSrc||'').split('/').pop(), t: __voice.currentTime, vol: __voice.volume})")
 
 with sync_playwright() as p:
-    b = p.chromium.launch(args=['--mute-audio'])   # běžná politika automatického přehrávání (bez výjimky)
+    b = launch(p, ['--mute-audio'])   # běžná politika automatického přehrávání (bez výjimky)
     for name, opts in (('desktop', dict(viewport={'width': 1440, 'height': 900})), ('mobile', dict(viewport={'width': 390, 'height': 844}, device_scale_factor=2, is_mobile=True, has_touch=True))):
         ctx = b.new_context(**opts); pg = ctx.new_page(); T = f'[{name}] '; M = name == 'mobile'
         pg.on('console', lambda m, n=name: errs.append(f'[{n}] {m.type}: {m.text}') if m.type in ('error', 'warning') else None)
@@ -92,6 +94,7 @@ with sync_playwright() as p:
             if nx == '/dokument':
                 pg.wait_for_function("window.__film && !document.getElementById('film').hidden", timeout=15000); pg.wait_for_timeout(800)
                 chain.append(here(pg)); pg.keyboard.press('Escape'); pg.wait_for_timeout(700)
+                if here(pg) == '/dokument': pg.keyboard.press('Escape'); pg.wait_for_timeout(700)   # v celé obrazovce první Esc zachytí prohlížeč (Firefox, Safari)
                 ok(here(pg) == '/hymna', T + 'Dál: Dokument otevře film, Esc vrátí zpět na Hymnu', here(pg))
                 go(pg, '/podekovani', 300); chain.append(here(pg)); continue
             ready(pg); pg.wait_for_timeout(250)

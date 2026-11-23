@@ -218,9 +218,9 @@ for p in C3D['places'] + C3D['spheres']:
 # Broskvová zahrada: podsféra, kam přecházejí zemřelí šedí mniši (upřesnění autora 23. 11. 2026); na mapách není
 add({'id': 'm-broskvova-zahrada', 't': 'misto', 'n': 'Broskvová zahrada', 'fn': None, 'al': ['laoneyské nebe'],
      's': 'Podsféra, „laoneyské nebe“, kam přecházejí zemřelí šedí mniši (šedí laoneyové); lze je tam vyhledat a mluvit s nimi.',
-     'd': 'Podsféra, „laoneyské nebe“, kam přecházejí šedí mniši, kteří zemřou. Lze je tam vyhledat a mluvit s nimi. Je tam mimo jiné Hoův otec, císař Lei Wu-Long, a Wang Fei-Hung. Kung Lao, který zemřel ve Feng Asay, je tam také a Ho u něj přestupoval. Chuang-Li, zrádkyně, tam není.',
-     'img': None, 'kind': 'podsféra', 'reg': 'sféry', 'sphere': True, 'ses': ['s-2020-07-17'],
-     'who': [x for x in (BY_NORM.get('kung lao'), BY_NORM.get('lei wu-long'), BY_NORM.get('wang fei-hung')) if x]})
+     'd': 'Podsféra, „laoneyské nebe“, kam přecházejí šedí mniši, kteří zemřou. Lze je tam vyhledat a mluvit s nimi. Je tam mimo jiné Hoův otec, císař Lei Wu-Long, a Wang Fei-Hung. Kung Lao, který zemřel ve Feng Asay, je tam také a Ho u něj přestupoval. Dlí tam i astrální tělo a duše lorda Rydena, kterého zabila Chuang-Li při prošetřování Cham Fau; Ho ho tam roku 1385 DR navštívil a prošel u něj Rydenovým cvičením cesty vzduchu. Chuang-Li, zrádkyně, tam není. Jediným dosud žijícím šedým mnichem vedle Hoa je Arduna. V sezení o Shou Lungu (1380–1382 DR) se Ho u Li-Longa ptal na Broskvovou zahradu; je to totéž místo.',
+     'img': None, 'kind': 'podsféra', 'reg': 'sféry', 'sphere': True, 'ses': ['s-2011-12-21', 's-2020-07-17', 's-2025-03-01'],
+     'who': [x for x in (BY_NORM.get('kung lao'), BY_NORM.get('lei wu-long'), BY_NORM.get('wang fei-hung'), BY_NORM.get('lord ryden')) if x]})
 
 # ---------------------------------------------------------------- frakce a organizace
 for f in W['factions']:

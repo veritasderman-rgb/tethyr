@@ -2,13 +2,15 @@
 """Test přehrávače svědectví s audiem i videem (a režimu dokument). Předpoklad: běží `npx vite preview --port 4173`."""
 import os, sys
 from playwright.sync_api import sync_playwright
+import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from browsers import launch
 
 URL = os.environ.get('SHOT_URL', 'http://127.0.0.1:4173/')
 OUT = os.environ.get('SHOT_OUT', '/home/claude/webshots/it2')
 os.makedirs(OUT, exist_ok=True)
 errs = []
 with sync_playwright() as p:
-    b = p.chromium.launch(args=['--autoplay-policy=no-user-gesture-required'])
+    b = launch(p, ['--autoplay-policy=no-user-gesture-required'])
     pg = b.new_context(viewport={'width': 1440, 'height': 900}).new_page()
     pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
     pg.on('pageerror', lambda e: errs.append(str(e)))
