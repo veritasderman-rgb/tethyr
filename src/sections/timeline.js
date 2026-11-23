@@ -66,6 +66,7 @@ function svg(Wpx) {
     const y = laneY[l.name];
     const c = D.characters.find((ch) => norm(ch.name) === norm(l.name) || norm(ch.name.split(' ')[0]) === norm(l.name));
     s += `<g class="tl-line" data-c="${esc(c?.id || '')}" tabindex="0" role="button" aria-label="${esc(l.name)}, hraje ${esc(l.player)}, ${Math.floor(l.t0)}–${Math.floor(l.t1)}">
+      <line x1="${x(l.t0)}" x2="${x(l.t1)}" y1="${y - 6}" y2="${y - 6}" class="tl-hit" stroke="transparent" stroke-width="44" pointer-events="stroke"/>
       <line x1="${x(l.t0)}" x2="${x(l.t1)}" y1="${y}" y2="${y}" stroke="${lift(l.color)}" class="tl-l${['Rauko', 'Ho'].includes(l.name) ? ' main' : ''}"/>
       <circle cx="${x(l.t0)}" cy="${y}" r="3.5" fill="${lift(l.color)}"/><circle cx="${x(l.t1)}" cy="${y}" r="3" class="tl-end" stroke="${lift(l.color)}"/>
       <text x="${x(l.t0) + 7}" y="${y - 4}" class="tl-ln">${esc(l.name)} <tspan>· ${esc(l.player)}</tspan></text></g>`;

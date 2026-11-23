@@ -1,0 +1,33 @@
+{
+  "popis": "Rok smrti nebo zmizení svědků, kteří nežijí. Rok vychází ze sezení a bitev, o které se svědectví opírá (pole zdroje).",
+  "kung-lao": {
+    "rok": 1377,
+    "kde": "Feng Asay",
+    "zdroj": "s-2011-07-14"
+  },
+  "ruda-rytirka": {
+    "rok": 1383,
+    "kde": "Rudá pevnost",
+    "zdroj": "b-bitva-o-rudou-pevnost"
+  },
+  "devrel": {
+    "rok": 1383,
+    "kde": "Zakhara",
+    "zdroj": "s-2015-06-05"
+  },
+  "yamoh-hokhra": {
+    "rok": 1385,
+    "kde": "Pyramida času (poslední souboj)",
+    "zdroj": "s-2026-08-01"
+  },
+  "sar-saratar": {
+    "rok": 1385,
+    "kde": "Pyramida času (poslední souboj)",
+    "zdroj": "s-2026-08-01"
+  },
+  "rivalen": {
+    "rok": 1385,
+    "kde": "Pyramida času",
+    "zdroj": "s-2026-08-01"
+  }
+}

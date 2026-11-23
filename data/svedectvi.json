@@ -93,7 +93,7 @@
    "txt:Ho_popisky"
   ],
   "skupina": "spojenci",
-  "fokus": "31% 30%"
+  "fokus": "42% 30%"
  },
  {
   "id": "honda",
@@ -352,7 +352,7 @@
    "b-posledni-souboj-na-pyramide-casu"
   ],
   "skupina": "spojenci",
-  "fokus": "31% 30%"
+  "fokus": "42% 30%"
  },
  {
   "id": "finian",
@@ -698,7 +698,7 @@
    "txt:NPC_doplnene"
   ],
   "skupina": "nepřátelé",
-  "fokus": "47% 30%"
+  "fokus": "58% 30%"
  },
  {
   "id": "yamun-ii",
@@ -1085,6 +1085,6 @@
    "s-2026-08-01"
   ],
   "skupina": "nadhled",
-  "fokus": "31% 30%"
+  "fokus": "44% 30%"
  }
 ]

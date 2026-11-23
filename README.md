@@ -39,6 +39,16 @@ Zdroje: `SRC_SVEDECTVI`, `SRC_VOICES`, `SRC_VID`, `SRC_HYMNA` (proměnné prost�
 - **Režim dokument** (`data/dokument.json`): knihy I–V, střídání spojenců, nepřátel a hlasů z nadhledu, mezi nimi střihy na mapu s trasou a malby bitev; Elminster je závěr.
 - Pole v `data/svedectvi.json`: `id`, `jmeno`, `role`, `strana`, `skupina` (`spojenci`/`nepřátelé`/`neutrální`/`nadhled`), `vazba`, `portret`, `fokus`, `hlas_popis`, `text` (pole vět), `zdroje` (`s-…` sezení, `b-…` bitva, `txt:…` text hráče, `hymna`), případně `stav`, `stav_titulek`.
 
+## Svědectví jako galerie a režim Dokument
+
+- **Galerie** (`src/sections/witness.js`): skupiny Spojenci / Nepřátelé / Mocní Faerûnu, jmenovka (jméno, role, vztah k družině), stav živý / padlý / zmizelý (padlí ztlumení s křížkem a rokem; rok, místo a zdroj v `data/svedkove-stav.json`). Přehrávač: video ve smyčce, hlas, titulky podle `timing.json` po větách, pauza, další svědek, +10/−10 s, hlasitost, automatické pokračování ve zvoleném „střihu“.
+- **Zvuk po kliknutí:** `src/lib/audio.js` drží jediný sdílený `<audio>` (v DOM, `window.__voice`), odemčený prvním gestem kdekoli na stránce (Safari/iOS). Videa jsou `muted playsinline loop`, zvuk jde z audia.
+- **Dokument** (`src/sections/film.js`, `src/lib/wstage.js`, `data/dokument.json`): celoobrazovkový film asi 14 minut (s hymnou 20), úvod, pět knih (mapa s trasou, tři malby s pomalou kamerou, dva svědci, mezititulek s rokem), finále (Rivalen, Elminster, závěrečná karta), poděkování Pánu jeskyně a klip hymny. Ovládání: mezerník, šipky (±10 s), Esc, N/P, časová osa s kapitolami, titulky zap/vyp. Ladicí API `window.__film`.
+- Struktura `dokument.json`: `uvod`, `knihy[] {key, ch, malby[3], sv[], rok{r,t}}`, `finale {malba, sv[]}`, `konec`, `hymna {video, poster}`.
+- Hráčské postavy nemají svědectví, hlas ani video; hlídá to `python3 scripts/test-players.py`.
+- Testy (po `npm run build` a `npx vite preview --port 4173`): `scripts/test-it4-audio.py`, `test-it4-witness.py`, `test-it4-film.py` (`FILM_FULL=1` projde celý film zrychleně, ~6 min), `shots4.py` (snímky, přetékání, dotykové cíle; `/home/claude/webshots/it4/`).
+- Mobil: spodní lišta (Příběh, Mapa, Svědectví, Dokument, Další), `100dvh`, `env(safe-area-inset-*)`, dotykové cíle ≥ 44 px.
+
 ## Hymna a poděkování
 
 Hymna „Rauko“: hlavním přehrávačem je videoklip `public/hymna/rauko_klip.mp4` (1280×720, H.264 crf 31, faststart, ~39 MB) s plakátem `rauko_klip.jpg`; pod ním se zvýrazňuje text podle videa. Záložní hudební přehrávač: `assets/hymna/rauko.mp3`, text a časy řádků v `data/hymna.json` (z `/home/claude/hymna/rauko.txt`; časy z `timing.json` ve zdrojové složce (`sekce[].radky[].start`, případně pole 47 čísel), jinak z `data/hymna-timing.json` (odhad z automatického přepisu)). Přehrávač má play/pauzu, posuv, hlasitost, zvýraznění řádku a sloky, klik na řádek skočí na řádek; vizuál reaguje na hlasitost (WebAudio analyser). Když ve složce hymny existuje `rauko_klip.mp4`, po `build-media.py` se nabídne „Videoklip“. Poděkování je `data/podekovani.txt` beze změn.

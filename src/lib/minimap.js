@@ -35,5 +35,5 @@ export function routeSvg(idx, { aspect = 2.2, pad = 70, minW = 520, cls = 'mc', 
     ${pts.map((p, i) => `<circle cx="${p.x}" cy="${p.y}" r="${((i === 0 || i === pts.length - 1 ? 6 : 4) * sc).toFixed(1)}" class="${cls}-pt" style="animation-delay:${(0.3 + (i / pts.length) * 2.4).toFixed(2)}s"/>`).join('')}
     ${labels}
   </svg>`;
-  return { svg, names, era: pts[0].era };
+  return { svg, names, era: pts[0].era, box: { w, h, rw: Math.max(...xs) - Math.min(...xs), rh: Math.max(...ys) - Math.min(...ys) } };
 }

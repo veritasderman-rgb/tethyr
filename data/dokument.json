@@ -1,201 +1,112 @@
 {
- "popis": "Dramaturgie režimu „Přehrát vše jako dokument“: knihy I–V, střídání spojenců, nepřátel a hlasů z nadhledu; mezi nimi střihy na mapu (úsek trasy jedné kapitoly, pole „ch“) a malby bitev. Elminster je závěr.",
- "scenar": [
+ "popis": "Dramaturgie filmu (režim Dokument, sections/film.js): úvod, pět knih (titulek knihy, mapa s trasou jedné kapitoly, malby s pomalým pohybem kamery, svědkové přítel i nepřítel, mezititulek s letopočtem), finále (Rivalen, Elminster), závěrečná karta, poděkování Pánu jeskyně a hymna. Svědkové jsou jen vedlejší postavy.",
+ "uvod": {
+  "k": "Kronika Tethyrské královské družiny",
+  "t": "Západní draci",
+  "r": "1372–1385 DR · u stolu 2003–2026",
+  "bg": "ilu/D_01"
+ },
+ "knihy": [
   {
-   "k": "kniha",
    "key": "I",
-   "ch": "ch-stity-apokalypsy"
+   "ch": "ch-stity-apokalypsy",
+   "malby": [
+    "ilu/K_001",
+    "ilu/K_004",
+    "ilu/K_024"
+   ],
+   "sv": [
+    "thalaxia",
+    "finian"
+   ],
+   "rok": {
+    "r": "1377 DR",
+    "t": "Bitva o Tvář vědění. Ho se jí jako jediný nezúčastnil, Varion se ztratil v Šedých pláních. Pak šel každý svou cestou."
+   }
   },
   {
-   "k": "sv",
-   "id": "thalaxia"
-  },
-  {
-   "k": "sv",
-   "id": "finian"
-  },
-  {
-   "k": "sv",
-   "id": "kung-lao"
-  },
-  {
-   "k": "bitva",
-   "id": "b-valka-s-tuiganskou-hordou"
-  },
-  {
-   "k": "sv",
-   "id": "yamun-ii"
-  },
-  {
-   "k": "sv",
-   "id": "zako"
-  },
-  {
-   "k": "sv",
-   "id": "yamoh-hokhra"
-  },
-  {
-   "k": "sv",
-   "id": "chuang-li"
-  },
-  {
-   "k": "bitva",
-   "id": "b-bitva-o-tvar-vedeni"
-  },
-  {
-   "k": "kniha",
    "key": "II",
-   "ch": "ch-draci-let-a-knihovna-arenkae"
+   "ch": "ch-bitva-o-rudou-pevnost",
+   "malby": [
+    "ilu/K_011",
+    "ilu/K_027",
+    "ilu/K_012"
+   ],
+   "sv": [
+    "ruda-rytirka",
+    "devrel"
+   ],
+   "rok": {
+    "r": "1383 DR",
+    "t": "Bitva o Rudou pevnost: Horda byla odražena, ale padla Rudá rytířka a družina ztratila Variona."
+   }
   },
   {
-   "k": "bitva",
-   "id": "b-bitva-o-rudou-pevnost"
-  },
-  {
-   "k": "sv",
-   "id": "ruda-rytirka"
-  },
-  {
-   "k": "sv",
-   "id": "khelbenova-dcera"
-  },
-  {
-   "k": "sv",
-   "id": "sar-saratar"
-  },
-  {
-   "k": "sv",
-   "id": "jenova"
-  },
-  {
-   "k": "sv",
-   "id": "gareth"
-  },
-  {
-   "k": "sv",
-   "id": "devrel"
-  },
-  {
-   "k": "bitva",
-   "id": "b-bitva-o-tethyrske-drzavy"
-  },
-  {
-   "k": "sv",
-   "id": "kenshi"
-  },
-  {
-   "k": "sv",
-   "id": "hasagi"
-  },
-  {
-   "k": "sv",
-   "id": "seung-mina"
-  },
-  {
-   "k": "sv",
-   "id": "asaman"
-  },
-  {
-   "k": "kniha",
    "key": "III",
-   "ch": "ch-runovladci-a-shoonach"
+   "ch": "ch-runovladci-a-shoonach",
+   "malby": [
+    "ilu/K_013",
+    "ilu/K_028",
+    "ilu/K_014"
+   ],
+   "sv": [
+    "turfin",
+    "isis"
+   ],
+   "rok": {
+    "r": "1384 DR",
+    "t": "Stopa Runovládců vedla do ruin Shoonachu, kde družina utekla podzemím před runodraky. V Halruaa pak osvobodila Betridala."
+   }
   },
   {
-   "k": "sv",
-   "id": "honda"
-  },
-  {
-   "k": "sv",
-   "id": "isis"
-  },
-  {
-   "k": "sv",
-   "id": "betridal"
-  },
-  {
-   "k": "sv",
-   "id": "turfin"
-  },
-  {
-   "k": "bitva",
-   "id": "b-bitva-u-velke-trhliny"
-  },
-  {
-   "k": "sv",
-   "id": "alusair"
-  },
-  {
-   "k": "kniha",
    "key": "IV",
-   "ch": "ch-prvni-dungeony-a-arborea"
+   "ch": "ch-prvni-dungeony-a-arborea",
+   "malby": [
+    "ilu/K_015",
+    "ilu/K_016",
+    "ilu/K_031"
+   ],
+   "sv": [
+    "axel-adamantis",
+    "gatrya"
+   ],
+   "rok": {
+    "r": "1384 DR",
+    "t": "Tažení skončilo velkou bitvou u Velké trhliny po boku trpaslíků krále Húrina."
+   }
   },
   {
-   "k": "sv",
-   "id": "gatrya"
-  },
-  {
-   "k": "bitva",
-   "id": "b-pad-sundabaru"
-  },
-  {
-   "k": "sv",
-   "id": "alustriel"
-  },
-  {
-   "k": "sv",
-   "id": "axel-adamantis"
-  },
-  {
-   "k": "kniha",
    "key": "V",
-   "ch": "ch-thultanthar-a-pyramida-casu"
-  },
-  {
-   "k": "sv",
-   "id": "agathon"
-  },
-  {
-   "k": "sv",
-   "id": "simbul"
-  },
-  {
-   "k": "sv",
-   "id": "arwin"
-  },
-  {
-   "k": "sv",
-   "id": "iryklathagra"
-  },
-  {
-   "k": "sv",
-   "id": "mitsurugy"
-  },
-  {
-   "k": "bitva",
-   "id": "b-bitva-v-anaurochu"
-  },
-  {
-   "k": "sv",
-   "id": "seltar"
-  },
-  {
-   "k": "bitva",
-   "id": "b-utok-na-thultanthar"
-  },
-  {
-   "k": "sv",
-   "id": "rivalen"
-  },
-  {
-   "k": "bitva",
-   "id": "b-posledni-souboj-na-pyramide-casu"
-  },
-  {
-   "k": "sv",
-   "id": "elminster"
-  },
-  {
-   "k": "konec"
+   "ch": "ch-thultanthar-a-pyramida-casu",
+   "malby": [
+    "ilu/K_017",
+    "ilu/K_019",
+    "ilu/K_033"
+   ],
+   "sv": [
+    "arwin",
+    "seltar"
+   ],
+   "rok": {
+    "r": "1385 DR",
+    "t": "Aliance o 49 630 mužích a 11 dracích nastoupila u Orofinu. Bitva v Anaurochu skončila vítězstvím za cenu poloviny vojsk."
+   }
   }
- ]
+ ],
+ "finale": {
+  "malba": "ilu/K_034",
+  "sv": [
+   "rivalen",
+   "elminster"
+  ]
+ },
+ "konec": {
+  "k": "Konec",
+  "t": "Kronika Tethyrské královské družiny",
+  "r": "1372–1385 DR · u stolu 2003–2026"
+ },
+ "hymna": {
+  "video": "hymna/rauko_klip.mp4",
+  "poster": "hymna/rauko_klip.jpg"
+ }
 }

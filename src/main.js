@@ -35,6 +35,8 @@ import { renderRegistry } from './sections/registry.js';
 import { renderTable } from './sections/table.js';
 import { renderHymna } from './sections/hymna.js';
 import { renderPodekovani } from './sections/podekovani.js';
+import { initFilm } from './sections/film.js';
+import './lib/audio.js';
 
 // Oddíly a data, která potřebují (načítají se až při přiblížení k oddílu).
 register('uvod', renderHero, ['images', 'stats']);
@@ -53,16 +55,17 @@ register('podekovani', renderPodekovani, ['images']);
 function nav() {
   const bar = $('#topbar');
   const btn = $('#menuBtn');
+  const more = $('#moreBtn');
   const menu = $('#mainNav');
-  btn.addEventListener('click', () => {
-    const o = btn.getAttribute('aria-expanded') !== 'true';
-    btn.setAttribute('aria-expanded', o); menu.classList.toggle('open', o);
-  });
-  menu.addEventListener('click', (e) => { if (e.target.closest('a')) { btn.setAttribute('aria-expanded', 'false'); menu.classList.remove('open'); } });
+  const setOpen = (o) => { [btn, more].forEach((b) => b.setAttribute('aria-expanded', o)); menu.classList.toggle('open', o); document.body.classList.toggle('nav-open', o); };
+  [btn, more].forEach((b) => b.addEventListener('click', () => setOpen(b.getAttribute('aria-expanded') !== 'true')));
+  menu.addEventListener('click', (e) => { if (e.target.closest('a, button')) setOpen(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && menu.classList.contains('open')) setOpen(false); });
+  document.addEventListener('pointerdown', (e) => { if (menu.classList.contains('open') && !e.target.closest('#mainNav, #moreBtn, #menuBtn')) setOpen(false); });
   const onScroll = () => bar.classList.toggle('solid', window.scrollY > window.innerHeight * 0.6);
   window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
   // zvýraznění aktivního oddílu
-  const links = $$('a', menu);
+  const links = [...$$('a', menu), ...$$('a', $('#bottomNav'))];
   const io = new IntersectionObserver((ents) => {
     for (const e of ents) if (e.isIntersecting) links.forEach((a) => a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id));
   }, { rootMargin: '-45% 0px -50% 0px' });
@@ -81,6 +84,7 @@ function sectionOf(hash) {
 
 async function boot() {
   nav();
+  initFilm();
   try {
     await need('images', 'stats');
     await ensure('uvod');

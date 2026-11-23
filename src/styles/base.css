@@ -85,12 +85,15 @@ figcaption { font: 400 .78rem/1.4 var(--f-ui); color: var(--parch-faint); paddin
 .mainnav { margin-left: auto; display: flex; gap: clamp(10px, 1.4vw, 22px); }
 .mainnav a { font: 500 .74rem/1 var(--f-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--parch-dim); text-decoration: none; padding: 6px 0; border-bottom: 1px solid transparent; transition: color .2s, border-color .2s; }
 .mainnav a:hover, .mainnav a.on { color: var(--parch); border-color: var(--gold); }
+.nav-film { font: 500 .72rem/1 var(--f-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--parch); background: rgba(139, 30, 30, .6); border: 1px solid var(--red2); padding: 8px 12px; cursor: pointer; transition: background .2s; white-space: nowrap; }
+.nav-film:hover { background: var(--red2); }
 .menu-btn { display: none; margin-left: auto; width: 42px; height: 42px; background: none; border: 0; cursor: pointer; padding: 10px; }
 .menu-btn span { display: block; height: 1.5px; background: var(--parch); margin: 5px 0; transition: transform .3s, opacity .3s; }
 @media (max-width: 1080px) {
   .menu-btn { display: block; }
-  .mainnav { position: fixed; inset: var(--nav-h) 0 auto; flex-direction: column; gap: 0; background: rgba(18, 16, 13, .97); padding: 8px 24px 20px; transform: translateY(-120%); transition: transform .4s var(--ease); border-bottom: 1px solid var(--line); }
-  .mainnav.open { transform: none; }
+  .mainnav { position: fixed; inset: var(--nav-h) 0 auto; flex-direction: column; gap: 0; background: rgba(18, 16, 13, .97); padding: 8px 24px 20px; transform: translateY(-120%); visibility: hidden; transition: transform .4s var(--ease), visibility 0s .4s; border-bottom: 1px solid var(--line); }
+  .mainnav.open { transform: none; visibility: visible; transition-delay: 0s; }
+  .nav-film { margin-top: 12px; padding: 14px; font-size: .8rem; }
   .mainnav a { padding: 14px 0; font-size: .85rem; border-bottom: 1px solid rgba(168, 132, 44, .14); }
   .menu-btn[aria-expanded="true"] span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
   .menu-btn[aria-expanded="true"] span:nth-child(2) { opacity: 0; }

@@ -26,7 +26,7 @@ export function renderHero() {
       <h1 class="hero-t rv d1"><span>Západní</span> <span>draci</span></h1>
       <p class="hero-y rv d2"><b>1372–1385</b> letopočtu Údolí <i>·</i> u stolu <b>2003–2026</b></p>
       <p class="hero-p rv d2">Třiadvacet let jedné kampaně ve Forgotten Realms. Od garáže v Lázních Kynžvartě po poslední souboj na vrcholu Pyramidy času. Vyprávějí ti, kdo u toho byli, přátelé i nepřátelé.</p>
-      <div class="hero-cta rv d3"><a class="btn red" href="#pribeh">Vstoupit do příběhu</a><a class="btn" href="#svedectvi" data-doc>Svědectví ▸</a></div>
+      <div class="hero-cta rv d3"><a class="btn red" href="#pribeh">Vstoupit do příběhu</a><button class="btn" type="button" data-film>▶ Dokument · 15 min</button><a class="btn ghost" href="#svedectvi" data-doc>Svědectví ▸</a></div>
       <p class="hero-more rv d3"><a href="#mapa3d">3D mapa Faerûnu</a><i>·</i><a href="#hymna">Hymna družiny</a><i>·</i><a href="#podekovani">Poděkování</a></p>
       ${pos?.ch && pos.n > 1 ? `<p class="hero-cont rv d3"><a href="#${esc(pos.ch)}">Pokračovat ve čtení · kapitola ${+pos.n}: ${esc(pos.title || '')} ▸</a></p>` : ''}
     </div>
