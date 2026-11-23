@@ -178,6 +178,7 @@ export function renderWitness() {
     loading = true; wantPlay = false;
     cancelNext();
     stopVoice(); hasAudio = false;
+    if (state === 'play') state = 'pause';   // předchozí svědek už nehraje
     cancelAnimationFrame(raf);
     curId = w.id;
     if (document.body.dataset.page === 'svedectvi' && location.pathname !== witPath(w.id)) { history.replaceState(history.state, '', witPath(w.id)); syncMeta(); }
@@ -235,7 +236,7 @@ export function renderWitness() {
     voice.pause(); stage.freeze(true); stage.sync(acc, false);
     ui();
   }
-  const toggle = () => (state === 'play' ? pause() : play());
+  const toggle = () => (loading ? play() : state === 'play' ? pause() : play());
   function end() {
     state = 'end'; ui();
     stage.lower.classList.remove('in');
