@@ -256,3 +256,49 @@ Seřazeno podle dopadu. **V** = vysoký, **S** = střední; všechny V a S jsou 
 3. **Časy veršů jsou ze strojového rozpoznání** (zarovnání 94–97 % slov); u veršů s přeslechy může zvýraznění přeskočit o zlomek sekundy dřív nebo později, ruční kontrola poslechem neproběhla.
 4. **Repo je pod limitem jen o 4 MB** (145,7 MB) a historie gitu roste (hlasy svědků překódované na 64 kb/s se do historie přidaly znovu); další média se vejdou jen na úkor stávajících.
 5. **Přepis odkazů je dvojí**: část šablon dál generuje staré kotvy a na nové adresy je převádí router (MutationObserver); funguje to všude, kde se testovalo, ale nové kódy by měly psát rovnou nové adresy (`chPath`, `sesPath`, `witPath` … v `router.js`).
+
+---
+
+## Iterace 9: jiné prohlížeče, kontrola faktů a jazyka, náhledy pro sdílení, logo
+
+### Prohlížeče
+- `scripts/browsers.py` (`BROWSER=chromium|firefox|webkit`, `DEVICE=iphone|pixel`) používají všechny testy; `scripts/run-all.sh` pustí celou sadu v jednom prohlížeči. Nainstalováno `npx playwright install firefox webkit`.
+- Mobilní emulace: WebKit jako iPhone 13, Chromium jako Pixel 7.
+- Opraveno kvůli Safari/Firefoxu: sdílený `<audio>` se odemyká prvním gestem, videa svědků mají `playsinline` a `muted` (zvuk jde z jediného přehrávače), `-webkit-backdrop-filter` ke všem rozmazaným plochám, `100vh` s `100dvh` pod `@supports`, animace řízené posunem (`animation-timeline`) mají náhradu přes IntersectionObserver, první Esc ve fullscreenu Firefox/Safari spotřebuje (test Dokumentu mačká dvakrát).
+- Šum v konzoli, který není chyba webu (Firefoxí hlášení o glyfech písma Cardo, WebGL stall), filtruje `noise()` v testech.
+- Firefox a WebKit v headless režimu tady nemají WebGL, test 3D mapy se v nich přeskočí s hláškou SKIP; plná 3D mapa je ověřena v Chromiu.
+
+### Kontrola faktů (`scripts/fakta.py`, součást buildu, při porušení build selže)
+Hlídá nad zdrojovými daty i vygenerovanými `public/data` a šablonami: Kung Lao padl ve Feng Asay a přebývá v Broskvové zahradě; Chuang-Li zrádce zabitý Hoem a v zahradě není; Wang Fei-Hung vězněm Chuang-Liho (astrálně v zahradě); Lord Ryden; Arduna; Yamoh a Sar Saratar v bitvě u Anauroch; Rivalen × Rauko na Pyramidě času; Seung Mina = Hoova žena; Khelben zmizel, dcera; „Ho Wu Long“ všude; PJ = Zdeněk T.; hráči jen křestním jménem; žádný Granan Silverkin; žádné svědectví, hlas ani video hráčské postavy; shoda českých titulků svědků s `svedectvi_v3.json`.
+
+**Opravené rozpory (u zdroje, v `scripts/upresneni.py`, `build-lexikon.py`, `data/vypraveni`):**
+1. Rydenovo cvičení cesty vzduchu proběhlo v Broskvové zahradě, Ryden už byl mrtvý (zabil ho Chuang-Li); Ryden vedený mezi padlými; vyprávění, Lexikon (Ryden, Broskvová zahrada), časová osa.
+2. „broskvová zahrada“ v sezení 1380 DR je totéž místo jako Broskvová zahrada: velké B, odkaz do Lexikonu.
+3. Ho Wu Long bojoval u Anauroch (Yamoh), na Pyramidě času finále vedl Rauko: opraveno u postavy a v shrnutí bitvy.
+4. Souboje Ho × Yamoh a Elminster × Sar Saratar patřily k bitvě u Anauroch, ne k Pyramidě času (přesunuty).
+5. Aliasy „Ho Wu Lung“ odstraněn; všude „Ho Wu Long“.
+6. Zápis „Chuang-li“ sjednocen na „Chuang-Li“, „lord Ryden“ na „Lord Ryden“ (včetně skloňování).
+7. Chuang-Li už nikde nestojí v Broskvové zahradě mezi obyvateli.
+8. Svědkové s vazbou na Rivalena a Arwin dostali správné napojení (Rauko na pyramidě).
+9. Chybějící mezera po čárce u jednotek bitvy (`2× létací loď,obléhací stroje`) – oprava obecně při sestavení dat.
+
+### Jazyk (`scripts/jazyk.py`, `--strict` selže na tvrdých pravidlech)
+Rovné uvozovky, spojovník místo pomlčky, tři tečky, dvojité mezery, mezera před interpunkcí, zdvojená slova: 0 nálezů. Nezlomitelné mezery po jednopísmenných předložkách a mezi číslem a jednotkou doplňuje za běhu `src/lib/nbsp.js` (MutationObserver nad celým webem), takže se týká i textů z dat. České titulky svědků se nemění.
+
+### Logo
+Logo bylo znak chrámu. Nahrazeno originálním jednoduchým heraldickým drakem (`src/assets/draci.svg`, jeden zdroj → `src/lib/logo.js` pro menu i horní lištu, `build-icons.py` z něj generuje favicon, apple-touch-icon a OG). Znak chrámu zůstává jen u Chrámu Západního úsvitu. Logo má `aria-label="Západní draci"`; testy hlídají logo na každé stránce i v menu a že se jako logo nepoužívá chrám.
+
+### Dluh z iterace 8
+- Šablony píšou nové adresy přímo (`H()` s `href="${H(`#…`)}"`); router převádí staré kotvy jen kvůli zpětné kompatibilitě.
+- Vlastní náhledy pro sdílení: předgenerované HTML (`dist/<adresa>/index.html`) s vlastním `title`, `description`, `og:title`, `og:description`, `og:image` pro `/pribeh`, `/pribeh/kniha-1…5`, `/druzina`, `/svedectvi`, `/bitvy`, `/mapa`, `/proroctvi`, `/osa`, `/lexikon`, `/u-stolu`, `/hymna`, `/dokument`, `/podekovani` (17 adres, 17 obrázků 1200×630 v `public/img/og/`) a výslovná pravidla ve `vercel.json`.
+- Přehrávač svědka v 3D mapě umí titulky CS / EN / vypnuto sdílené s webem a dodržuje pravidlo jednoho zvuku (`postMessage`: `zd:sound`, `zd:pause`, `zd:submode`).
+
+### Testy
+`scripts/test-it9.py` (logo, náhledy, titulky v 3D mapě, jeden zvuk). Chromium: it9 38/38. Výsledky ostatních prohlížečů viz níže.
+
+### 5 největších zbývajících slabin
+1. **Hlasová svědectví Seltara, Khelbenovy dcery a Arwin** (nahrané dřív) implikují Hoa na vrcholu pyramidy; text je opraven, zvuk by se musel nahrát znovu.
+2. **Firefox a WebKit bez WebGL v tomto prostředí**: 3D mapa tam není ověřena, na skutečném Safari/iOS a telefonu se nic netestovalo.
+3. **Časy veršů proroctví** jsou ze strojového rozpoznání (zarovnání 94–97 %).
+4. **Repo (143 MB bez git historie) je těsně pod limitem 150 MB**, historie gitu dál roste.
+5. **Nezlomitelné mezery se doplňují za běhu**: v předgenerovaném HTML pro crawlery a bez JavaScriptu zůstanou běžné mezery; fakta i jazyk se hlídají nad daty, ne nad hlasovým zněním.
