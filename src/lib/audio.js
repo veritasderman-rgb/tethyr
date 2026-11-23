@@ -88,8 +88,10 @@ export function release(name) { if (owner === name) { owner = null; ownerLost = 
 document.addEventListener('play', (e) => {
   const m = e.target;
   if (!(m instanceof HTMLMediaElement) || m.muted) return;
-  for (const x of document.querySelectorAll('audio, video')) if (x !== m && !x.paused && !x.muted) x.pause();
-  if (m !== voice && owner) { const f = ownerLost; owner = null; ownerLost = null; try { f?.(); } catch (er) { console.error(er); } }
+  // film (Dokument) řídí své zvuky sám: jeho klip hymny nesmí film „připravit“ o hlas ani ho pozastavit
+  const inFilm = !!m.closest?.('#film');
+  for (const x of document.querySelectorAll('audio, video')) if (x !== m && !x.paused && !x.muted && !(inFilm && (x === voice || x.closest('#film')))) x.pause();
+  if (m !== voice && owner && !(inFilm && owner === 'dokument')) { const f = ownerLost; owner = null; ownerLost = null; try { f?.(); } catch (er) { console.error(er); } }
 }, true);
 
 /** Plynulé ztišení sdíleného hlasu a pauza (odchod ze stránky). */
