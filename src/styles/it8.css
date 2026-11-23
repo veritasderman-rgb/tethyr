@@ -177,3 +177,22 @@ body[data-page="proroctvi"] .nextp { margin-bottom: 110px; }
 .pr-film-t b { font: 600 1.15rem/1.15 var(--f-title, 'Cinzel', serif); letter-spacing: .04em; color: #f3d27a; }
 .pr-film-t small { font: 400 .85rem/1.35 var(--f-ui); color: var(--parch-dim); }
 @media (max-width: 520px) { .pr-film { flex-direction: column; } .pr-film-pic { flex-basis: auto; aspect-ratio: 16 / 7; } }
+
+/* iterace 10: protějšek „Zpět“ k přechodu „Dál“ */
+.nextp-prev { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin: 0 auto 10px; padding: 0 12px; font: 500 .78rem/1 var(--f-ui); letter-spacing: .08em; color: var(--parch-dim); text-decoration: none; }
+.nextp-prev span { text-transform: uppercase; letter-spacing: .16em; color: var(--gold2, #c9a54a); }
+.nextp-prev:hover, .nextp-prev:focus-visible { color: var(--parch); }
+.nextp { display: flex; flex-direction: column; align-items: center; }
+.nextp > .nextp-a { align-self: stretch; }
+/* časová osa: nápověda k posouvání */
+.tl-hint { margin: 0; font: 400 .8rem/1.3 var(--f-ui); color: var(--parch-dim); display: flex; gap: 8px; align-items: center; transition: opacity .6s; }
+.tl-hint span { color: var(--gold2, #c9a54a); animation: tlNudge 1.8s ease-in-out infinite alternate; }
+.tl-hint.used { opacity: .45; }
+.tl-hint[hidden] { display: none; }
+@keyframes tlNudge { to { transform: translateX(4px); } }
+@media (prefers-reduced-motion: reduce) { .tl-hint span { animation: none; } }
+@media (max-width: 760px) { .tl-hint { display: none; } }
+/* Svědectví: na mobilu kratší úvod, přehrávač dřív na obrazovce */
+@media (max-width: 760px) { #svedectvi .sec-head .lead .lead-more { display: none; } }
+.lx-note { list-style: none; grid-column: 1 / -1; padding: 12px 14px; font: 400 .9rem/1.4 var(--f-ui); color: var(--parch-dim); border: 1px dashed rgba(201, 165, 74, .4); }
+.lx-note .btn { margin-left: 8px; }

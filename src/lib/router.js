@@ -224,7 +224,7 @@ async function show(r, ctx = {}) {
   if (my !== seq) return;
   const m = metaOf(r);
   renderCrumbs(m.crumbs);
-  renderNext(m.next, r);
+  renderNext(m.next, r, m.prev);
   document.title = m.title;
   setMeta(m.page, location.pathname, m.desc);
   if (ctx.pop && history.state?.y != null) {
@@ -255,7 +255,7 @@ function setMeta(page, path, desc) {
 function metaOf(r) {
   const page = pageById(r.page) || EXTRA.nenalezeno;
   const own = moduleOf(r.page)?.meta?.(r);
-  if (own) return { page, crumbs: own.crumbs || [], title: own.title || `${page.label} · ${SITE}`, next: own.next || nextAfter(r.page), desc: own.desc };
+  if (own) return { page, crumbs: own.crumbs || [], title: own.title || `${page.label} · ${SITE}`, next: own.next || nextAfter(r.page), desc: own.desc, prev: own.prev !== undefined ? own.prev : (r.page === 'pribeh' && (r.book || r.ch)) || r.sub ? null : prevBefore(r.page) };
   const crumbs = [];
   let leaf = null;
   if (r.page === 'm3d') { crumbs.push(['Mapa', '/mapa'], ['3D mapa', null]); leaf = '3D mapa'; }
@@ -269,7 +269,14 @@ function metaOf(r) {
   }
   if (r.page === 'm3d') leaf = null;
   const title = r.page === 'm3d' ? `3D mapa · Mapa · ${SITE}` : r.page === 'uvod' ? `${SITE} – kronika Tethyrské královské družiny` : leaf ? `${leaf} · ${page.label} · ${SITE}` : `${page.label} · ${SITE}`;
-  return { page, crumbs, title, next: nextAfter(r.page === 'm3d' ? 'mapa' : r.page) };
+  return { page, crumbs, title, next: nextAfter(r.page === 'm3d' ? 'mapa' : r.page), prev: r.sub || r.page === 'm3d' ? null : prevBefore(r.page) };
+}
+/** Předchozí stránka v pořadí menu (protějšek „Dál“, iterace 10). Úvod a 404 ho nemají. */
+export function prevBefore(id) {
+  const i = PAGES.findIndex((p) => p.id === id);
+  if (i <= 0) return null;
+  const p = PAGES[i - 1];
+  return { href: p.path, label: p.label };
 }
 export function nextAfter(id) {
   if (id === 'nenalezeno') return { href: '/', label: 'Úvod', sub: 'Začít od začátku' };
@@ -285,12 +292,12 @@ function renderCrumbs(list) {
   nav.hidden = false;
   nav.innerHTML = `<ol>${list.map(([t, h], i) => `<li>${h && i < list.length - 1 ? `<a href="${esc(h)}">${esc(t)}</a>` : `<span aria-current="page">${esc(t)}</span>`}</li>`).join('')}</ol>`;
 }
-function renderNext(n, r) {
+function renderNext(n, r, pv) {
   const box = $('#nextPage');
   if (!box) return;
-  if (!n || r.page === 'uvod' && false) { box.hidden = true; return; }
+  if (!n) { box.hidden = true; return; }
   box.hidden = false;
-  box.innerHTML = `<a class="nextp-a" href="${esc(n.href)}"${n.href === '/dokument' ? ' data-film-link' : ''}><span class="nextp-k">${esc(n.k || 'Dál')}</span><b>${esc(n.label)}</b>${n.sub ? `<small>${esc(n.sub)}</small>` : ''}<i aria-hidden="true">→</i></a>`;
+  box.innerHTML = (pv ? `<a class="nextp-prev" href="${esc(pv.href)}"><i aria-hidden="true">←</i> <span>Zpět:</span> ${esc(pv.label)}</a>` : '') + `<a class="nextp-a" href="${esc(n.href)}"${n.href === '/dokument' ? ' data-film-link' : ''}><span class="nextp-k">${esc(n.k || 'Dál')}</span><b>${esc(n.label)}</b>${n.sub ? `<small>${esc(n.sub)}</small>` : ''}<i aria-hidden="true">→</i></a>`;
 }
 function renderNotFound(el) {
   el.innerHTML = `<header class="sec-head"><p class="kicker">Chyba 404</p><h1 tabindex="-1">Tahle stránka v kronice není</h1>

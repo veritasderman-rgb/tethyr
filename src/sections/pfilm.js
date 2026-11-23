@@ -186,7 +186,7 @@ function create() {
     g.fill(new Path2D('M3 22 L10 17 L15 15 L26 5 L21 16 C24 20 26 26 28 30 C32 34 38 34 42 36 C48 38 52 42 54 48 C55 52 58 53 60 50 L58 47 L63 44 L63 51 C62 57 53 58 49 52 L47 49 L49 56 L54 60 L43 60 L41 52 C36 53 30 51 27 47 L24 45 L17 47 L15 43 L21 40 C21 35 19 30 17 27 L12 27 L5 28 L10 24 Z'));
     g.fill(new Path2D('M27 31 L33 12 L45 1 Q44 8 46.5 12.5 Q50 8.5 55 7 Q53 13 54.5 18.5 Q58 16.5 63 17 Q58 21 57.5 26 Q59 30 61 33 Q52 33 44 35 C38 34 31 33 27 31Z'));
     const d = g.getImageData(0, 0, S, S).data, pts = [];
-    const step = LITE ? 3.4 : 2.1;
+    const step = LITE ? 3.4 : 2.4;
     const on = (x, y) => x >= 0 && y >= 0 && x < S && y < S && d[(Math.floor(y) * S + Math.floor(x)) * 4 + 3] > 128;
     for (let y = 0; y < S; y += step) for (let x = 0; x < S; x += step) {
       if (!on(x, y)) continue;

@@ -142,7 +142,7 @@ function chapterHtml(c, book, n, prev, next) {
   return `<section class="chap" id="${c.id}" data-ch="${c.id}" aria-labelledby="${c.id}-h">
     <div class="chap-tr" aria-hidden="true">${lead ? `<div class="chap-tr-img">${img(lead.k, { alt: '', sizes: '100vw', pos: '50% 40%' })}</div>` : ''}<span class="chap-tr-n">${n}</span></div>
     <header class="chap-h rv"><p class="chap-n">${esc(book.kap)} · kapitola ${n}</p><h1 id="${c.id}-h" tabindex="-1">${esc(c.title)}</h1>
-      <p class="chap-m"><span>${esc(real)} u stolu</span>${dr ? `<span>${esc(dr)}</span>` : ''}<span>${plural(list.length, 'sezení', 'sezení', 'sezení')}</span><span>čtení asi ${c.min} min</span></p></header>
+      <p class="chap-m"><span>${esc(real)} u stolu</span>${dr ? `<span>${esc(dr)}</span>` : ''}<span>${plural(list.length, 'sezení', 'sezení', 'sezení')}</span><span>čtení ${readMin(c.min)}</span></p></header>
     ${c.cast?.length ? `<p class="chap-cast rv"><b>Kdo hrál</b> ${c.cast.map(([ch, p]) => `<span>${esc(ch)}${p ? ` <i>${esc(p)}</i>` : ''}</span>`).join('')}</p>` : ''}
     <div class="chap-body">${body}</div>
     <div class="chap-x rv">
@@ -194,6 +194,9 @@ function changes(b, books) {
 let chs = [], view = null, stopReading = null;
 const chIndex = (id) => chs.findIndex((x) => x.c.id === id);
 
+/** Délka čtení (iterace 10): krátké kapitoly „méně než 2 minuty“ místo nepřesného „1 min“. */
+const readMin = (m, short = false) => (m <= 1 ? (short ? 'do 2 min' : 'méně než 2 minuty') : `${short ? '' : 'asi '}${m} min`);
+
 export function renderStory() {
   const el = $('#pribeh');
   chs = D.books.flatMap((b) => b.chapters.map((c) => ({ c, b })));
@@ -201,7 +204,7 @@ export function renderStory() {
     <div class="toc-bar" aria-hidden="true"><i id="tocBarI"></i></div>
     <nav class="toc" id="toc" aria-label="Obsah příběhu">
       <div class="toc-h"><b>Obsah</b><span id="tocPct">0 %</span><button class="toc-x" type="button" aria-label="Zavřít obsah">×</button></div>
-      <ol>${D.books.map((b) => `<li class="toc-b"><a href="${bookPath(b.key)}" class="toc-bk"><b>${b.key}</b> ${esc(b.title)}</a><ol>${b.chapters.map((c) => `<li><a href="${chPath(c.id)}" data-toc="${c.id}"><span class="tn">${chIndex(c.id) + 1}</span><span class="tt">${esc(c.title)}</span><span class="tm">${c.min}′</span><i style="--p:0"></i></a></li>`).join('')}</ol></li>`).join('')}</ol>
+      <ol>${D.books.map((b) => `<li class="toc-b"><a href="${bookPath(b.key)}" class="toc-bk"><b>${b.key}</b> ${esc(b.title)}</a><ol>${b.chapters.map((c) => `<li><a href="${chPath(c.id)}" data-toc="${c.id}"><span class="tn">${chIndex(c.id) + 1}</span><span class="tt">${esc(c.title)}</span><span class="tm">${c.min <= 1 ? '&lt;2′' : `${c.min}′`}</span><i style="--p:0"></i></a></li>`).join('')}</ol></li>`).join('')}</ol>
       <p class="toc-f">← → předchozí a další kapitola</p>
     </nav>
     <button class="toc-btn" id="tocBtn" type="button" aria-controls="toc" aria-expanded="false"><span>☰ Obsah</span><b id="tocBtnCh"></b></button>`;
@@ -256,9 +259,9 @@ function viewBook(b) {
       <div class="book-intro wrap-text">
         ${rest ? `<p class="lead rv">${esc(nb(rest))}</p>` : ''}
         <h2 class="book-toc-h">Kapitoly</h2>
-        <ol class="book-toc rv">${b.chapters.map((c) => { const i = chIndex(c.id); return `<li><a href="${chPath(c.id)}"${done.has(c.id) ? ' class="done"' : ''}><span>${i + 1}</span>${esc(c.title)}<i>${c.min} min${done.has(c.id) ? ' · přečteno' : ''}</i></a></li>`; }).join('')}</ol>
-        <div class="book-keys rv"><div><h3>Hlavní místa</h3><p>${b.key_places.map((x) => `<span class="chip">${esc(x)}</span>`).join(' ')}</p></div>
-        <div><h3>Protivníci</h3><p>${b.key_enemies.map((x) => `<span class="chip red">${esc(x)}</span>`).join(' ')}</p></div></div>
+        <ol class="book-toc rv">${b.chapters.map((c) => { const i = chIndex(c.id); return `<li><a href="${chPath(c.id)}"${done.has(c.id) ? ' class="done"' : ''}><span>${i + 1}</span>${esc(c.title)}<i>${readMin(c.min, true)}${done.has(c.id) ? ' · přečteno' : ''}</i></a></li>`; }).join('')}</ol>
+        <div class="book-keys rv"><div><h3>Hlavní místa</h3><p>${b.key_places.map((x) => `<a class="chip" href="/lexikon?q=${encodeURIComponent(x)}" title="${esc(x)} v Lexikonu">${esc(x)}</a>`).join(' ')}</p></div>
+        <div><h3>Protivníci</h3><p>${b.key_enemies.map((x) => `<a class="chip red" href="/lexikon?q=${encodeURIComponent(x.split(' a ')[0])}" title="${esc(x)} v Lexikonu">${esc(x)}</a>`).join(' ')}</p></div></div>
         ${b.side.map((c) => `<div class="side rv"><p class="side-k">Souběžně · ${esc(c.real)} u stolu · ${esc(c.dr)}</p><h3>${esc(c.title)}</h3><p>${esc(nb(c.summary))}</p></div>`).join('')}
       </div>
     </article>`;
@@ -325,13 +328,13 @@ export function meta(r) {
   if (!c) {
     const f = b.chapters[0];
     return { crumbs: [['Příběh', '/pribeh'], [bk, null]], title: `${b.kap} · ${b.title} · Příběh · Západní draci`, desc: b.summary.slice(0, 180),
-      next: { href: chPath(f.id), label: `Kapitola ${chIndex(f.id) + 1}: ${f.title}`, sub: `čtení asi ${f.min} min`, k: 'Začít číst' } };
+      next: { href: chPath(f.id), label: `Kapitola ${chIndex(f.id) + 1}: ${f.title}`, sub: `čtení ${readMin(f.min)}`, k: 'Začít číst' } };
   }
   const i = chIndex(c.id), nx = chs[i + 1];
   let next;
   if (!nx) next = { ...nextAfter('pribeh'), k: 'Dál' };
   else if (nx.b.key !== b.key) next = { href: bookPath(nx.b.key), label: `${nx.b.kap}: ${nx.b.title}`, sub: `${nx.b.chapters.length} kapitol · ${nx.b.real} u stolu` };
-  else next = { href: chPath(nx.c.id), label: `Kapitola ${i + 2}: ${nx.c.title}`, sub: `čtení asi ${nx.c.min} min` };
+  else next = { href: chPath(nx.c.id), label: `Kapitola ${i + 2}: ${nx.c.title}`, sub: `čtení ${readMin(nx.c.min)}` };
   return { crumbs: [['Příběh', '/pribeh'], [`Kniha ${b.key}`, bookPath(b.key)], [`Kapitola ${i + 1}: ${c.title}`, null]],
     title: `${c.title} · Příběh · Západní draci`, desc: `${b.kap}, kapitola ${i + 1}: ${c.title}. ${c.real} u stolu${c.drs ? `, ${c.drs}` : ''}.`, next };
 }

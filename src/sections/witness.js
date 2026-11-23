@@ -40,7 +40,7 @@ export function renderWitness() {
   const nVoice = all.filter((w) => VOICE_FILE[w.id]).length;
   const nDead = all.filter(isPast).length;
   el.innerHTML = `<header class="sec-head"><p class="kicker">Svědectví</p><h1 id="svedectvi-h" tabindex="-1">Hlasy z obou stran</h1>
-    <p class="lead">${all.length} lidí a bytostí, kteří družinu znali: spojenci, ${plural(nFoe, 'nepřítel', 'nepřátelé', 'nepřátel')} a ${plural(nMighty, 'mocný', 'mocní', 'mocných')} Faerûnu. ${nDead ? `${plural(nDead, 'z nich už nežije nebo zmizel', 'z nich už nežijí nebo zmizeli', 'z nich už nežije nebo zmizelo')}, jejich hlas je „z minulosti“. ` : ''}Mluví o tom, co s družinou zažili. Každé slovo se opírá o konkrétní hru, o hráčských postavách mluví ve třetí osobě.</p><div class="orn">✦</div></header>
+    <p class="lead">${all.length} lidí a bytostí, kteří družinu znali: spojenci, ${plural(nFoe, 'nepřítel', 'nepřátelé', 'nepřátel')} a ${plural(nMighty, 'mocný', 'mocní', 'mocných')} Faerûnu. <span class="lead-more">${nDead ? `${plural(nDead, 'z nich už nežije nebo zmizel', 'z nich už nežijí nebo zmizeli', 'z nich už nežije nebo zmizelo')}, jejich hlas je „z minulosti“. ` : ''}</span><span class="lead-more">Mluví o tom, co s družinou zažili. Každé slovo se opírá o konkrétní hru, o hráčských postavách mluví ve třetí osobě.</span></p><div class="orn">✦</div></header>
     <div class="w-stage" id="wStage" tabindex="0" aria-roledescription="přehrávač svědectví" aria-label="Přehrávač svědectví, mezerník přehraje nebo pozastaví">
       ${STAGE_HTML}
       <div class="w-tap" id="wTap" hidden><button class="btn red" data-act="play">▶ Spustit</button></div>

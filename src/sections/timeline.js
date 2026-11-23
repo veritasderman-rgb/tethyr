@@ -138,8 +138,9 @@ export function renderTimeline() {
   el.innerHTML = `<header class="sec-head"><p class="kicker">Časová osa</p><h1 id="osa-h" tabindex="-1">Dvojí čas</h1>
     <p class="lead">Nahoře léta u stolu, dole letopočet Údolí. Každá barevná linka je jedna postava a ten, kdo ji hrál. Tečky jsou sezení, klepnutím se otevřou v kronice.</p><div class="orn">✦</div></header>
     <div class="wrap tl-ctl"><div><button class="btn sm" data-z="-1" aria-label="Oddálit">−</button><button class="btn sm" data-z="1" aria-label="Přiblížit">+</button></div>
+      <p class="tl-hint ui" id="tlHint" aria-hidden="true"><span>←</span> Osa je širší než okno: posouvejte do stran (tažením, Shift + kolečko nebo šipkami) <span>→</span></p>
       <button class="btn sm" id="tlPaint">Malovaná osa ▸</button></div>
-    <div class="tl-scroll wrap" id="tlScroll" tabindex="0" aria-label="Časová osa, lze posouvat"></div>
+    <div class="tl-scroll wrap" id="tlScroll" tabindex="0" aria-label="Časová osa, lze posouvat do stran šipkami"></div>
     ${mobileHtml()}
     <div class="wrap tl-paint">
       <button class="tl-paint-btn" id="tlPaint2" aria-label="Otevřít malovanou osu"><span class="pic">${img('osa/osa_full', { alt: 'Malovaná časová osa Cesty Tethyrské královské družiny', sizes: '320px' })}</span><span><b>Cesta Tethyrské královské družiny</b><i>Malovaná osa, jak visí na zdi. Otevřít a přiblížit.</i></span></button>
@@ -154,7 +155,12 @@ export function renderTimeline() {
     box.innerHTML = svg(Math.round(base * z));
   };
   draw();
-  new ResizeObserver(() => { if (z === 1) draw(); }).observe(box);
+  // nápověda k posouvání (iterace 10): jen když je osa širší než okno, po prvním posunu zmizí
+  const hint = $('#tlHint', el);
+  const syncHint = () => { hint.hidden = box.scrollWidth <= box.clientWidth + 4; };
+  box.addEventListener('scroll', () => hint.classList.add('used'), { passive: true, once: true });
+  new ResizeObserver(() => { if (z === 1) draw(); syncHint(); }).observe(box);
+  syncHint();
   el.addEventListener('click', (e) => {
     const b = e.target.closest('[data-z]');
     if (b) { const c = box.scrollLeft / Math.max(1, box.scrollWidth); z = Math.min(4, Math.max(1, z + (+b.dataset.z) * 0.75)); draw(); box.scrollLeft = c * box.scrollWidth; }

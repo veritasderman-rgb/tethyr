@@ -40,7 +40,6 @@ if isinstance(t, dict) and isinstance(t.get('sekce'), list):  # formát z /home/
             drop = [l['x'] for l in s_['lines'] if key(l['x']) not in want]
             if drop: print('  vynecháno (ve skladbě nezazní):', ' / '.join(drop))
             s_['lines'] = [l for l in s_['lines'] if key(l['x']) in want]
-        secs = [s_ for s_ in secs if s_['lines']]
         n = sum(len(s_['lines']) for s_ in secs)
     sekce = {s_['nazev']: s_['start'] for s_ in t['sekce']}
 else:

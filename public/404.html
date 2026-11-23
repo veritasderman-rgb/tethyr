@@ -8,6 +8,15 @@
 <meta name="theme-color" content="#12100d" />
 <link rel="icon" href="/img/misc/favicon.svg" type="image/svg+xml" />
 <style>
+  /* iterace 10: vlastní písma i na 404 mimo aplikaci (stálé cesty v /fonts, bez hashů) */
+  @font-face{font-family:'Cinzel';font-weight:400;font-display:swap;src:url('/fonts/cinzel-latin-400-normal.woff2') format('woff2')}
+  @font-face{font-family:'Cinzel';font-weight:400;font-display:swap;src:url('/fonts/cinzel-latin-ext-400-normal.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+  @font-face{font-family:'Cardo';font-weight:400;font-display:swap;src:url('/fonts/cardo-latin-400-normal.woff2') format('woff2')}
+  @font-face{font-family:'Cardo';font-weight:400;font-display:swap;src:url('/fonts/cardo-latin-ext-400-normal.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+  @font-face{font-family:'Crimson Text';font-weight:400;font-display:swap;src:url('/fonts/crimson-text-latin-400-normal.woff2') format('woff2')}
+  @font-face{font-family:'Crimson Text';font-weight:400;font-display:swap;src:url('/fonts/crimson-text-latin-ext-400-normal.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+  @font-face{font-family:'Fira Sans';font-weight:500;font-display:swap;src:url('/fonts/fira-sans-latin-500-normal.woff2') format('woff2')}
+  @font-face{font-family:'Fira Sans';font-weight:500;font-display:swap;src:url('/fonts/fira-sans-latin-ext-500-normal.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
   *{box-sizing:border-box}
   html,body{height:100%;margin:0}
   body{background:#12100d;color:#eadfc6;font:400 20px/1.6 'Crimson Text',Cardo,Georgia,serif;display:grid;place-items:center;text-align:center;padding:24px;

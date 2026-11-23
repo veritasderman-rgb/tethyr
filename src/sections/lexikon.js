@@ -1,6 +1,7 @@
 // Lexikon (iterace 7, nahrazuje Rejstřík): osoby (postavy, svědci a vedlejší postavy), místa (2D i 3D mapa),
 // frakce a organizace, pojmy. Abecední rejstřík, filtry, rychlé hledání, detail hesla. Texty jen z dat
 // (public/data/lexikon.json, staví scripts/build-lexikon.py).
+import { openSearch } from '../lib/search.js';
 import { D } from '../lib/data.js';
 import { small, img } from '../lib/img.js';
 import { $, $$, esc, norm, plural, reduced } from '../lib/util.js';
@@ -53,9 +54,14 @@ export function renderLexikon() {
   $$('.lx-abc [data-l]', el).forEach((b) => { if (b.dataset.l && !avail.has(b.dataset.l)) b.disabled = true; });
 
   function run() {
-    const qq = norm(st.q).trim().split(/\s+/).filter(Boolean);
-    const res = E.filter((e) => (!st.t || e.t === st.t) && (!st.l || e._l === st.l) && (!st.s || e.stav === st.s) && (!st.side || e.strana === st.side)
-      && (!st.w || e.wit) && (!st.p || e.img) && qq.every((w) => e._s.includes(w)));
+    let qq = norm(st.q).trim().split(/\s+/).filter(Boolean);
+    const match = (q) => E.filter((e) => (!st.t || e.t === st.t) && (!st.l || e._l === st.l) && (!st.s || e.stav === st.s) && (!st.side || e.strana === st.side)
+      && (!st.w || e.wit) && (!st.p || e.img) && q.every((w) => e._s.includes(w)));
+    let res = match(qq), note = '';
+    // iterace 10: víceslovný dotaz bez výsledku (např. z „Hlavních míst“ knihy) → zkusit nejvýraznější slovo
+    if (!res.length && qq.length > 1) {
+      for (const w of [...qq].filter((x) => x.length >= 4).sort((a, b) => b.length - a.length)) { const r2 = match([w]); if (r2.length) { res = r2; note = w; qq = [w]; break; } }
+    }
     // při hledání nahoru přesná a začínající jména
     if (qq.length) { const q0 = qq.join(' '); res.sort((a, b) => (norm(b.n).startsWith(q0) - norm(a.n).startsWith(q0)) || (!!b.wit - !!a.wit)); }
     $('#lxCount', el).textContent = `${res.length} ${res.length === 1 ? 'heslo' : res.length >= 2 && res.length <= 4 ? 'hesla' : 'hesel'}`;
@@ -64,7 +70,10 @@ export function renderLexikon() {
       <span class="lx-tx"><b>${esc(e.n)}</b><small>${esc(TNAME[e.t])}${e.grp ? ` · ${esc(e.grp)}` : e.reg ? ` · ${esc(e.reg)}` : ''}</small><span class="lx-s">${esc(e.s || '')}</span></span>
       <span class="lx-b">${stavHtml(e)}${e.wit ? '<span class="lx-wb" title="Má svědectví">▶</span>' : ''}</span></button></li>`).join('');
     $('#lxMore', el).hidden = res.length <= st.shown;
+    if (note) list.insertAdjacentHTML('afterbegin', `<li class="lx-note">Přesně „${esc(st.q)}“ v Lexikonu není, ukazuji hesla pro „${esc(note)}“.</li>`);
+    if (!res.length && st.q.trim()) list.innerHTML = `<li class="lx-note">„${esc(st.q)}“ nemá v Lexikonu samostatné heslo. <button class="btn sm" type="button" data-gsearch>Hledat v celé kronice</button></li>`;
   }
+  list.addEventListener('click', (e) => { if (e.target.closest('[data-gsearch]')) openSearch(st.q); });
 
   function sesLinks(ids) {
     return (ids || []).slice(0, 12).map((id) => { const s = D.sesById?.[id]; return s ? `<a href="${H(`#${id}`)}" title="${esc(s.title)}">${esc(s.date_label)}</a>` : ''; }).filter(Boolean).join(' ');

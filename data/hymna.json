@@ -4,6 +4,13 @@
  "delka": 359.952,
  "sekce": [
   {
+   "tag": "Intro",
+   "note": "vypravěč",
+   "label": "Úvod",
+   "lines": [],
+   "start": 0.0
+  },
+  {
    "tag": "Verse 1",
    "note": "",
    "label": "I. sloka",
@@ -186,6 +193,13 @@
     }
    ],
    "start": 188.7
+  },
+  {
+   "tag": "Guitar Solo",
+   "note": "",
+   "label": "Kytarové sólo",
+   "lines": [],
+   "start": 213.4
   },
   {
    "tag": "Final Chorus",
