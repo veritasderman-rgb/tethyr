@@ -4,7 +4,7 @@ import os, pathlib, re
 from playwright.sync_api import sync_playwright
 R = pathlib.Path(__file__).resolve().parent.parent
 M = R / 'public/img/misc'
-# Logo = src/assets/draci.svg (jediný zdroj: dračí hlava). Favicon: tmavý čtverec se zlatou hlavou bez rámečku (čitelné v 16 px).
+# Logo = src/assets/draci.svg (jediný zdroj: heraldický drak, iterace 10). Favicon: tmavý čtverec se zlatým drakem bez rámečku (čitelné v 16 px).
 DR = (R / 'src/assets/draci.svg').read_text(encoding='utf-8')
 INNER = re.search(r'<svg[^>]*>(.*)</svg>', DR, re.S).group(1)
 (M / 'favicon.svg').write_text(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><title>Západní draci</title><rect width="64" height="64" rx="12" fill="#12100d"/><g transform="translate(4.6 5.5) scale(.9)" fill="#c9a54a">{INNER}</g></svg>', encoding='utf-8')
