@@ -294,11 +294,14 @@ Logo bylo znak chrámu. Nahrazeno originálním jednoduchým heraldickým drakem
 - Přehrávač svědka v 3D mapě umí titulky CS / EN / vypnuto sdílené s webem a dodržuje pravidlo jednoho zvuku (`postMessage`: `zd:sound`, `zd:pause`, `zd:submode`).
 
 ### Testy
-`scripts/test-it9.py` (logo, náhledy, titulky v 3D mapě, jeden zvuk). Chromium: it9 38/38. Výsledky ostatních prohlížečů viz níže.
+`scripts/test-it9.py` (logo, náhledy, titulky v 3D mapě, jeden zvuk). Výsledky (sekvenčně, jeden prohlížeč najednou; souběh dvou prohlížečů dával časové limity):
+- Chromium: it8 321/321, it9 38/38, svědci 21/21, přehrávače, zvuk; axe 0 porušení (desktop i mobil); úvod 0,6 MB (limit 1,2), repo 146,8 MB (limit 150), čistý klon `npm ci && npm run build` projde.
+- Firefox: it8 321/321 (po odfiltrování varování Firefoxu o autoplay a scroll-linked efektech, která nejsou chyby), it9 plně bez chyb (3D mapa přeskočena, bez WebGL), svědci 21/21.
+- WebKit: players 1/1, it9 38/38 (včetně 3D mapy), it8 160 kontrol bez chyby, pak pád stránky WebKitu v kontejneru při otevření druhého kontextu na `/proroctvi/2-5`; svědci: 20 OK, 1 chyba (v emulaci iPhonu se video ve smyčce za 6 s nerozběhlo). Obojí vypadá jako omezení headless WebKitu na Linuxu, ne webu (desktop WebKit stejnou kontrolu splní), na skutečném iOS neověřeno.
 
 ### 5 největších zbývajících slabin
 1. **Hlasová svědectví Seltara, Khelbenovy dcery a Arwin** (nahrané dřív) implikují Hoa na vrcholu pyramidy; text je opraven, zvuk by se musel nahrát znovu.
-2. **Firefox a WebKit bez WebGL v tomto prostředí**: 3D mapa tam není ověřena, na skutečném Safari/iOS a telefonu se nic netestovalo.
+2. **Safari/iOS jen v emulaci**: headless WebKit na Linuxu spadl při druhém kontextu na proroctví a v emulaci iPhonu nerozjel video svědka ve smyčce; Firefox bez WebGL (3D mapa přeskočena). Skutečný telefon se netestoval.
 3. **Časy veršů proroctví** jsou ze strojového rozpoznání (zarovnání 94–97 %).
 4. **Repo (143 MB bez git historie) je těsně pod limitem 150 MB**, historie gitu dál roste.
 5. **Nezlomitelné mezery se doplňují za běhu**: v předgenerovaném HTML pro crawlery a bez JavaScriptu zůstanou běžné mezery; fakta i jazyk se hlídají nad daty, ne nad hlasovým zněním.
