@@ -846,9 +846,9 @@
  {
   "id": "gatrya",
   "jmeno": "Gatrya",
-  "role": "vůdkyně Temných panen, Turgenova matka",
+  "role": "vůdkyně Temných panen",
   "strana": "spojenec",
-  "vazba": "Jenovina první důstojnice; na Raukově pohřbu ji Ho svedl dohromady s Tamisem, je matkou Turgena.",
+  "vazba": "Jenovina první důstojnice; na Raukově pohřbu ji Ho svedl dohromady s Tamisem.",
   "hlas_popis": "žena, drowka, tichý nízký hlas, váží slova, dlouhé pauzy, suchý humor",
   "text": [
    "I guarded Dragonflight with the High Priestess long before I heard the name Tamis.",
@@ -866,8 +866,7 @@
    "b-bitva-v-anaurochu",
    "s-2021-03-06",
    "s-2021-04-03",
-   "s-2026-09-05-epilog",
-   "s-2025-12-21"
+   "s-2026-09-05-epilog"
   ],
   "titulky": [
    "Dračí let jsem hlídala dlouho předtím, než jsem slyšela jméno Tamis.",

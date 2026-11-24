@@ -380,6 +380,27 @@ if os.path.exists(TCS):
             if wid in src:
                 check([l['cs'] for l in t['lines']] == [l['cs'] for l in src[wid]['lines']], f'{wid}: české titulky se liší od schváleného zdroje {SRC_CS} (nic se nepřepisuje)')
 
+# ------------------------------------------------------------------ 8) v12.5: nová družina (1491 DR, D&D 5e) do webu nepatří
+# Autor 24. 11. 2026: „dobrodružství skončilo a to další bude definováno jinde“. Kronika končí epilogem (1400 DR);
+# nová hra (Turgen, Ray/Raymond, Niri, Zek, rok 1491 DR, kapitola Nová generace) se nesmí objevit v datech ani v rozhraní.
+# (Název Knihy třetí „Nová krev, Shoonach, Halruaa“ je historie kampaně a zůstává.)
+NOVA = re.compile(r'Turgen\w*|\bRaymond\w*|\bRay\b|\bNiri\b|\bZek(?:a|em|ovi|ův|ova|ovo)?\b|(?<!\d)1491(?!\d)|[Nn]ov(?:á|é|ou) generac\w*|nova-generace|[Nn]ov(?:á|é|ou|ých|ým) družin\w*')
+NOVA_FILES = [(f, p, s) for f, p, s in CORPUS + UI]
+if os.path.exists('public/data/search.json'):
+    NOVA_FILES += [('public/data/search.json', p, s) for p, s in strings(load('public/data/search.json'))]
+for f, p, s in NOVA_FILES:
+    checks += 1
+    m = NOVA.search(s)
+    if m:
+        ctx = s[max(0, m.start() - 50):m.end() + 50].replace('\n', ' ')
+        fail(f'{f} {p}: nová družina (1491 DR) z webu odstraněna: …{ctx}…')
+for f in glob.glob('public/img/nove/n*') + glob.glob('public/img/port/*'):
+    if re.match(r'n(?:01|02|04|05|06|08|11|12|13|63|75|78)\b|(?:turgen|ray|niri|zek)\b', os.path.basename(f)):
+        fail(f'{f}: obrázek nové družiny')
+if os.path.exists('public/data/sessions.json'):
+    for x in load('public/data/sessions.json') if isinstance(load('public/data/sessions.json'), list) else load('public/data/sessions.json').get('sessions', []):
+        check(not (isinstance(x, dict) and x.get('dr') == 1491), f'sezení z roku 1491 DR: {x.get("id") if isinstance(x, dict) else x}')
+
 # ------------------------------------------------------------------ výsledek
 if errors:
     print(f'FAKTA: {len(errors)} porušení invariantů ({checks} kontrol)')

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Iterace 8: web rozdělený na podstránky (History API) a hlas proroctví.
 
-Každá stránka: přímý vstup, reload, zpět, přechod „Dál“ (řetěz od Úvodu po Poděkování přes všech 5 knih a 36 kapitol),
+Každá stránka: přímý vstup, reload, zpět, přechod „Dál“ (řetěz od Úvodu po Poděkování přes všech 5 knih a 35 kapitol),
 drobečky a zvýraznění v menu, staré kotvy → nové adresy (i /index.html#… z 3D mapy), žádné staré #kotvy v odkazech,
 klávesy ←/→ v kapitolách, „Pokračovat ve čtení“, 404. Proroctví: po kliknutí z menu hlas hraje a rozsvícený verš odpovídá
 času, klik na verš skočí, odchod ztiší, přímý vstup ukáže tlačítko; jeden zvuk najednou (svědectví × proroctví × hymna).
@@ -108,7 +108,7 @@ with sync_playwright() as p:
                 want.append(f"/pribeh/kniha-{NUM[bk['key']]}")
                 want += [chp(bk['key'], c) for c in bk['chapters']]
             want += ['/druzina', '/svedectvi', '/bitvy', '/mapa', '/proroctvi', '/osa', '/lexikon', '/u-stolu', '/hymna', '/dokument', '/podekovani']
-            ok(chain == want, T + f'řetěz Dál: {len(chain)} stránek od Úvodu přes 5 knih a 36 kapitol po Poděkování', [x for x in chain if x not in want][:5] + [x for x in want if x not in chain][:5])
+            ok(chain == want, T + f'řetěz Dál: {len(chain)} stránek od Úvodu přes 5 knih a 35 kapitol po Poděkování', [x for x in chain if x not in want][:5] + [x for x in want if x not in chain][:5])
             # zpět v historii: z Poděkování o tři kroky (Dokument nebyl v historii, film se zavřel přes „zpět“)
             pg.go_back(); ready(pg); pg.wait_for_timeout(400)
             ok(here(pg) in ('/hymna', '/u-stolu'), T + 'zpět z Poděkování', here(pg))

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Iterace 10: kontrola živé adresy (nebo náhledu). LIVE_URL=https://tethyr-six.vercel.app PW_PROXY=http://127.0.0.1:<port> python3 scripts/live-check.py
-Přímý vstup na všechny hlavní adresy, všech 36 kapitol a namátkou svědky, bitvy, hesla Lexikonu a verše (HTTP 200 a žádný chybový stav ani 404),
+Přímý vstup na všechny hlavní adresy, všech 35 kapitol a namátkou svědky, bitvy, hesla Lexikonu a verše (HTTP 200 a žádný chybový stav ani 404),
 staré kotvy, hlavičky Cache-Control, /version.json, 404 mimo aplikaci, konzole bez chyb. Snímky do /home/claude/webshots/it10/live/."""
 import os, sys, json, random, urllib.request
 from playwright.sync_api import sync_playwright

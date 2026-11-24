@@ -41,7 +41,7 @@ with sync_playwright() as p:
         ok(st['cur'] == 'uvod', T + 'aktuální oddíl zvýrazněný (Úvod)', st['cur'])
         pg.click('.navp-exp'); pg.wait_for_timeout(700)
         nb = pg.evaluate("document.querySelectorAll('#navBooks details').length + ':' + document.querySelectorAll('#navBooks a[data-ch]').length")
-        ok(nb == '5:36', T + 'Příběh v menu: 5 knih, 36 kapitol', nb)
+        ok(nb == '5:35', T + 'Příběh v menu: 5 knih, 35 kapitol (od v12.5 bez kapitoly Nová generace)', nb)
         pg.evaluate("document.querySelector('#navBooks details').open = true"); pg.wait_for_timeout(200)
         shot(pg, f'{name}-menu')
         # fokus-trap: Tab z posledního prvku se vrátí na první
@@ -107,7 +107,7 @@ with sync_playwright() as p:
         if M: pg.evaluate("document.querySelector('.lx-x')?.click()"); pg.wait_for_timeout(300)
         go(pg, 'lexikon', 600); shot(pg, f'{name}-lexikon')
         # ------------------------------------------------------------ příběh: předěl knihy, kapitoly, hlasy, citace, změny
-        # od it8: kniha = stránka s předělem, každá kapitola = vlastní stránka; součty přes všech 5 knih a 36 kapitol
+        # od it8: kniha = stránka s předělem, každá kapitola = vlastní stránka; součty přes všech 5 knih a 35 kapitol
         go(pg, 'kniha-I', 1500); shot(pg, f'{name}-kniha-predel')
         bk = {k: 0 for k in ('num', 'perex', 'who', 'map', 'chg', 'tr', 'vc', 'vq', 'x')}
         chs = pg.evaluate("[...document.querySelectorAll('#toc [data-toc]')].map(a => a.dataset.toc)")
@@ -121,7 +121,7 @@ with sync_playwright() as p:
             for k, v in r.items(): bk[k] += v
         ok(bk['num'] == 5 and bk['perex'] == 5 and bk['who'] == 5 and bk['map'] == 5, T + 'pět předělů knih (číslo, perex, kdo hrál, mini-mapa)', bk)
         ok(bk['chg'] == 5, T + 'na konci každé knihy „Co se změnilo“', bk)
-        ok(bk['tr'] == 36, T + 'přechody kapitol (36)', bk)
+        ok(bk['tr'] == 35, T + 'přechody kapitol (35)', bk)
         ok(bk['vc'] >= 15 and bk['vq'] >= 8, T + 'hlasy svědků v textu a citace z textů hráčů', bk)
         ok(bk['x'] > 300, T + 'odkazy na hesla (hover karty) v textu', bk)
         go(pg, 'ch-feng-asay-a-tempat-larang', 1400)
@@ -141,7 +141,7 @@ with sync_playwright() as p:
         go(pg, 'ch-thultanthar-a-pyramida-casu', 1400)
         fin = pg.evaluate("document.getElementById('ch-thultanthar-a-pyramida-casu').innerText.replace(/\\u00a0/g, ' ')")
         ok('bitvy o Anauroch' in fin and 'Na vrcholu Pyramidy času svedl Rauko' in fin and 'Ho bojoval po jeho boku' in fin and 'Clariburnuse' in fin, T + 'finále: součást bitvy o Anauroch, Rauko × Rivalen, Ho s Arwin × Clariburnus (upřesnění 23. 11. 11:50)')
-        go(pg, 'ch-nova-generace', 1200)  # „Co se změnilo“ je od it8 na konci poslední kapitoly knihy
+        go(pg, 'ch-epilog', 1200)  # „Co se změnilo“ je od it8 na konci poslední kapitoly knihy (od v12.5 Epilog)
         pg.evaluate("document.querySelector('#stView .book-chg').scrollIntoView({block:'center'})"); pg.wait_for_timeout(1200)
         shot(pg, f'{name}-co-se-zmenilo')
         # ------------------------------------------------------------ anglický dabing: 3 náhodní svědci, nový zvuk a české titulky podle času

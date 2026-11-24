@@ -60,7 +60,7 @@ export function renderParty() {
   const el = $('#druzina');
   const pcs = D.characters.filter((c) => c.kind === 'hrac')
     .sort((a, b) => (yrs(a.active_real)[0] || 9999) - (yrs(b.active_real)[0] || 9999));
-  const main = pcs.filter((c) => c.portrait?.kind === 'port' || ['nathan', 'theira', 'turgen', 'ray', 'zek', 'niri', 'zia'].includes(c.id));
+  const main = pcs.filter((c) => c.portrait?.kind === 'port' || ['nathan', 'theira', 'zia'].includes(c.id));
   const rest = pcs.filter((c) => !main.includes(c));
   const guides = D.characters.filter((c) => c.kind === 'pruvodce');
 
@@ -81,13 +81,13 @@ export function renderParty() {
       <span class="pc-i" data-n="${String(i + 1).padStart(2, '0')}">${portraitHtml(c)}</span>
       <span class="pc-t"><b>${esc(c.full_name || c.name)}</b><i>${esc([c.race, c.class].filter(Boolean).join(' · '))}</i><em>Hraje <strong>${esc(playerOf(c))}</strong> · ${esc(c.active_real || '')}</em>
         ${keyMs(c)}${c.fate ? `<span class="pc-fate">${esc(nb(fateShort(c.fate)))}</span>` : ''}<span class="pc-more">Celý životopis</span></span></button>`).join('')}</div>
-    <aside class="dm rv" aria-label="Pán jeskyně"><div><h4>Pán jeskyně</h4><b>Zdeněk T.</b><p>Hru vedl od první hry v roce 2003 po velké finále 1. srpna 2026. Sám si zahrál jen pixie Zaxe v Sigilských lovcích a goliáše Zeka v nové hře.</p></div><a class="btn red" href="${H(`#podekovani`)}">Poděkování od všech vděčných hráčů</a></aside>
+    <aside class="dm rv" aria-label="Pán jeskyně"><div><h4>Pán jeskyně</h4><b>Zdeněk T.</b><p>Hru vedl od první hry v roce 2003 po velké finále 1. srpna 2026. Sám si zahrál jen pixie Zaxe v Sigilských lovcích.</p></div><a class="btn red" href="${H(`#podekovani`)}">Poděkování od všech vděčných hráčů</a></aside>
     <div class="wrap minor-pcs"><h4>Další postavy hráčů</h4><p>${rest.map((c) => `<button class="chip" data-c="${esc(c.id)}">${esc(c.name)} <span>· ${esc(c.player || '')}</span></button>`).join(' ')}</p>
     <h4>Průvodci a důležité postavy Pána jeskyně</h4><p>${guides.map((c) => `<button class="chip gold" data-c="${esc(c.id)}">${esc(c.name)}</button>`).join(' ')}</p>
     <h4>Protivníci</h4><p>${D.characters.filter((c) => c.kind === 'protivnik').map((c) => `<button class="chip red" data-c="${esc(c.id)}">${esc(c.name)}</button>`).join(' ')}</p></div>
     <div class="wrap players rv"><h3>Hráči a léta u stolu</h3>
       <div class="pl-scroll"><table class="pl"><thead><tr><th>Hráč</th><th>Postavy</th><th class="pl-bar"><div class="pl-yrs">${[2003, 2008, 2013, 2018, 2023].map((y) => `<span style="left:${((y - Y0) / span * 100).toFixed(1)}%">${y}</span>`).join('')}</div></th></tr></thead><tbody>${rows}</tbody></table></div>
-      <p class="small">Hru po celou dobu vedl Pán jeskyně Zdeněk T. Sám si zahrál jen pixie Zaxe v Sigilských lovcích a goliáše Zeka v nové hře. Variona hrál jiný Zdeněk, v tabulce Zdeněk K.</p></div>`;
+      <p class="small">Hru po celou dobu vedl Pán jeskyně Zdeněk T. Sám si zahrál jen pixie Zaxe v Sigilských lovcích. Variona hrál jiný Zdeněk, v tabulce Zdeněk K.</p></div>`;
   el.addEventListener('click', (e) => {
     const b = e.target.closest('[data-c]'); if (!b) return;
     e.preventDefault();

@@ -120,8 +120,8 @@ ERA = {
     'V': ('Kniha pátá', 'Poslední tažení', '2023–2026', '1384–1385 DR'),
 }
 CHN = ast.literal_eval(open(BUILD + '/kniha.py', encoding='utf-8').read().split('CHN=', 1)[1].split('\n', 1)[0])
-CHN.pop('s-2026-02-14', None); CHN['s-2026-05-02'] = 'Thultanthar a Pyramida času'
-GAME = {'hlavni': '', 'lovci': 'Sigilští lovci', 'solo': 'Hra ve dvou', 'priprava': 'Příprava', 'druha': 'Druhá hra', '5e': 'Nová generace'}
+CHN.pop('s-2026-03-28', None); CHN['s-2026-05-02'] = 'Thultanthar a Pyramida času'  # v knize začíná kapitola akcí Maduro, na webu až Do pekla a nazpátek
+GAME = {'hlavni': '', 'lovci': 'Sigilští lovci', 'solo': 'Hra ve dvou', 'priprava': 'Příprava', 'druha': 'Druhá hra'}
 MINOR = {'s-2007-02-09', 's-2007-06-29', 's-2007-07-25', 's-2014-05-22', 's-2014-07-05', 's-2019-12-30', 's-2020-01-11',
          's-2020-04-26', 's-2020-05-29', 's-2020-12-18', 's-2021-06-19', 's-2026-01-10'}
 CAMP = {c['key']: c for c in WD['campaigns']}
@@ -133,7 +133,7 @@ for c in C:
     if c.get('player'):
         for nm in {c['name'], c['name'].split()[0], c['id']}:
             PLAYER[norm(nm)] = c['player'].replace(', Pán jeskyně', '')
-PLAYER['raymond'] = 'Lukáš'; PLAYER['calla'] = 'Jana'
+PLAYER['calla'] = 'Jana'
 
 # ---------------------------------------------------------------- obrázky: seznam k převodu
 JOBS = []  # (src, dst_base, widths, quality)
@@ -253,21 +253,20 @@ CH_ROUTE = {
     'ch-cesta-zapadnich-draku': [71], 'ch-lovci-v-turmishi': [70], 'ch-tovarna-temnych-a-deepgate': [70, 73], 'ch-velka-trhlina': [74, 72],
     'ch-mount-talath-zacatek-konce': [75, 76, 77], 'ch-cham-fau-a-navrat-na-faerun': [78, 79],
     'ch-morske-veze-draci-a-illithide': [79, 82, 83, 84, 81], 'ch-selunarra-a-vyklad-proroctvi': [80, 85], 'ch-vycvik-a-velka-rada': [86],
-    'ch-anauroch': [86, 88], 'ch-thultanthar-a-pyramida-casu': [88, 89, 90], 'ch-epilog': [91, 92], 'ch-nova-generace': [83],
+    'ch-anauroch': [86, 88], 'ch-thultanthar-a-pyramida-casu': [88, 89, 90], 'ch-epilog': [91, 92],
 }
 books = []
 for k, (kap, tit, real, dr) in ERA.items():
     ss = [s for s in sessions if s['era'] == k]
     chapters = []
-    # nová generace (5e) a epilog stojí v páté knize zvlášť, na konci
-    main = [s for s in ss if s.get('dr') != 1491 and s['id'] != 's-2026-09-05-epilog']
+    # epilog stojí v páté knize zvlášť, na konci
+    main = [s for s in ss if s['id'] != 's-2026-09-05-epilog']
     for s in main:
         if s['id'] in CHN or not chapters:
             chapters.append({'title': CHN.get(s['id'], s.get('region', '')).replace('Arenkai', 'Arenkae'), 'sessions': []})
         chapters[-1]['sessions'].append(s['id'])
     if k == 'V':
         chapters.append({'title': 'Epilog: budoucnosti', 'sessions': ['s-2026-09-05-epilog'], 'id': 'ch-epilog'})
-        chapters.append({'title': 'Nová generace', 'sessions': [s['id'] for s in ss if s.get('dr') == 1491]})
     for ch in chapters:
         grp = [s for s in ss if s['id'] in ch['sessions']]
         yrs = sorted({s['year'] for s in grp}); drs = sorted({s['dr'] for s in grp if s.get('dr')})
@@ -292,7 +291,7 @@ for k, (kap, tit, real, dr) in ERA.items():
         ch['regions'] = list(dict.fromkeys(s.get('region') for s in grp if s.get('region')))
         ch['players'] = list(dict.fromkeys(p for s in grp for p in s.get('players', [])))
     c = CAMP.get(k, {})
-    sub = {'I': ['klid'], 'II': ['lovci'], 'III': ['druha'], 'IV': [], 'V': ['epilog', 'nova']}[k]
+    sub = {'I': ['klid'], 'II': ['lovci'], 'III': ['druha'], 'IV': [], 'V': ['epilog']}[k]
     div = next((m['file'][:-4] for m in MAN if m.get('target') == 'kniha-' + k), None)
     books.append({'key': k, 'kap': kap, 'title': tit, 'real': real, 'dr': dr, 'sessions': len(ss), 'summary': c.get('summary', ''),
                   'key_places': c.get('key_places', []), 'key_enemies': c.get('key_enemies', []), 'img': div,
@@ -312,7 +311,7 @@ def portrait_of(cid):
              'yamun-ii': ('ilu', 'T1_040'), 'zesion': ('ilu', 'K_024'), 'devrel': ('ilu', 'K_012'), 'thalaxia': ('ilu', 'K_001'),
              'axel-adamantis': ('ilu', 'K_040'), 'lao': ('ilu', 'T2_026'), 'kung-lao': ('ilu', 'T1_040'), 'mitsurugy': ('ilu', 'K_017'),
              'finian': ('ilu', 'K_018'), 'jenova': ('ilu', 'K_039')}
-    best = {'nathan': 79, 'theira': 17, 'turgen': 75, 'ray': 11, 'zek': 12, 'niri': 13, 'zia': 77, 'arwin': 10, 'sar-saratar': 69, 'agathon': 16}
+    best = {'nathan': 79, 'theira': 17, 'zia': 77, 'arwin': 10, 'sar-saratar': 69, 'agathon': 16}
     if cid in best: return {'src': 'nove/n%02d' % best[cid], 'kind': 'nove'}
     if cid in alias: ilu_need(alias[cid][1]); return {'src': 'ilu/' + alias[cid][1], 'kind': 'ilu'}
     return None
@@ -501,7 +500,7 @@ def lit(name):
 
 CHL = lit('CH'); EV = lit('EV'); BK = lit('BK')
 # DR k reálnému času (z dat sezení)
-drmap = [(sdate(s).year + (sdate(s).timetuple().tm_yday - 1) / 366, s['dr']) for s in S if s.get('dr') and s['dr'] < 1400 and s['game'] != '5e']
+drmap = [(sdate(s).year + (sdate(s).timetuple().tm_yday - 1) / 366, s['dr']) for s in S if s.get('dr') and s['dr'] < 1400]
 timeline = {'lines': [{'name': a, 'player': b, 't0': c, 't1': d, 'lane': e, 'color': f} for a, b, c, d, e, f in CHL],
             'events': [{'t': t, 'label': l} for t, l in EV], 'books': [{'t0': a, 't1': b, 'label': c} for a, b, c, d in BK],
             'dr': drmap, 'dr_events': [x for x in WD['dr_timeline']],

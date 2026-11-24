@@ -143,7 +143,7 @@ with sync_playwright() as p:
     rm = pg.evaluate("""() => ({letters: [...document.querySelectorAll('.hero-t i')].every(i => getComputedStyle(i).opacity === '1'), doors: [...document.querySelectorAll('.door')].every(d => getComputedStyle(d).opacity === '1'),
         canvas: !!document.querySelector('#uvod canvas.ash'), stats: [...document.querySelectorAll('.hero-stats dt')].map(d => d.textContent).join(',')})""")
     ok(rm['letters'] and rm['doors'] and not rm['canvas'], 'reduced motion: obsah hned viditelný, bez částic', rm)
-    ok(rm['stats'].startswith('198'), 'reduced motion: počítadla hned na konečných číslech', rm['stats'])
+    ok(rm['stats'].startswith('191'), 'reduced motion: počítadla hned na konečných číslech', rm['stats'])
     go(pg, 'bitvy', 800); go(pg, 'proroctvi', 800)
     ok(pg.evaluate("[...document.querySelectorAll('.pr-v .vl')].slice(0,6).every(i => getComputedStyle(i).opacity === '1')"), 'reduced motion: verše bez čekání')
     ctx.close()
