@@ -33,6 +33,7 @@ import { initHoverCards } from './lib/hovercard.js';
 import { filmHooks, pfilmHooks } from './lib/filmhook.js';
 import './lib/audio.js';
 import './lib/stale.js';
+import { initMusic } from './lib/bgm.js';
 import { closeDrawer, close as closeLightbox } from './lib/lightbox.js';
 
 // Stránky: kód (dynamický import) a data, která potřebují. Načítají se až při prvním vstupu na stránku.
@@ -52,7 +53,7 @@ register('hymna', S(() => import('./sections/hymna.js'), 'renderHymna'), ['image
 register('podekovani', S(() => import('./sections/podekovani.js'), 'renderPodekovani'), ['images']);
 
 async function boot() {
-  initMenu(); initSearch(); initHoverCards();
+  initMenu(); initSearch(); initHoverCards(); initMusic();
   const bar = $('#topbar');
   const onScroll = () => bar.classList.toggle('solid', window.scrollY > 40 || document.body.dataset.page !== 'uvod');
   window.addEventListener('scroll', onScroll, { passive: true });

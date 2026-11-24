@@ -255,3 +255,11 @@ kbd { display: inline-block; min-width: 1.5em; padding: .15em .4em; border: 1px 
   .lx-list { grid-template-columns: 1fr; }
 }
 @media (min-width: 761px) and (max-width: 900px) { .lx-det { bottom: 0; } }
+
+/* hudební podkres kroniky – vypínač v horní liště */
+.tb-music { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid rgba(168, 132, 44, .4); border-radius: 999px; background: rgba(18, 16, 13, .5); color: var(--parch-dim); cursor: pointer; padding: 0; }
+.tb-music:hover, .tb-music:focus-visible { color: var(--parch); border-color: var(--gold2); }
+.tb-music svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tb-music .x { display: none; }
+.tb-music[aria-pressed="false"] { opacity: .75; }
+.tb-music[aria-pressed="false"] .x { display: inline; }

@@ -89,6 +89,7 @@ export function release(name) { if (owner === name) { owner = null; ownerLost = 
 document.addEventListener('play', (e) => {
   const m = e.target;
   if (!(m instanceof HTMLMediaElement) || m.muted) return;
+  if (m.dataset.bgm) return;   // hudební podkres (bgm.js) nikoho nepozastavuje, sám ustupuje
   // film (Dokument) řídí své zvuky sám: jeho klip hymny nesmí film „připravit“ o hlas ani ho pozastavit
   const inFilm = !!m.closest?.('#film');
   for (const x of document.querySelectorAll('audio, video')) if (x !== m && !x.paused && !x.muted && !(inFilm && (x === voice || x.closest('#film')))) x.pause();
