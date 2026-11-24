@@ -668,7 +668,7 @@ const toHost=msg=>{ try{ if(window.parent!==window) window.parent.postMessage(ms
 function setSubMode(m,fromHost){ try{ localStorage.setItem(SUBKEY,m); }catch(e){} if(!fromHost) toHost({type:'zd:submode',mode:m}); if(wit&&wit.refresh) wit.refresh(); }
 window.addEventListener('message',e=>{ if(e.origin!==location.origin||!e.data||typeof e.data!=='object') return;
   if(e.data.type==='zd:submode'&&['cs','en','off'].includes(e.data.mode)) setSubMode(e.data.mode,true);
-  if(e.data.type==='zd:pause'&&wit&&wit.pause) wit.pause(); });
+  if(e.data.type==='zd:pause'){ if(wit&&wit.pause) wit.pause(); if(TM.au&&!TM.au.paused){ TM.want=0; tmFade(); } } });
 function stopWit(){ if(!wit) return; try{ wit.au.pause(); wit.v&&wit.v.pause(); }catch(e){} cancelAnimationFrame(wit.raf); wit=null; }
 function openWitness(w, fly){ curCard={type:'wit',id:w.id}; if(fly&&w.pl&&BYID[w.pl]) flyToObj(BYID[w.pl]);
   const cc=['cs','en','off'].map(m=>`<button type="button" data-cc="${m}" aria-pressed="${subMode()===m}">${m==='cs'?'CZ':m==='en'?'EN':'vyp'}</button>`).join('');
@@ -689,7 +689,7 @@ function openWitness(w, fly){ curCard={type:'wit',id:w.id}; if(fly&&w.pl&&BYID[w
   const pause=()=>{ au.pause(); v&&v.pause(); btn.textContent='▶ Pokračovat'; show(curK()); };
   wit.refresh=refresh; wit.pause=pause;
   document.querySelectorAll('.wit-cc [data-cc]').forEach(b=>b.addEventListener('click',()=>setSubMode(b.dataset.cc)));
-  btn.onclick=()=>{ if(!w.audio){ sub.textContent='Hlas zatím chybí.'; return; } if(au.paused){ au.volume=0.95; au.play().then(()=>{ toHost({type:'zd:sound',on:true}); v&&v.play().catch(()=>{}); btn.textContent='❚❚ Pozastavit'; tick(); }).catch(()=>{ sub.textContent='Přehrávání zablokoval prohlížeč – klepni znovu.'; }); } else pause(); };
+  btn.onclick=()=>{ if(!w.audio){ sub.textContent='Hlas zatím chybí.'; return; } if(au.paused){ au.volume=0.95; au.play().then(()=>{ toHost({type:'zd:sound',on:true}); tmDuck(); v&&v.play().catch(()=>{}); btn.textContent='❚❚ Pozastavit'; tick(); }).catch(()=>{ sub.textContent='Přehrávání zablokoval prohlížeč – klepni znovu.'; }); } else pause(); };
   au.onended=()=>{ btn.textContent='▶ Přehrát znovu'; v&&v.pause(); sub.textContent=''; };
   refresh(); if(v && !REDUCED) v.play().catch(()=>{});
   setHash('w='+w.id); }
@@ -709,7 +709,17 @@ function showChapter(s){ const c=CHAP[s.ch], el=$('chapT'); if(!c||!el) return; 
   el.style.setProperty('--c',ERA_COL(s.era)); el.innerHTML=`<p class="ck">${esc(e.kap||'')} · u stolu ${esc(c.real)}${c.dr?' · '+esc(c.dr):''}</p><h3>${esc(c.t)}</h3>${tl.tour?`<p class="cs">${esc(s.o.name)} – ${esc(s.what)}</p>`:''}`;
   el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); clearTimeout(chapTimer); chapTimer=setTimeout(()=>el.classList.remove('on'), (tl.tour?5200:3400)/Math.sqrt(tl.speed)); }
 function setSpeed(v){ tl.speed=v; const b=$('tlSpeed'); if(b){ b.textContent=String(v).replace('.',',')+'×'; } }
-function toggleTour(force){ const on=force!=null?force:!tl.tour; if(on===tl.tour) return; tl.tour=on; document.body.classList.toggle('tour',on); $('tlTour').setAttribute('aria-pressed',String(on));
+// hudba k přeletu tažením: klidná fantasy smyčka, náběh a dozvuk, vlastní vypínač (pamatuje se), ztlumí se pod hlasem svědka
+const TM={au:null, want:0, raf:0, off:(()=>{ try{ return localStorage.getItem('mapa3d-tourmus')==='off'; }catch(e){ return false; } })()};
+function tmLevel(){ return (wit&&wit.au&&!wit.au.paused)?0.12:0.55; }
+function tmFade(){ clearInterval(TM.raf); const au=TM.au; if(!au) return; let last=performance.now(); TM.raf=setInterval(()=>{ const now=performance.now(), dt=(now-last)/1000; last=now; const d=TM.want-au.volume, rate=d>0?0.35:0.6; if(Math.abs(d)<=rate*dt){ au.volume=TM.want; clearInterval(TM.raf); if(TM.want===0) au.pause(); return; } au.volume=Math.max(0,Math.min(1,au.volume+Math.sign(d)*rate*dt)); },50); }
+function tmPlay(){ if(TM.off) return; if(!TM.au){ TM.au=new Audio('assets/sounds/tour.mp3'); TM.au.loop=true; TM.au.preload='auto'; TM.au.volume=0; TM.au.setAttribute('playsinline',''); }
+  TM.want=tmLevel(); TM.au.play().then(()=>{ toHost({type:'zd:sound',on:true}); tmFade(); }).catch(()=>{}); }
+function tmStop(){ if(!TM.au) return; TM.want=0; tmFade(); }
+function tmDuck(){ if(TM.au&&!TM.au.paused&&TM.want>0){ TM.want=tmLevel(); tmFade(); } }
+function tmBtn(){ const b=$('tourMusic'); if(b){ b.setAttribute('aria-pressed',String(!TM.off)); b.textContent=TM.off?'♪ Hudba vypnutá':'♪ Hudba'; } }
+function toggleTourMusic(){ TM.off=!TM.off; try{ localStorage.setItem('mapa3d-tourmus',TM.off?'off':'on'); }catch(e){} tmBtn(); if(TM.off) tmStop(); else if(tl.tour) tmPlay(); }
+function toggleTour(force){ const on=force!=null?force:!tl.tour; if(on===tl.tour) return; tl.tour=on; if(on) tmPlay(); else tmStop(); document.body.classList.toggle('tour',on); $('tlTour').setAttribute('aria-pressed',String(on));
   if(on){ tl.diaryWas=tl.diary; tl.diary=false; closeInfo(); tl.lastCh=null; if(tl.i>=STOPS.length-1) tl.i=-1; togglePlay(true); if(tl.i>=0) showChapter(STOPS[tl.i]); }
   else { tl.diary=tl.diaryWas!=null?tl.diaryWas:true; if(tl.playing) togglePlay(false); } }
 const range=$('tlRange'); range.max=String(STOPS.length-1);
@@ -764,7 +774,7 @@ function stepTour(now, dt){
 function holdFor(s){ const n=(s.s||[]).length; const base=tl.tour?2400+Math.min(1800,n*400):3800+Math.min(4000,n*900); const h=(base+(s.o.sphere?1200:0)+(tl.chapHold||0))/tl.speed; tl.chapHold=0; return h; }
 $('tlTour').onclick=()=>toggleTour();
 $('tlSpeed').onclick=()=>{ const L=[0.5,1,2,4]; setSpeed(L[(L.indexOf(tl.speed)+1)%L.length]); };
-$('tourExit').onclick=()=>toggleTour(false);
+$('tourExit').onclick=()=>toggleTour(false); { const b=$('tourMusic'); if(b){ b.onclick=toggleTourMusic; tmBtn(); } }
 $('tlPlay').onclick=()=>togglePlay(); $('tlPrev').onclick=()=>{ togglePlay(false); stepRel(-1); }; $('tlNext').onclick=()=>{ stepRel(1); };
 $('tlDiary').onclick=()=>{ tl.diary=!tl.diary; $('tlDiary').setAttribute('aria-pressed',String(tl.diary)); if(tl.diary&&tl.i>=0) diaryCard(STOPS[tl.i]); else if(curCard&&curCard.type==='stop') closeInfo(); };
 range.addEventListener('input',()=>{ togglePlay(false); const i=+range.value; tl.i=i; const s=STOPS[i]; updateUIForStop(s); setProg(i); token.g.visible=true; tokenLabel.on=true; token.g.position.copy(s.pos); });
@@ -838,7 +848,7 @@ $('btnSound').onclick=()=>{ SND.on=!SND.on; $('btnSound').setAttribute('aria-pre
 function updateSound(){ if(!SND.on||!SND.ctx) return; const tx=controls.target.x, tz=controls.target.z, h=hAt(tx,tz), close=1-smooth(80,900,camD);
   let city=0; for(const o of placeObjs){ if(o.p.kind!=='město') continue; const d=Math.hypot(o.p.x-tx,o.p.z-tz); city=Math.max(city,1-smooth(4,40,d)); }
   const m=maskAt(tx,tz), sea=h<0?1:smooth(2,0,h)*0.6, storm=(moodCur.cl>0.85||moodCur.night>0.3&&moodCur.cl>0.7)?0.5:0;
-  const tgt={music:0.16*(1-close*0.5), musiccity:0.22*city*close, musicwild:0.14*(1-city)*close, wind:(0.08+0.3*Math.max(m[2],m[1],smooth(400,1600,camD)))*(1-sea*0.5), sea:0.45*sea*(0.4+close*0.6), harbor:0.3*city*sea*close, town:0.4*city*close, storm};
+  const mq=(tl.tour&&TM.au&&!TM.au.paused)?0:1; const tgt={music:0.16*(1-close*0.5)*mq, musiccity:0.22*city*close*mq, musicwild:0.14*(1-city)*close*mq, wind:(0.08+0.3*Math.max(m[2],m[1],smooth(400,1600,camD)))*(1-sea*0.5), sea:0.45*sea*(0.4+close*0.6), harbor:0.3*city*sea*close, town:0.4*city*close, storm};
   for(const k in SND.g) SND.g[k].gain.setTargetAtTime(tgt[k]||0, SND.ctx.currentTime, 0.9); }
 
 // ================================================================ ostatní ovládání
@@ -856,7 +866,7 @@ let eggsOn=true;
 window.addEventListener('keydown',e=>{ const tag=e.target.tagName; if(tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA') return; const k=e.key.toLowerCase();
   if(['w','a','s','d','q','e','r','f','arrowup','arrowdown','arrowleft','arrowright','+','-','='].includes(k)&&!(k==='f'&&e.shiftKey)){ if(k==='f'&&!keys.size&&e.repeat===false&&false){} keys.add(k); anim=null; flyMode=null; e.preventDefault(); }
   if(k===' '){ togglePlay(); e.preventDefault(); } else if(k===','){ togglePlay(false); stepRel(-1); } else if(k==='.'){ stepRel(1); } else if(k==='/'){ $('q').focus(); e.preventDefault(); }
-  else if(k==='t'){ toggleTour(); }
+  else if(k==='t'){ toggleTour(); } else if(k==='m'&&tl.tour){ toggleTourMusic(); }
   else if(k==='m'){ toggleMeasure(); } else if(k==='z'){ $('btnSound').click(); } else if(k==='home'){ flyView('all'); } else if(k==='?'){ $('btnLegend').click(); }
   else if(k==='escape'){ if(tl.tour){ toggleTour(false); } else if(!$('lightbox').hidden){ $('lightbox').hidden=true; } else if(!$('legend').hidden){ $('legend').hidden=true; } else if(!info.hidden) closeInfo(); else if(measuring) toggleMeasure(); else closeProbe(); } });
 window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase())); window.addEventListener('blur',()=>keys.clear());
@@ -877,7 +887,7 @@ function perfStep(d){ if(d>0.4||performance.now()-PERF.t0<6000) return; PERF.acc
   if(avg>1/27 && PERF.pr>PERF.min){ PERF.pr=Math.max(PERF.min,PERF.pr-0.25); PERF.good=0; renderer.setPixelRatio(PERF.pr); }
   else if(avg<1/52 && PERF.pr<PERF.max){ if(++PERF.good>=6){ PERF.pr=Math.min(PERF.max,PERF.pr+0.25); PERF.good=0; renderer.setPixelRatio(PERF.pr); } } else PERF.good=0; }
 window.__perf=()=>({pr:PERF.pr,fps:PERF.fps,calls:renderer.info.render.calls,tris:renderer.info.render.triangles,hq:HQ,anim:!!anim,camD:Math.round(camD),lod:terrLOD,frame:frameN});
-window.__map={ scene, renderer, toggleTour, setSpeed, goStop, openPlace:(id)=>openPlace(BYID[id],true), openBattle:(id)=>openBattle(BATT[id],true), openWitness:(id)=>openWitness(WIT[id],true), flyView, togglePlay, camera, controls, setMood:(m)=>{ moodWant=m; setMood(m); }, toggleMeasure, pickMeasure:(a)=>pickMeasure(BYID[a]), flyTo:(p,t,d)=>flyTo(v3(p),v3(t),d), tl, buildArmy:()=>battleObjs.forEach(buildArmy) };
+window.__map={ scene, renderer, toggleTour, tourMusic:TM, toggleTourMusic, setSpeed, goStop, openPlace:(id)=>openPlace(BYID[id],true), openBattle:(id)=>openBattle(BATT[id],true), openWitness:(id)=>openWitness(WIT[id],true), flyView, togglePlay, camera, controls, setMood:(m)=>{ moodWant=m; setMood(m); }, toggleMeasure, pickMeasure:(a)=>pickMeasure(BYID[a]), flyTo:(p,t,d)=>flyTo(v3(p),v3(t),d), tl, buildArmy:()=>battleObjs.forEach(buildArmy) };
 
 // ================================================================ smyčka
 const SNI={ scale:$('scaleTxt'), bar:$('scaleBar') };

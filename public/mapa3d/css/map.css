@@ -286,6 +286,10 @@ body.playing .lbl.place:not(.cur){opacity:.5}
 .btn.tour[aria-pressed="true"]{background:var(--gold2);color:#1a140c}
 #tourExit{display:none;position:fixed;z-index:31;right:calc(14px + env(safe-area-inset-right));top:calc(14px + env(safe-area-inset-top))}
 body.tour #tourExit{display:inline-flex}
+#tourMusic{display:none;position:fixed;z-index:31;right:calc(170px + env(safe-area-inset-right));top:calc(14px + env(safe-area-inset-top))}
+body.tour #tourMusic{display:inline-flex}
+#tourMusic[aria-pressed="false"]{opacity:.7}
+@media (max-width:560px){#tourMusic{right:auto;left:calc(14px + env(safe-area-inset-left))}}
 body.tour #top,body.tour #hint,body.tour #measure,body.tour #probe{opacity:0;pointer-events:none;transition:opacity .8s}
 body.tour #tl{opacity:.82}
 body.tour::before,body.tour::after{content:'';position:fixed;left:0;right:0;height:7vh;background:#000;z-index:20;pointer-events:none;animation:lbx .9s ease both}
