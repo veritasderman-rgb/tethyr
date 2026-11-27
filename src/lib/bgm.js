@@ -27,7 +27,8 @@ function fade() {
   let last = performance.now();
   timer = setInterval(() => {
     const now = performance.now(), dt = (now - last) / 1000; last = now;
-    const d = want - au.volume, rate = d > 0 ? 0.08 : 0.5;  // náběh pomalu, ústup rychle
+    // náběh pomalu, ústup rychle
+    const d = want - au.volume, rate = d > 0 ? 0.08 : 0.5;
     if (Math.abs(d) <= rate * dt) { au.volume = want; clearInterval(timer); if (want === 0) au.pause(); return; }
     au.volume = Math.max(0, Math.min(1, au.volume + Math.sign(d) * rate * dt));
   }, 50);

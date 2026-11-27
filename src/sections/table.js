@@ -53,6 +53,7 @@ export function renderTable() {
       <p>${nb('Místo pro plochu našel Lukáš v bytě v Lázních Kynžvartě, který družina užívala od léta 2024 dva roky. Pod plochu se postavil stůl z OSB desek na trámcích, vysoký 75 cm, aby bylo na jednotky vidět shora. V září 2024 dostala plocha podle šablony šestiúhelníková pole, která se na ni ručně domalovávala fixami. Dodělávaly se i barvy, přechody a detaily; podíleli se na tom hlavně Lukáš a Zdeněk T. Hotová byla 6. května 2025.')}</p>
       <p>${nb('Jednotky Aliance se v červnu 2025 skládaly ve sdílené tabulce do legií po tisíci mužích, některé zůstaly jako dvojlegie. Kouzlící jednotky dostaly seznamy kouzel pro 6., 9. a 12. úroveň. Pepa k tomu na jaře 2026 napsal simulátor, který vyhodnocoval střety legií. Na ploše se hrálo od května 2025 do června 2026.')}</p>
     </div>
+    ${D.gallery.historky?.items?.length ? `<div class="wrap-text st-text st-hist" id="historky"><h3>Historky od stolu</h3><p class="small"><i>${esc(D.gallery.historky.zdroj || '')}</i></p>${D.gallery.historky.items.map((h) => `<h4>${esc(h.t)}</h4><p>${nb(esc(h.p))}</p>`).join('')}</div>` : ''}
     <div class="wrap st-grid" role="list" aria-label="Fotky od stolu">${all.map((it, i) => `<button class="st-p" role="listitem" data-i="${i}" aria-label="${esc(it.cap)}"><img src="${small(it.key)}" alt="" loading="lazy" decoding="async" onload="this.classList.add('ok')"></button>`).join('')}</div>`;
   el.addEventListener('click', (e) => {
     const b = e.target.closest('[data-i]'); if (!b) return;

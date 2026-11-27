@@ -56,7 +56,7 @@ with sync_playwright() as p:
         # karta místa
         pg.evaluate("window.__router.navigate('/mapa?misto=castle-tethyr')"); pg.wait_for_timeout(1500)
         txt = pg.text_content('#mpPanel')
-        check('Castle Tethyr' in txt and 'V Příběhu' in txt and 'Svědci' in txt, f'[{name}] karta místa (příběh, svědci)')
+        check('Castle Tethyr' in txt and 'V Příběhu' in txt.replace('\xa0', ' ') and 'Svědci' in txt, f'[{name}] karta místa (příběh, svědci)')
         pg.screenshot(path=f'{OUT}/{name}-mapa-karta.png')
         links = pg.evaluate("[...document.querySelectorAll('#mpPanel a')].map(a=>a.getAttribute('href'))")
         check(any(h.startswith('/pribeh/kniha-') for h in links) and any(h.startswith('/svedectvi/') for h in links) and any('mapa3d' in h for h in links), f'[{name}] prokliky karty (nové adresy): {len(links)}')

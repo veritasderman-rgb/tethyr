@@ -509,7 +509,7 @@ timeline = {'lines': [{'name': a, 'player': b, 't0': c, 't1': d, 'lane': e, 'col
 # ---------------------------------------------------------------- svět, galerie, fotky, stůl
 world = {'stats': WD['stats'], 'campaigns': WD['campaigns'], 'places': WD['places'], 'factions': WD['factions'],
          'artifacts': WD['artifacts'], 'dr_timeline': WD['dr_timeline'], 'battles': BATTLES}
-gallery = {'nove': [{'n': g['n'], 'kind': g['kind'], 'title': g['title'], 'cap': g.get('caption', ''), 'session': g.get('session'), 'w': g['w'], 'h': g['h']} for g in GAL],
+gallery = {'historky': WD.get('historky', {}), 'nove': [{'n': g['n'], 'kind': g['kind'], 'title': g['title'], 'cap': g.get('caption', ''), 'session': g.get('session'), 'w': g['w'], 'h': g['h']} for g in GAL],
            'foto': [{'n': n, 'dt': FI.get(str(n), {}).get('dt', ''), 'w': FI.get(str(n), {}).get('w'), 'h': FI.get(str(n), {}).get('h')} for n in FOTO],
            'ilu': [{'f': m['file'][:-4], 'target': m.get('target'), 'cap': m.get('caption', ''), 'session': m.get('session'), 'battle': m.get('battle')} for m in MAN]}
 

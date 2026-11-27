@@ -184,7 +184,7 @@ def fix_characters(chars):
             for m in c.get('milestones', []):
                 if 'Rozhovor v Tempat Larangu' in m.get('title', '') and 'Broskvov' not in m.get('text', ''):
                     m['text'] = 'V Broskvové zahradě, kam po smrti přešel: ' + m['text'][:1].lower() + m['text'][1:]
-            c['fate'] = 'Padl ve Feng Asay a přešel do Broskvové zahrady, laoneyského nebe, kde ho lze vyhledat a mluvit s ním; jeho klobouk nosí Ho.'
+            c['fate'] = 'Padl ve Feng Asay a přešel do Broskvové zahrady, laoneyského nebe, kde ho lze vyhledat a mluvit s ním; jeho klobouk nosil Ho až do posledního přestupu, kdy ho odložil.'
             c['status'] = 'padl'
         if c.get('id') == 'ho':
             c['aliases'] = [a for a in c.get('aliases', []) if a != 'Ho Wu Lung']   # jméno je vždy „Ho Wu Long“
