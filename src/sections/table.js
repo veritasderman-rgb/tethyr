@@ -22,7 +22,6 @@ const CAP = {
   603: '29. listopadu 2025, Podzimní mise 2. Plocha přes celou místnost.',
   604: '29. listopadu 2025, Podzimní mise 2. Bitevní plocha Anaurochu.',
   605: '27. června 2026, Thultanthar. Monitor Pána jeskyně s mapou a portréty, pod ním figurky.',
-  606: '27. června 2026, Thultanthar. Poháry s draky.',
   607: '1. srpna 2026, Poslední souboj. U stolu na chatě.',
   608: '1. srpna 2026, Poslední souboj. Draci nad digitální mapou na stole.',
   609: '1. srpna 2026, Poslední souboj. Hvězdná mapa se žetony postav.',
