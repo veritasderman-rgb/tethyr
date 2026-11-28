@@ -17,6 +17,17 @@ const CAP = {
   15: 'Lukáš převáží díly plochy.',
   16: 'Figurky na plochu.',
   600: '1. července 2026. Bitevní plocha Anaurochu je sklizená. Hra se dohrála 1. srpna na chatě.',
+  601: '1. listopadu 2025, Podzimní mise. Figurky na bitevní ploše Anaurochu.',
+  602: '1. listopadu 2025, Podzimní mise. Plocha Anaurochu shora.',
+  603: '29. listopadu 2025, Podzimní mise 2. Plocha přes celou místnost.',
+  604: '29. listopadu 2025, Podzimní mise 2. Bitevní plocha Anaurochu.',
+  605: '27. června 2026, Thultanthar. Monitor Pána jeskyně s mapou a portréty, pod ním figurky.',
+  606: '27. června 2026, Thultanthar. Poháry s draky.',
+  607: '1. srpna 2026, Poslední souboj. U stolu na chatě.',
+  608: '1. srpna 2026, Poslední souboj. Draci nad digitální mapou na stole.',
+  609: '1. srpna 2026, Poslední souboj. Hvězdná mapa se žetony postav.',
+  610: '1. srpna 2026, Poslední souboj. Digitální mapa na stole.',
+  611: '1. srpna 2026, Poslední souboj. Figurky draků.',
 };
 const pad = (n, k = 3) => String(n).padStart(k, '0');
 function dtLabel(dt) {
